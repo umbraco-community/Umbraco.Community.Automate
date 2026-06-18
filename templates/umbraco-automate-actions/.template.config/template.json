@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Umbraco Community",
+  "classifications": ["Umbraco", "Automation", "Actions"],
+  "identity": "Umbraco.Community.Automate.Actions",
+  "name": "Umbraco Automate Actions Provider (Community)",
+  "shortName": "umbraco-automate-actions",
+  "description": "A provider package with a sample action for Umbraco Automate, referencing the published Umbraco.Automate.Core package.",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "Umbraco.Community.Automate.Provider1",
+  "preferNameDirectory": true,
+  "symbols": {
+    "actionName": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "MyAction",
+      "replaces": "MyAction1",
+      "fileRename": "MyAction1",
+      "description": "Name for the sample action class (e.g. CreateIssue, SendEmail)"
+    },
+    "actionNameCamel": {
+      "type": "derived",
+      "valueSource": "actionName",
+      "valueTransform": "firstLowerCase",
+      "replaces": "myAction1"
+    },
+    "providerAlias": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "myProvider",
+      "replaces": "myProvider1",
+      "description": "Alias prefix for actions (e.g. jira, github, smtp)"
+    },
+    "providerName": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "MyProvider",
+      "replaces": "Provider1",
+      "fileRename": "Provider1",
+      "description": "Display name for the provider (e.g. Jira, GitHub, Smtp)"
+    }
+  },
+  "forms": {
+    "firstLowerCase": {
+      "identifier": "firstLowerCase"
+    }
+  }
+}
