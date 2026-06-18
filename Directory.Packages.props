@@ -1,0 +1,47 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!-- Global packages (SourceLink, version-from-git, Umbraco code style analyzer) -->
+  <ItemGroup>
+    <GlobalPackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
+    <GlobalPackageReference Include="Nerdbank.GitVersioning" Version="3.8.118" />
+    <GlobalPackageReference Include="Umbraco.Code" Version="3.0.0-beta" />
+  </ItemGroup>
+
+  <!-- Umbraco CMS -->
+  <ItemGroup>
+    <PackageVersion Include="Umbraco.Cms.Core" Version="[17.4.0, 17.999.999)" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="[17.4.0, 17.999.999)" />
+    <PackageVersion Include="Umbraco.Cms.Web.Common" Version="[17.4.0, 17.999.999)" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="[17.4.0, 17.999.999)" />
+  </ItemGroup>
+
+  <!-- Umbraco.Automate (published core engine + OAuth infra this repo's packages build on) -->
+  <ItemGroup>
+    <PackageVersion Include="Umbraco.Automate.Core" Version="[17.0.0-beta, 17.999.999)" />
+    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="[17.0.0-beta, 17.999.999)" />
+    <PackageVersion Include="Umbraco.Automate.Testing" Version="[17.0.0-beta, 17.999.999)" />
+    <PackageVersion Include="OpenIddict.Client.WebIntegration" Version="[7.4.0, 7.999.999)" />
+  </ItemGroup>
+
+  <!-- Test dependencies -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="[10.0.2, 10.999.999)" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Shouldly" Version="4.2.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+  </ItemGroup>
+
+  <!--
+    Deferred: WorkflowCore, Cronos, JsonSchema.Net.Generation, Microsoft.EntityFrameworkCore.*,
+    Umbraco.GitVersioning.Extensions, Umbraco.JsonSchema.Extensions — these are Umbraco.Automate's
+    own internal engine dependencies and release-tooling extensions, not things a community
+    provider package typically references directly. Add them here if/when a specific package
+    actually needs one (e.g. a package with its own EF Core persistence).
+  -->
+</Project>
