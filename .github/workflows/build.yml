@@ -1,0 +1,42 @@
+name: Build
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Find solutions
+        id: find-solutions
+        shell: bash
+        run: |
+          solutions=$(find . -maxdepth 3 -iname "*.slnx" -not -path "*/templates/*" -not -path "*/node_modules/*" | sort)
+          if [ -z "$solutions" ]; then
+            echo "No solutions found yet — nothing to build."
+            echo "has_solutions=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_solutions=true" >> "$GITHUB_OUTPUT"
+            echo "$solutions"
+          fi
+
+      - name: Restore, build, and test
+        if: steps.find-solutions.outputs.has_solutions == 'true'
+        shell: bash
+        run: |
+          find . -maxdepth 3 -iname "*.slnx" -not -path "*/templates/*" -not -path "*/node_modules/*" | sort | while read -r sln; do
+            echo "::group::$sln"
+            dotnet restore "$sln"
+            dotnet build "$sln" --no-restore --configuration Release
+            dotnet test "$sln" --no-build --configuration Release
+            echo "::endgroup::"
+          done
