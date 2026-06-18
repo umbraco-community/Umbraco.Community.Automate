@@ -1,0 +1,106 @@
+# top-most EditorConfig file
+root = true
+
+############################
+# Global (all files)
+############################
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Keep line length advisory only (many tools ignore this, but harmless)
+max_line_length = 120
+
+############################
+# C# / .NET
+############################
+[*.{cs,csx}]
+indent_style = space
+indent_size = 4
+
+# Avoid churn: don't force var everywhere, don't force "this.", etc.
+# Keep analyzers mostly as-is; set only high-signal preferences.
+
+# Using directives
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+
+# "var" usage: allow either (avoid annoying refactors)
+csharp_style_var_for_built_in_types = false:silent
+csharp_style_var_when_type_is_apparent = false:silent
+csharp_style_var_elsewhere = false:silent
+
+# Expression-bodied members: don't fight developers
+csharp_style_expression_bodied_methods = false:silent
+csharp_style_expression_bodied_properties = true:silent
+
+# Braces: enforce (high signal, prevents bugs)
+csharp_prefer_braces = true:suggestion
+
+# Nullable / simplifications: useful, but don't nag too hard
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:silent
+
+# Suppress/relax naming noise that gets in the way
+# Rider/ReSharper-specific:
+resharper_inconsistent_naming_highlighting = none
+
+# If you use file-scoped namespaces widely, keep it consistent:
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+############################
+# Solution & project files
+############################
+[*.{sln,csproj,fsproj,vbproj,props,targets}]
+indent_style = space
+indent_size = 2
+
+############################
+# TypeScript / JavaScript
+############################
+[*.{ts,tsx,js,jsx,mjs,cjs}]
+indent_style = space
+indent_size = 4
+
+# Don't try to out-format Prettier here; keep it minimal.
+# (Prettier will control semicolons, quotes, trailing commas, etc.)
+
+############################
+# JSON
+############################
+[*.{json,jsonc}]
+indent_style = space
+indent_size = 2
+
+############################
+# Web / styles
+############################
+[*.{css,scss,less,html,htm}]
+indent_style = space
+indent_size = 2
+
+############################
+# Markdown
+############################
+[*.md]
+# Common choice: keep trailing whitespace (Markdown line breaks) intact
+trim_trailing_whitespace = false
+indent_style = space
+indent_size = 2
+max_line_length = off
+
+############################
+# YAML
+############################
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+############################
+# Shell / scripts
+############################
+[*.sh]
+indent_style = space
+indent_size = 2

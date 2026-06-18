@@ -1,0 +1,3 @@
+# Add commit hashes here for bulk formatting or refactoring passes
+# that should be ignored by git blame.
+# Configure with: git config blame.ignoreRevsFile .git-blame-ignore-revs
