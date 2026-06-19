@@ -1,0 +1,16 @@
+{
+    "name": "@umbraco-community-automate/google-sheets",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "watch": "tsc && vite build --watch",
+        "build": "tsc && vite build"
+    },
+    "dependencies": {
+        "@umbraco-cms/backoffice": "^17.4.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.9.2",
+        "vite": "^7.3.2"
+    }
+}
