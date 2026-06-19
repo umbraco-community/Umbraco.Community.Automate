@@ -1,0 +1,14 @@
+{
+    "id": "Umbraco.Community.Automate.GoogleSheets",
+    "name": "Umbraco Community Automate Google Sheets",
+    "version": "0.0.0",
+    "allowTelemetry": true,
+    "extensions": [
+        {
+            "name": "Umbraco Community Automate Google Sheets",
+            "alias": "UmbracoCommunityAutomateGoogleSheets.Bundle",
+            "type": "bundle",
+            "js": "/App_Plugins/UmbracoCommunityAutomateGoogleSheets/umbraco-community-automate-google-sheets-manifests.js"
+        }
+    ]
+}
