@@ -9,7 +9,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Connection;
 /// </summary>
 [ConnectionType("googleSheets", "Google Sheets",
     Group = "Productivity",
-    Icon = "icon-sheet",
+    Icon = "icon-google-sheets",
     Description = "Connect to Google Sheets")]
 public sealed class GoogleSheetsConnectionType : OAuthConnectionTypeBase<GoogleSheetsConnectionSettings>
 {

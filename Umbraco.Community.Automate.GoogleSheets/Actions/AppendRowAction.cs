@@ -14,7 +14,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("googleSheets.appendRow", "Append Row to Google Sheet",
     Description = "Appends a row of values to a Google Sheet.",
     Group = "Productivity",
-    Icon = "icon-sheet",
+    Icon = "icon-google-sheets",
     ConnectionTypeAlias = "googleSheets")]
 public sealed class AppendRowAction : ActionBase<AppendRowSettings, AppendRowOutput>
 {
