@@ -24,5 +24,5 @@ public sealed class GoogleSheetsConnectionType : OAuthConnectionTypeBase<GoogleS
     }
 
     /// <inheritdoc />
-    public override string ProviderName => "Google";
+    public override string ProviderName => "GoogleSheets";
 }

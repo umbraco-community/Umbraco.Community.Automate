@@ -13,6 +13,6 @@ public class GoogleSheetsConnectionSettings
     [Field(Label = "Google Account",
         Description = "Authenticate with the Google account that owns the spreadsheet.",
         EditorUiAlias = "Umb.Automate.OAuth",
-        EditorConfig = """[{ "alias": "provider", "value": "Google" }]""")]
+        EditorConfig = """[{ "alias": "provider", "value": "GoogleSheets" }]""")]
     public Guid? OAuthCredentialsId { get; set; }
 }

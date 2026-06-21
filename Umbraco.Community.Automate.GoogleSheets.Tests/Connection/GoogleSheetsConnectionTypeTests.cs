@@ -11,10 +11,10 @@ namespace Umbraco.Community.Automate.GoogleSheets.Tests.Connection;
 public class GoogleSheetsConnectionTypeTests
 {
     [Fact]
-    public void ProviderName_is_Google()
+    public void ProviderName_is_GoogleSheets()
     {
         var sut = CreateSut(out _);
-        sut.ProviderName.ShouldBe("Google");
+        sut.ProviderName.ShouldBe("GoogleSheets");
     }
 
     [Fact]

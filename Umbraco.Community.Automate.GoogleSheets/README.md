@@ -29,7 +29,7 @@ Create an OAuth 2.0 Client ID in the [Google Cloud Console](https://console.clou
   "Umbraco": {
     "Automate": {
       "Providers": {
-        "Google": {
+        "GoogleSheets": {
           "ClientId": "your-google-oauth-client-id",
           "ClientSecret": "your-google-oauth-client-secret",
           "Scopes": [ "https://www.googleapis.com/auth/spreadsheets" ]
@@ -42,7 +42,9 @@ Create an OAuth 2.0 Client ID in the [Google Cloud Console](https://console.clou
 
 Keep the client secret out of source control — use environment variables, user secrets, or a key vault to inject it at deployment time.
 
-The OAuth callback URI follows the convention `{your-site}/umbraco/automate/oauth/callback/google` — add it to your OAuth client's **Authorized redirect URIs** in the Google Cloud Console.
+The OAuth callback URI follows the convention `{your-site}/umbraco/automate/oauth/callback/googlesheets` — add it to your OAuth client's **Authorized redirect URIs** in the Google Cloud Console.
+
+The provider is registered as `GoogleSheets` rather than the generic `Google`, so other Google-flavored Automate packages (Drive, Gmail, etc.) can register their own OpenIddict client without colliding with this one — OpenIddict rejects two registrations that share the same provider name without a distinct identifier.
 
 Once configured, create a Google Sheets connection in a workspace from the backoffice and authorize it via the OAuth popup. The **Append Row to Google Sheet** action can then reference the connection — paste the sheet's URL or ID, the tab name, and the ordered column values to append.
 
