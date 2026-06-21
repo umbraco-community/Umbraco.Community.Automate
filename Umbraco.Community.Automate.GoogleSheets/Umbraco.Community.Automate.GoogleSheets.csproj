@@ -43,4 +43,11 @@
         <Content Include="appsettings-schema.Umbraco.Community.Automate.GoogleSheets.json" PackagePath="" Visible="false" />
     </ItemGroup>
 
+    <!-- Ships as the NuGet package README (see PackageReadmeFile in Directory.Build.props) and
+         drives the Umbraco Marketplace listing's description, since this repo relies on the
+         auto-sourced NuGet metadata rather than a hosted umbraco-marketplace.json override. -->
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+
 </Project>

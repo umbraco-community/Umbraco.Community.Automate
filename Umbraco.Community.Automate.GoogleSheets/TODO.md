@@ -5,7 +5,7 @@ Tracked in priority order. Check items off as they land; add new ones at the bot
 ## Now
 
 - [ ] **CI workflow** — nothing currently runs the test suite on push/PR. Add a GitHub Actions workflow (`dotnet build`/`dotnet test` at minimum) so this and future PRs get automated signal.
-- [ ] **Package README.md** — `Umbraco.Community.Automate.GoogleSheets/` has no README. Needed for discoverability and so contributors don't have to read the source to understand what it does or how to configure it.
+- [x] **Package README.md** — ships in the NuGet package and drives the Umbraco Marketplace listing's description.
 
 ## Next
 
