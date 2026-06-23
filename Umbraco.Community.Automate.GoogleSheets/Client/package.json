@@ -4,13 +4,21 @@
     "type": "module",
     "scripts": {
         "watch": "tsc && vite build --watch",
-        "build": "tsc && vite build"
+        "build": "tsc && vite build",
+        "test": "web-test-runner",
+        "test:watch": "web-test-runner --watch"
     },
     "dependencies": {
         "@umbraco-cms/backoffice": "^17.4.0"
     },
     "devDependencies": {
         "typescript": "^5.9.2",
-        "vite": "^7.3.2"
+        "vite": "^7.3.2",
+        "@open-wc/testing": "^4.0.0",
+        "@types/mocha": "^10.0.10",
+        "@web/dev-server-esbuild": "^1.0.0",
+        "@web/dev-server-import-maps": "^0.2.0",
+        "@web/test-runner": "^0.18.0",
+        "@web/test-runner-playwright": "^0.11.0"
     }
 }

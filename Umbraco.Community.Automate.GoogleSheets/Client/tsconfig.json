@@ -20,7 +20,7 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
 
-        "types": ["@umbraco-cms/backoffice/extension-types"]
+        "types": ["@umbraco-cms/backoffice/extension-types", "mocha"]
     },
     "include": ["src"]
 }
