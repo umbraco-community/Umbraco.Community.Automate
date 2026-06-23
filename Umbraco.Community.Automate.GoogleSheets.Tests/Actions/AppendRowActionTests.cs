@@ -107,6 +107,74 @@ public class AppendRowActionTests
         result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_succeeds_with_zeroed_output_when_response_body_omits_updates()
+    {
+        // Google's success responses always include "updates", but the deserialization is
+        // defensive about it (Updates is nullable) — this documents that a 200 with no
+        // "updates" object degrades to a zeroed output rather than throwing.
+        var httpClientFactory = CreateHttpClientFactory(StubHandler(HttpStatusCode.OK, "{}", _ => { }));
+
+        var creds = new Mock<IOAuthCredentialsService>();
+        creds.Setup(c => c.GetValidAccessTokenAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync("tok123");
+
+        var result = await ActionTestHarness.For<AppendRowAction>()
+            .WithService(httpClientFactory)
+            .WithService(creds.Object)
+            .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
+            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .ExecuteAsync();
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        var output = (AppendRowOutput)result.OutputData!;
+        output.UpdatedRange.ShouldBeNull();
+        output.UpdatedRows.ShouldBe(0);
+        output.UpdatedCells.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_fails_invalid_response_when_body_is_not_json()
+    {
+        var httpClientFactory = CreateHttpClientFactory(
+            StubHandler(HttpStatusCode.OK, "<html>not json</html>", _ => { }));
+
+        var creds = new Mock<IOAuthCredentialsService>();
+        creds.Setup(c => c.GetValidAccessTokenAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync("tok123");
+
+        var result = await ActionTestHarness.For<AppendRowAction>()
+            .WithService(httpClientFactory)
+            .WithService(creds.Object)
+            .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
+            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .ExecuteAsync();
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_fails_invalid_response_when_body_is_truncated_json()
+    {
+        var httpClientFactory = CreateHttpClientFactory(
+            StubHandler(HttpStatusCode.OK, """{"updates":{"updatedRange":"Sheet1!A2:B2""", _ => { }));
+
+        var creds = new Mock<IOAuthCredentialsService>();
+        creds.Setup(c => c.GetValidAccessTokenAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync("tok123");
+
+        var result = await ActionTestHarness.For<AppendRowAction>()
+            .WithService(httpClientFactory)
+            .WithService(creds.Object)
+            .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
+            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .ExecuteAsync();
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+    }
+
     private static IHttpClientFactory CreateHttpClientFactory(HttpMessageHandler handler)
     {
         var client = new HttpClient(handler);
