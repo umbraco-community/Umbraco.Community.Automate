@@ -1,3 +1,4 @@
+using Umbraco.Community.Automate.Demo.E2E;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,13 @@ builder.CreateUmbracoBuilder()
     .AddWebsite()
     .AddComposers()
     .Build();
+
+if (AutomateE2EMode.IsEnabled)
+{
+    builder.Services.AddTransient<GoogleSheetsStubHandler>();
+    builder.Services.AddHttpClient("UmbracoAutomate")
+        .AddHttpMessageHandler<GoogleSheetsStubHandler>();
+}
 
 WebApplication app = builder.Build();
 
@@ -24,5 +32,10 @@ app.UseUmbraco()
         u.UseBackOfficeEndpoints();
         u.UseWebsiteEndpoints();
     });
+
+if (AutomateE2EMode.IsEnabled)
+{
+    app.MapAutomateE2EEndpoints();
+}
 
 await app.RunAsync();
