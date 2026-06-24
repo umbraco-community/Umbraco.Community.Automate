@@ -25,13 +25,18 @@ public static class GoogleApiErrorParser
                 "to a connection authenticated with an account that does have access.",
                 StepRunErrorCategory.InvalidResponse),
 
-            // Google deliberately returns NOT_FOUND for both "doesn't exist" and "exists but not
-            // shared with you", to avoid confirming a private file's existence — so the message
-            // can't claim either with confidence.
+            // Google's own API design checks permission before existence (see
+            // https://google.aip.dev/193), so a sheet that exists but isn't shared with the
+            // caller should surface as PERMISSION_DENIED above, not this. Confirmed NOT_FOUND
+            // is what a genuinely wrong/deleted spreadsheet ID returns. Real-world reports (e.g.
+            // various automation tools' support threads) do show this same message appearing for
+            // access-flavored problems too, so the hint below is phrased as a possibility to
+            // check, not a confident claim about why.
             "NOT_FOUND" => (
                 "Google couldn't find a spreadsheet at that URL or ID. Double-check it's correct " +
-                "— note that Google also returns this message when a spreadsheet exists but " +
-                "hasn't been shared with the connected account.",
+                "— if it looks right, also confirm the spreadsheet has been shared with the " +
+                "connected Google account, since access problems can sometimes surface this same " +
+                "error.",
                 StepRunErrorCategory.Validation),
 
             "INVALID_ARGUMENT" => (
@@ -39,6 +44,13 @@ public static class GoogleApiErrorParser
                 "spreadsheet URL/ID and that the sheet/tab name matches exactly, including " +
                 "capitalization.",
                 StepRunErrorCategory.Validation),
+
+            // Documented at https://developers.google.com/workspace/sheets/api/limits — the
+            // engine has a dedicated category for this rather than treating it as a hard failure.
+            "RESOURCE_EXHAUSTED" => (
+                "Google is rate-limiting requests to the Sheets API right now. This will need to " +
+                "be retried after a short wait.",
+                StepRunErrorCategory.RateLimiting),
 
             _ => ($"Google Sheets API error ({statusCode}): {body}", StepRunErrorCategory.InvalidResponse),
         };
