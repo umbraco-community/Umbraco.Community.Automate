@@ -4,7 +4,7 @@ Tracked in priority order. Check items off as they land; add new ones at the bot
 
 ## Now
 
-- [ ] **CI workflow** — nothing currently runs the test suite on push/PR. Add a GitHub Actions workflow (`dotnet build`/`dotnet test` at minimum) so this and future PRs get automated signal.
+- [x] **CI workflow** — `.github/workflows/ci.yml` runs backend unit tests, frontend unit tests, and the full Playwright E2E suite against the Demo site, on PRs to `main` and via manual dispatch.
 - [x] **Package README.md** — ships in the NuGet package and drives the Umbraco Marketplace listing's description.
 
 ## Next
