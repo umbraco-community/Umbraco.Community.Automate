@@ -44,4 +44,23 @@ export default defineConfig({
             },
         },
     ],
+
+    webServer: {
+        cwd: join(__dirname, '../../Umbraco.Community.Automate.Demo'),
+        command: 'dotnet run --urls "https://localhost:44343;http://localhost:52012"',
+        // Polled over plain HTTP because Node's built-in TCP/HTTP checker can't validate the
+        // self-signed dev cert on the HTTPS port — browser tests still go over HTTPS via `baseURL`.
+        // /umbraco/api/health/ready returns 503 during unattended install/migrations and 200 once
+        // Umbraco reaches RuntimeLevel.Run, so Playwright only proceeds once it's fully booted.
+        url: 'http://localhost:52012/umbraco/api/health/ready',
+        stdout: 'pipe',
+        stderr: 'pipe',
+        ignoreHTTPSErrors: true,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120 * 1000,
+        env: {
+            ASPNETCORE_ENVIRONMENT: 'Development',
+            AUTOMATE_E2E_MODE: '1',
+        },
+    },
 });
