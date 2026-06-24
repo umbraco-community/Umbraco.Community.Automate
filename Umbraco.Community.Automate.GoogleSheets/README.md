@@ -50,9 +50,11 @@ Once configured, create a Google Sheets connection in a workspace from the backo
 
 ## Troubleshooting
 
-If a run fails with a message that Google "couldn't find a spreadsheet" at the given URL/ID, this can mean either the link is wrong **or** that the spreadsheet exists but hasn't been shared with the Google account used by the connection — Google's API deliberately returns the same "not found" response for both cases, so it can't be told apart automatically. Check both: that the URL/ID is correct, and that the file has been shared with (or owned by) the connected account.
+If a run fails saying the connected account doesn't have access to the spreadsheet, share the spreadsheet with that specific Google account, or authorize the connection using an account that already has access to it.
 
-If a run fails saying the connected account doesn't have access, share the spreadsheet with that specific Google account, or authorize the connection using an account that already has access to it.
+If a run fails with a message that Google "couldn't find a spreadsheet" at the given URL/ID, double-check the link or ID is correct — that's usually a typo or a stale link. If it looks right, also check the sharing settings: access problems can occasionally surface as this same "not found" error rather than the access-denied one above.
+
+If a run fails saying Google is rate-limiting requests, this isn't an error with your setup — the [Sheets API has a fixed request quota](https://developers.google.com/workspace/sheets/api/limits), and the run will need to be retried after a short wait.
 
 ## License
 
