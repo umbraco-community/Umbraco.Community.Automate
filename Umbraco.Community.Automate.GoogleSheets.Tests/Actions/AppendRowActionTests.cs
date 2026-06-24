@@ -159,6 +159,30 @@ public class AppendRowActionTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_fails_rate_limited_with_friendly_message_when_quota_exceeded()
+    {
+        var httpClientFactory = CreateHttpClientFactory(
+            StubHandler(HttpStatusCode.TooManyRequests,
+                """{"error":{"code":429,"message":"Quota exceeded for quota metric 'Read requests'.","status":"RESOURCE_EXHAUSTED"}}""",
+                _ => { }));
+
+        var creds = new Mock<IOAuthCredentialsService>();
+        creds.Setup(c => c.GetValidAccessTokenAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync("tok123");
+
+        var result = await ActionTestHarness.For<AppendRowAction>()
+            .WithService(httpClientFactory)
+            .WithService(creds.Object)
+            .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
+            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .ExecuteAsync();
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.RateLimiting);
+        result.Exception!.Message.ShouldContain("rate-limiting requests");
+    }
+
+    [Fact]
     public async Task ExecuteAsync_fails_validation_without_calling_api_when_link_is_unrelated_site()
     {
         var callCount = 0;

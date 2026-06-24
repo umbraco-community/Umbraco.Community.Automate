@@ -38,6 +38,16 @@ public class GoogleApiErrorParserTests
     }
 
     [Fact]
+    public void Parse_maps_resource_exhausted_to_a_friendly_message_and_rate_limiting()
+    {
+        var (message, category) = GoogleApiErrorParser.Parse(429,
+            """{"error":{"code":429,"message":"Quota exceeded for quota metric 'Read requests'.","status":"RESOURCE_EXHAUSTED"}}""");
+
+        category.ShouldBe(StepRunErrorCategory.RateLimiting);
+        message.ShouldContain("rate-limiting requests");
+    }
+
+    [Fact]
     public void Parse_falls_back_to_raw_body_for_unrecognized_status()
     {
         var (message, category) = GoogleApiErrorParser.Parse(500,
