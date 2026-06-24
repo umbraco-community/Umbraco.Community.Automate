@@ -48,6 +48,12 @@ The provider is registered as `GoogleSheets` rather than the generic `Google`, s
 
 Once configured, create a Google Sheets connection in a workspace from the backoffice and authorize it via the OAuth popup. The **Append Row to Google Sheet** action can then reference the connection — paste the sheet's URL or ID, the tab name, and the ordered column values to append.
 
+## Troubleshooting
+
+If a run fails with a message that Google "couldn't find a spreadsheet" at the given URL/ID, this can mean either the link is wrong **or** that the spreadsheet exists but hasn't been shared with the Google account used by the connection — Google's API deliberately returns the same "not found" response for both cases, so it can't be told apart automatically. Check both: that the URL/ID is correct, and that the file has been shared with (or owned by) the connected account.
+
+If a run fails saying the connected account doesn't have access, share the spreadsheet with that specific Google account, or authorize the connection using an account that already has access to it.
+
 ## License
 
 MIT — see [LICENSE](../LICENSE) for details.

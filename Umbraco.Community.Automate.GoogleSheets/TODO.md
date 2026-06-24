@@ -10,7 +10,7 @@ Tracked in priority order. Check items off as they land; add new ones at the bot
 ## Next
 
 - [x] **Test coverage gaps** — malformed/partial Google API JSON responses in `AppendRowAction`.
-- [ ] **Friendlier error surfacing** — `AppendRowAction` currently dumps the raw Google API error JSON into the exception message. Parse it into a cleaner, user-facing message.
+- [x] **Friendlier error surfacing** — `GoogleApiErrorParser` now turns `PERMISSION_DENIED`/`NOT_FOUND`/`INVALID_ARGUMENT` Google API errors into clear, user-facing messages instead of raw JSON, and `AppendRowAction` rejects an obviously non-Google-Sheets URL before ever calling the API.
 
 ## New actions
 
