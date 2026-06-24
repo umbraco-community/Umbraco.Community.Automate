@@ -10,6 +10,7 @@ builder.CreateUmbracoBuilder()
 
 if (AutomateE2EMode.IsEnabled)
 {
+    builder.Services.AddSingleton<GoogleSheetsRequestLog>();
     builder.Services.AddTransient<GoogleSheetsStubHandler>();
     builder.Services.AddHttpClient("UmbracoAutomate")
         .AddHttpMessageHandler<GoogleSheetsStubHandler>();

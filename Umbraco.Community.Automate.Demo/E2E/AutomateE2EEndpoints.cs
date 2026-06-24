@@ -17,6 +17,7 @@ public static class AutomateE2EEndpoints
     public static IEndpointRouteBuilder MapAutomateE2EEndpoints(this IEndpointRouteBuilder app)
     {
         app.MapPost("/umbraco-automate-e2e/seed-google-sheets", SeedGoogleSheetsConnectionAsync);
+        app.MapGet("/umbraco-automate-e2e/google-sheets-requests", DrainGoogleSheetsRequests);
         return app;
     }
 
@@ -57,5 +58,12 @@ public static class AutomateE2EEndpoints
             cancellationToken: cancellationToken);
 
         return Results.Ok(new { connectionId = connection.Id, connectionAlias = connection.Alias });
+    }
+
+    // Drain (read + clear) rather than read-only, so a test can call this right after triggering a
+    // run and only see the requests its own run produced, without leftovers from earlier tests.
+    private static IResult DrainGoogleSheetsRequests(GoogleSheetsRequestLog requestLog)
+    {
+        return Results.Ok(new { requests = requestLog.Drain() });
     }
 }

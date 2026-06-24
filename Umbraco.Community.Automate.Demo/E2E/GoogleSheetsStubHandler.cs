@@ -12,12 +12,24 @@ namespace Umbraco.Community.Automate.Demo.E2E;
 /// </summary>
 public sealed class GoogleSheetsStubHandler : DelegatingHandler
 {
+    private readonly GoogleSheetsRequestLog _requestLog;
+
+    public GoogleSheetsStubHandler(GoogleSheetsRequestLog requestLog)
+    {
+        _requestLog = requestLog;
+    }
+
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         if (request.RequestUri?.Host != "sheets.googleapis.com")
         {
             return base.SendAsync(request, cancellationToken);
         }
+
+        // The sheet name (and spreadsheet id) only ever appear in the request URL — Google's
+        // append endpoint takes no body field for them — so recording the URL is enough for a
+        // test to confirm a value bound from a previous step's output actually reached this call.
+        _requestLog.Record(request.RequestUri.ToString());
 
         var response = new HttpResponseMessage(HttpStatusCode.OK)
         {
