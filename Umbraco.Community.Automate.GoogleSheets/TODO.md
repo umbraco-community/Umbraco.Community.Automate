@@ -9,7 +9,7 @@ Tracked in priority order. Check items off as they land; add new ones at the bot
 
 ## Next
 
-- [ ] **Test coverage gaps** — malformed/partial Google API JSON responses in `AppendRowAction`; currently only covers well-formed success/error shapes.
+- [x] **Test coverage gaps** — malformed/partial Google API JSON responses in `AppendRowAction`.
 - [ ] **Friendlier error surfacing** — `AppendRowAction` currently dumps the raw Google API error JSON into the exception message. Parse it into a cleaner, user-facing message.
 
 ## New actions
