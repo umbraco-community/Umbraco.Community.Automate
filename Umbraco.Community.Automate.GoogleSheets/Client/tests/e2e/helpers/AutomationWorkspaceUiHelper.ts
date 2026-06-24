@@ -51,6 +51,45 @@ export class AutomationWorkspaceUiHelper extends BasePage {
         return this.page.locator('ua-google-sheets-column-list .row');
     }
 
+    // Each canvas node renders its own icon-only "Settings" button (accessible name comes from
+    // its `title` attribute, not visible text), so with more than one step on the canvas a bare
+    // role locator is ambiguous. Scope to the node carrying the step's alias chip instead.
+    async openStepSettings(stepAlias: string): Promise<void> {
+        const node = this.page.locator('.ua-node--action').filter({ hasText: stepAlias });
+        await this.click(node.getByTitle('Settings'));
+    }
+
+    async clickAddColumn(): Promise<void> {
+        await this.click(this.page.getByRole('button', { name: 'Add column' }));
+    }
+
+    async clickRemoveColumn(rowIndex: number): Promise<void> {
+        await this.click(this.getColumnRows().nth(rowIndex).getByRole('button', { name: 'Remove' }));
+    }
+
+    async getColumnInputValue(rowIndex: number): Promise<string> {
+        return this.getValue(this.getColumnRows().nth(rowIndex).getByRole('textbox'));
+    }
+
+    // The picker only offers binding sources once `ua-node-settings-modal` resolves the step's
+    // predecessor output schemas asynchronously, so this button isn't necessarily present yet
+    // the instant the modal opens — waitForVisible covers that load.
+    async clickInsertBinding(rowIndex: number): Promise<void> {
+        const button = this.getColumnRows().nth(rowIndex).getByRole('button', { name: 'Insert binding' });
+        await this.waitForVisible(button);
+        await this.click(button);
+    }
+
+    // Selects a leaf in the real `ua-binding-picker` modal by source step alias and output
+    // property path (e.g. "first" / "updatedRange") — this both submits the modal and splices
+    // the binding expression into the row that opened it. Scoping by source alias matters: a
+    // step with exactly one predecessor gets both a "steps.<alias>" source AND a "previous"
+    // pseudo-source offering the *same* leaf paths, so an unscoped `name=` lookup is ambiguous.
+    async selectBindingLeaf(sourceAlias: string, path: string): Promise<void> {
+        const box = this.page.locator('ua-binding-picker uui-box').filter({ hasText: sourceAlias });
+        await this.click(box.locator(`uui-ref-node[name="${path}"]`));
+    }
+
     // The tree row's quick-action buttons (e.g. Run now) render as a hover-revealed popover that
     // is not a DOM descendant of the row despite appearing nested in the accessibility tree, so
     // the action button has to be queried unscoped rather than scoped under the row locator.
