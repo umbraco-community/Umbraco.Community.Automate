@@ -87,10 +87,12 @@ public class AppendRowActionTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_fails_invalid_response_when_api_returns_error_status()
+    public async Task ExecuteAsync_fails_with_friendly_message_when_caller_lacks_permission()
     {
         var httpClientFactory = CreateHttpClientFactory(
-            StubHandler(HttpStatusCode.Forbidden, """{"error":{"code":403,"message":"The caller does not have permission"}}""", _ => { }));
+            StubHandler(HttpStatusCode.Forbidden,
+                """{"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}""",
+                _ => { }));
 
         var creds = new Mock<IOAuthCredentialsService>();
         creds.Setup(c => c.GetValidAccessTokenAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
@@ -105,6 +107,84 @@ public class AppendRowActionTests
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
         result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+        result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_fails_validation_with_friendly_message_when_spreadsheet_not_found()
+    {
+        var httpClientFactory = CreateHttpClientFactory(
+            StubHandler(HttpStatusCode.NotFound,
+                """{"error":{"code":404,"message":"Requested entity was not found.","status":"NOT_FOUND"}}""",
+                _ => { }));
+
+        var creds = new Mock<IOAuthCredentialsService>();
+        creds.Setup(c => c.GetValidAccessTokenAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync("tok123");
+
+        var result = await ActionTestHarness.For<AppendRowAction>()
+            .WithService(httpClientFactory)
+            .WithService(creds.Object)
+            .WithSettings(new AppendRowSettings { SpreadsheetId = "DOES_NOT_EXIST", SheetName = "Sheet1", Columns = ["x"] })
+            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .ExecuteAsync();
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.Validation);
+        result.Exception!.Message.ShouldContain("couldn't find a spreadsheet");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_fails_validation_with_friendly_message_when_argument_invalid()
+    {
+        var httpClientFactory = CreateHttpClientFactory(
+            StubHandler(HttpStatusCode.BadRequest,
+                """{"error":{"code":400,"message":"Invalid range.","status":"INVALID_ARGUMENT"}}""",
+                _ => { }));
+
+        var creds = new Mock<IOAuthCredentialsService>();
+        creds.Setup(c => c.GetValidAccessTokenAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync("tok123");
+
+        var result = await ActionTestHarness.For<AppendRowAction>()
+            .WithService(httpClientFactory)
+            .WithService(creds.Object)
+            .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Not A Real Tab", Columns = ["x"] })
+            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .ExecuteAsync();
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.Validation);
+        result.Exception!.Message.ShouldContain("rejected the spreadsheet ID or sheet name");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_fails_validation_without_calling_api_when_link_is_unrelated_site()
+    {
+        var callCount = 0;
+        var httpClientFactory = CreateHttpClientFactory(
+            StubHandler(HttpStatusCode.OK, "{}", _ => callCount++));
+
+        var creds = new Mock<IOAuthCredentialsService>();
+        creds.Setup(c => c.GetValidAccessTokenAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+             .ReturnsAsync("tok123");
+
+        var result = await ActionTestHarness.For<AppendRowAction>()
+            .WithService(httpClientFactory)
+            .WithService(creds.Object)
+            .WithSettings(new AppendRowSettings
+            {
+                SpreadsheetId = "https://www.dropbox.com/s/abc123/notes.xlsx",
+                SheetName = "Sheet1",
+                Columns = ["x"],
+            })
+            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .ExecuteAsync();
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.Validation);
+        result.Exception!.Message.ShouldContain("doesn't look like a Google Sheets link");
+        callCount.ShouldBe(0);
     }
 
     [Fact]
