@@ -53,6 +53,16 @@ public sealed class AppendRowAction : ActionBase<AppendRowSettings, AppendRowOut
                 StepRunErrorCategory.Validation);
         }
 
+        if (SpreadsheetIdParser.LooksLikeUnrelatedUrl(settings.SpreadsheetId))
+        {
+            return ActionResult.Failed(
+                new ArgumentException(
+                    "That doesn't look like a Google Sheets link. Paste the full URL from your " +
+                    "browser's address bar (e.g. https://docs.google.com/spreadsheets/d/.../edit) " +
+                    "or just the spreadsheet ID."),
+                StepRunErrorCategory.Validation);
+        }
+
         var connectionSettings = context.Connection?.GetSettings<GoogleSheetsConnectionSettings>();
         if (connectionSettings?.OAuthCredentialsId is not { } credentialId || credentialId == Guid.Empty)
         {
@@ -82,9 +92,8 @@ public sealed class AppendRowAction : ActionBase<AppendRowSettings, AppendRowOut
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync(cancellationToken);
-                return ActionResult.Failed(
-                    new InvalidOperationException($"Google Sheets API error ({(int)response.StatusCode}): {error}"),
-                    StepRunErrorCategory.InvalidResponse);
+                var (message, category) = GoogleApiErrorParser.Parse((int)response.StatusCode, error);
+                return ActionResult.Failed(new InvalidOperationException(message), category);
             }
 
             var parsed = await response.Content.ReadFromJsonAsync<AppendApiResponse>(cancellationToken);
