@@ -31,8 +31,7 @@ Create an OAuth 2.0 Client ID in the [Google Cloud Console](https://console.clou
       "Providers": {
         "GoogleSheets": {
           "ClientId": "your-google-oauth-client-id",
-          "ClientSecret": "your-google-oauth-client-secret",
-          "Scopes": [ "https://www.googleapis.com/auth/spreadsheets" ]
+          "ClientSecret": "your-google-oauth-client-secret"
         }
       }
     }
