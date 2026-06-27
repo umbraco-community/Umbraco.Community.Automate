@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 
@@ -14,10 +14,22 @@ public sealed class GoogleSheetsComposer : IComposer
     /// <inheritdoc />
     public void Compose(IUmbracoBuilder builder)
     {
+        // Validate credentials at startup — if ClientId or ClientSecret are missing,
+        // GoogleSheetsOAuthOptionsValidator logs a warning with actionable guidance then
+        // returns ValidateOptionsResult.Fail(), causing ValidateOnStart to throw before
+        // the first request rather than producing a cryptic "registration not found" error
+        // at challenge time.
+        builder.Services
+            .AddOptions<GoogleSheetsOAuthOptions>()
+            .BindConfiguration(GoogleSheetsOAuthOptions.SectionPath)
+            .ValidateOnStart();
+
+        builder.Services.AddSingleton<IValidateOptions<GoogleSheetsOAuthOptions>, GoogleSheetsOAuthOptionsValidator>();
+
         // Read credentials at composition time — same path the Core's PostConfigure reads from,
         // so appsettings structure stays consistent for users installing multiple Google packages.
-        var clientId = builder.Config["Umbraco:Automate:Providers:GoogleSheets:ClientId"] ?? string.Empty;
-        var clientSecret = builder.Config["Umbraco:Automate:Providers:GoogleSheets:ClientSecret"] ?? string.Empty;
+        var clientId = builder.Config[$"{GoogleSheetsOAuthOptions.SectionPath}:ClientId"] ?? string.Empty;
+        var clientSecret = builder.Config[$"{GoogleSheetsOAuthOptions.SectionPath}:ClientSecret"] ?? string.Empty;
 
         builder.Services.AddOpenIddict()
             .AddClient(options =>
