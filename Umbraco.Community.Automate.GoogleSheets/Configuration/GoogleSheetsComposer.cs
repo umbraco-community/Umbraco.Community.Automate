@@ -14,11 +14,13 @@ public sealed class GoogleSheetsComposer : IComposer
     /// <inheritdoc />
     public void Compose(IUmbracoBuilder builder)
     {
-        // Validate credentials at startup — if ClientId or ClientSecret are missing,
-        // GoogleSheetsOAuthOptionsValidator logs a warning with actionable guidance then
-        // returns ValidateOptionsResult.Fail(), causing ValidateOnStart to throw before
-        // the first request rather than producing a cryptic "registration not found" error
-        // at challenge time.
+        // Register validation BEFORE reading credentials. ValidateOnStart fires via
+        // IHostedService.StartAsync — after service resolution completes. OpenIddict's
+        // SetClientId throws ArgumentException during service resolution (when
+        // AuthenticationSchemeProvider is constructed), which happens earlier. Registering
+        // here guarantees our warning log and OptionsValidationException are emitted on
+        // any startup where credentials are absent, even when the OpenIddict registration
+        // is skipped by the guard below.
         builder.Services
             .AddOptions<GoogleSheetsOAuthOptions>()
             .BindConfiguration(GoogleSheetsOAuthOptions.SectionPath)
@@ -30,6 +32,14 @@ public sealed class GoogleSheetsComposer : IComposer
         // so appsettings structure stays consistent for users installing multiple Google packages.
         var clientId = builder.Config[$"{GoogleSheetsOAuthOptions.SectionPath}:ClientId"] ?? string.Empty;
         var clientSecret = builder.Config[$"{GoogleSheetsOAuthOptions.SectionPath}:ClientSecret"] ?? string.Empty;
+
+        // Skip the OpenIddict registration when credentials are absent. SetClientId throws
+        // ArgumentException on an empty string during service resolution — before ValidateOnStart
+        // has a chance to fire — producing a cryptic error. The early return prevents that crash;
+        // ValidateOnStart (registered above) then surfaces the problem on startup with our clear
+        // warning log and OptionsValidationException.
+        if (string.IsNullOrEmpty(clientId))
+            return;
 
         builder.Services.AddOpenIddict()
             .AddClient(options =>
