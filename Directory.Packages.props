@@ -4,10 +4,10 @@
     <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Umbraco.Automate" Version="17.0.0-beta" />
-    <PackageVersion Include="Umbraco.Automate.Core" Version="17.0.0-beta" />
-    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="17.0.0-beta" />
-    <PackageVersion Include="Umbraco.Automate.Testing" Version="17.0.0-beta" />
+    <PackageVersion Include="Umbraco.Automate" Version="17.0.0-beta.1" />
+    <PackageVersion Include="Umbraco.Automate.Core" Version="17.0.0-beta.1" />
+    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="17.0.0-beta.1" />
+    <PackageVersion Include="Umbraco.Automate.Testing" Version="17.0.0-beta.1" />
     <PackageVersion Include="Umbraco.Cms" Version="17.4.2" />
     <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.4.2" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />

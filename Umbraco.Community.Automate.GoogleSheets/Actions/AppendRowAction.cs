@@ -53,6 +53,13 @@ public sealed class AppendRowAction : ActionBase<AppendRowSettings, AppendRowOut
                 StepRunErrorCategory.Validation);
         }
 
+        if (settings.Columns is not { Count: > 0 })
+        {
+            return ActionResult.Failed(
+                new ArgumentException("At least one column value is required."),
+                StepRunErrorCategory.Validation);
+        }
+
         if (SpreadsheetIdParser.LooksLikeUnrelatedUrl(settings.SpreadsheetId))
         {
             return ActionResult.Failed(

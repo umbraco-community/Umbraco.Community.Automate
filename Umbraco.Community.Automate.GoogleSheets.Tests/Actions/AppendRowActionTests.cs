@@ -155,7 +155,7 @@ public class AppendRowActionTests
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
         result.ErrorCategory.ShouldBe(StepRunErrorCategory.Validation);
-        result.Exception!.Message.ShouldContain("rejected the spreadsheet ID or sheet name");
+        result.Exception!.Message.ShouldContain("sheet/tab name doesn't match");
     }
 
     [Fact]

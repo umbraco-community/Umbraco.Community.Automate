@@ -11,7 +11,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Connection;
     Group = "Productivity",
     Icon = "icon-google-sheets",
     Description = "Connect to Google Sheets")]
-public sealed class GoogleSheetsConnectionType : OAuthConnectionTypeBase<GoogleSheetsConnectionSettings>
+public sealed class  GoogleSheetsConnectionType : OAuthConnectionTypeBase<GoogleSheetsConnectionSettings>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="GoogleSheetsConnectionType"/> class.

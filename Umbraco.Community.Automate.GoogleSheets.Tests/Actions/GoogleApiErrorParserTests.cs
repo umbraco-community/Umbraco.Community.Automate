@@ -34,7 +34,7 @@ public class GoogleApiErrorParserTests
             """{"error":{"code":400,"message":"Invalid range.","status":"INVALID_ARGUMENT"}}""");
 
         category.ShouldBe(StepRunErrorCategory.Validation);
-        message.ShouldContain("rejected the spreadsheet ID or sheet name");
+        message.ShouldContain("sheet/tab name doesn't match");
     }
 
     [Fact]

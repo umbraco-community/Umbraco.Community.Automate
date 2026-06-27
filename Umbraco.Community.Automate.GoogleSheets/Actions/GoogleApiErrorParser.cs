@@ -39,10 +39,16 @@ public static class GoogleApiErrorParser
                 "error.",
                 StepRunErrorCategory.Validation),
 
+            // Real-world testing shows Google also returns INVALID_ARGUMENT when a personal
+            // Google account tries to access a Google Workspace spreadsheet it has no permission
+            // to (cross-domain access). The primary cause is still a wrong ID/tab name, but the
+            // message includes the access-denied possibility so users don't chase their config
+            // when the real fix is sharing the sheet.
             "INVALID_ARGUMENT" => (
-                "Google rejected the spreadsheet ID or sheet name as invalid. Double-check the " +
-                "spreadsheet URL/ID and that the sheet/tab name matches exactly, including " +
-                "capitalization.",
+                "Google rejected the request — this usually means the sheet/tab name doesn't " +
+                "match exactly (check capitalisation), or the spreadsheet URL/ID is wrong. If " +
+                "both look correct, the connected Google account may not have permission to " +
+                "access this spreadsheet.",
                 StepRunErrorCategory.Validation),
 
             // Documented at https://developers.google.com/workspace/sheets/api/limits — the
