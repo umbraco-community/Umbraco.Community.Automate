@@ -1,3 +1,7 @@
 <Solution>
+  <Folder Name="/GoogleSheets/">
+    <Project Path="Umbraco.Community.Automate.GoogleSheets.Tests/Umbraco.Community.Automate.GoogleSheets.Tests.csproj" />
+    <Project Path="Umbraco.Community.Automate.GoogleSheets/Umbraco.Community.Automate.GoogleSheets.csproj" />
+  </Folder>
   <Project Path="Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj" />
 </Solution>

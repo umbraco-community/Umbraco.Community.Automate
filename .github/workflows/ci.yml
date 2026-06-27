@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  NODE_VERSION: '22.x'
+  CLIENT_DIR: Umbraco.Community.Automate.GoogleSheets/Client
+
+jobs:
+  backend-tests:
+    name: Backend unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - run: dotnet restore
+
+      - run: dotnet build --no-restore --configuration Release
+
+      - run: dotnet test Umbraco.Community.Automate.GoogleSheets.Tests --no-build --configuration Release
+
+  frontend-unit-tests:
+    name: Frontend unit tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/Umbraco.Community.Automate.GoogleSheets/Client
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.CLIENT_DIR }}/package-lock.json
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm test
+
+  e2e-tests:
+    name: Playwright E2E tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # Kestrel needs a cert to bind the HTTPS port the Demo site (and Playwright's baseURL)
+      # use. Trust isn't required: playwright.config.ts already sets `ignoreHTTPSErrors: true`.
+      - run: dotnet dev-certs https
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.CLIENT_DIR }}/package-lock.json
+
+      - working-directory: ${{ github.workspace }}/${{ env.CLIENT_DIR }}
+        run: npm ci
+
+      # wwwroot is generated output (gitignored) — the Demo site serves whatever's already
+      # built there as static web assets, so a fresh checkout has no column-list editor bundle
+      # until this runs. Skipping this step is why the UI tests below failed in the first run:
+      # the custom element never registered, so its rows never rendered.
+      - working-directory: ${{ github.workspace }}/${{ env.CLIENT_DIR }}
+        run: npm run build
+
+      - working-directory: ${{ github.workspace }}/${{ env.CLIENT_DIR }}
+        run: npx playwright install --with-deps chromium
+
+      # playwright.config.ts's `webServer` block starts the Demo site itself (with
+      # AUTOMATE_E2E_MODE=1) and waits for /umbraco/api/health/ready, so this step doesn't
+      # need to boot it separately. Credentials match the Demo site's fixed unattended-install
+      # admin account (Umbraco.Community.Automate.Demo/appsettings.Development.json) — not a
+      # secret, since it only ever exists in this throwaway, freshly-seeded SQLite instance.
+      - working-directory: ${{ github.workspace }}/${{ env.CLIENT_DIR }}
+        env:
+          URL: https://localhost:44343
+          UMBRACO_USER_LOGIN: admin@example.com
+          UMBRACO_USER_PASSWORD: password1234
+        run: npx playwright test
+
+      # test-results/ holds traces and screenshots for any failing test regardless of which
+      # reporter ran (playwright.config.ts uses the 'line' reporter in CI, which never writes
+      # playwright-report/ — that's an HTML-reporter-only output).
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-test-results
+          path: ${{ env.CLIENT_DIR }}/test-results/
+          retention-days: 7
+          if-no-files-found: ignore

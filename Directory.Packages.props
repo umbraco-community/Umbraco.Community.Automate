@@ -1,0 +1,23 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Umbraco.Automate" Version="17.0.0-beta.1" />
+    <PackageVersion Include="Umbraco.Automate.Core" Version="17.0.0-beta.1" />
+    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="17.0.0-beta.1" />
+    <PackageVersion Include="Umbraco.Automate.Testing" Version="17.0.0-beta.1" />
+    <PackageVersion Include="Umbraco.Cms" Version="17.4.2" />
+    <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.4.2" />
+    <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
+    <PackageVersion Include="OpenIddict.Client.WebIntegration" Version="[7.4.0, 7.999.999)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="Shouldly" Version="4.2.1" />
+  </ItemGroup>
+</Project>
