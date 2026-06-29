@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Title>Umbraco Community Automate Google Sheets</Title>
+        <Description>Google Sheets connection and actions for Umbraco Automate</Description>
+        <PackageTags>umbraco automate automation google sheets umbraco-marketplace</PackageTags>
+        <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+        <StaticWebAssetBasePath>App_Plugins/UmbracoCommunityAutomateGoogleSheets</StaticWebAssetBasePath>
+        <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- Dont include the client folder as part of packaging nuget build -->
+        <Content Remove="Client\**" />
+
+        <!-- However make the Umbraco-package.json included for dotnet pack or nuget package and visible to the solution -->
+        <None Include="Client\public\umbraco-package.json" Pack="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="wwwroot\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Umbraco.Automate.Core" />
+        <PackageReference Include="Umbraco.Automate.OpenIddict" />
+        <PackageReference Include="OpenIddict.Client.WebIntegration" />
+    </ItemGroup>
+
+    <!-- Ship buildTransitive props so consuming sites' CopyUmbracoJsonSchemaFiles target
+         (from Umbraco.Cms.Targets) discovers the schema and copies it into the project. -->
+    <ItemGroup>
+        <Content Include="buildTransitive\**" PackagePath="buildTransitive" />
+    </ItemGroup>
+
+    <!-- Hand-written JSON schema describing the appsettings.json shape this provider reads.
+         Not auto-generated on build (no JsonSchema.Net.Generation dependency) — update by hand
+         alongside GoogleSheetsComposer/GoogleSheetsConnectionType if the config shape changes. -->
+    <ItemGroup>
+        <Content Include="appsettings-schema.Umbraco.Community.Automate.GoogleSheets.json" PackagePath="" Visible="false" />
+    </ItemGroup>
+
+    <!-- Ships as the NuGet package README (see PackageReadmeFile in Directory.Build.props) and
+         drives the Umbraco Marketplace listing's description, since this repo relies on the
+         auto-sourced NuGet metadata rather than a hosted umbraco-marketplace.json override. -->
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+</Project>
