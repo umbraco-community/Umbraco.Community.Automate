@@ -45,7 +45,7 @@ public sealed class FindRowSettings
     /// </summary>
     [Field(
         Label = "Match mode",
-        Description = "How to compare the search value against each cell. Exact (default) requires the whole value to match.",
+        Description = "How to compare the search value against each cell. Exact (default) requires the whole value to match. Always returns the first matching row.",
         SortOrder = 4,
         EditorUiAlias = "Umb.PropertyEditorUi.Dropdown",
         EditorConfig = """[{ "alias": "items", "value": ["Exact", "Contains", "StartsWith", "EndsWith"] }]""")]
