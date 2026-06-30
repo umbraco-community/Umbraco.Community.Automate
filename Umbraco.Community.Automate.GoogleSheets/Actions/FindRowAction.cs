@@ -93,17 +93,17 @@ public sealed class FindRowAction : ActionBase<FindRowSettings, FindRowOutput>
             var rows = parsed?.Values ?? [];
             var columnIndex = ColumnLetterParser.ToIndex(settings.SearchColumn);
 
+            var comparison = settings.CaseSensitive
+                ? StringComparison.Ordinal
+                : StringComparison.OrdinalIgnoreCase;
+
+            var matchMode = Enum.TryParse<FindRowMatchMode>(settings.MatchMode, ignoreCase: true, out var m)
+                ? m : FindRowMatchMode.Exact;
+
             for (var i = 0; i < rows.Count; i++)
             {
                 var row = rows[i];
                 var cellValue = columnIndex < row.Count ? row[columnIndex] : string.Empty;
-
-                var comparison = settings.CaseSensitive
-                    ? StringComparison.Ordinal
-                    : StringComparison.OrdinalIgnoreCase;
-
-                var matchMode = Enum.TryParse<FindRowMatchMode>(settings.MatchMode, ignoreCase: true, out var m)
-                    ? m : FindRowMatchMode.Exact;
 
                 var isMatch = matchMode switch
                 {
