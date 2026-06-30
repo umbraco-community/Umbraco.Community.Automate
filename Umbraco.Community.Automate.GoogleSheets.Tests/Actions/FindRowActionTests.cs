@@ -108,7 +108,7 @@ public class FindRowActionTests
     }
 
     [Fact]
-    public async Task ExecuteAsync_search_is_case_sensitive()
+    public async Task ExecuteAsync_search_is_case_insensitive_by_default()
     {
         var handler = StubHandler(HttpStatusCode.OK, """
             {
@@ -118,6 +118,99 @@ public class FindRowActionTests
 
         var result = await BuildHarness(handler,
             new FindRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", SearchColumn = "A", SearchValue = "alice" });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("found");
+        ((FindRowOutput)result.OutputData!).RowNumber.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_search_is_case_sensitive_when_enabled()
+    {
+        var handler = StubHandler(HttpStatusCode.OK, """
+            {
+              "values": [["alice"], ["Alice"], ["ALICE"]]
+            }
+            """);
+
+        var result = await BuildHarness(handler,
+            new FindRowSettings
+            {
+                SpreadsheetId = "SHEET_ID",
+                SheetName = "Sheet1",
+                SearchColumn = "A",
+                SearchValue = "alice",
+                CaseSensitive = true,
+            });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("found");
+        ((FindRowOutput)result.OutputData!).RowNumber.ShouldBe(1);
+    }
+
+    [Theory]
+    [InlineData("Exact",      false, "bob smith",  "found",    1)]
+    [InlineData("Exact",      true,  "bob smith",  "notFound", 0)]
+    [InlineData("Exact",      true,  "Bob Smith",  "found",    1)]
+    [InlineData("Contains",   false, "alice",      "found",    2)]
+    [InlineData("Contains",   true,  "alice",      "notFound", 0)]
+    [InlineData("Contains",   true,  "Alice",      "found",    2)]
+    [InlineData("StartsWith", false, "bob",        "found",    1)]
+    [InlineData("StartsWith", true,  "bob",        "notFound", 0)]
+    [InlineData("StartsWith", true,  "Bob",        "found",    1)]
+    [InlineData("EndsWith",   false, "doe",        "found",    3)]
+    [InlineData("EndsWith",   true,  "doe",        "notFound", 0)]
+    [InlineData("EndsWith",   true,  "DOE",        "found",    3)]
+    public async Task ExecuteAsync_matches_according_to_mode_and_case_sensitivity(
+        string matchMode, bool caseSensitive, string searchValue, string expectedOutcome, int expectedRowNumber)
+    {
+        var handler = StubHandler(HttpStatusCode.OK, """
+            {
+              "values": [
+                ["Bob Smith", "bob@example.com"],
+                ["Alice Brown", "alice@example.com"],
+                ["CHARLIE DOE", "charlie@example.com"]
+              ]
+            }
+            """);
+
+        var result = await BuildHarness(handler,
+            new FindRowSettings
+            {
+                SpreadsheetId = "SHEET_ID",
+                SheetName = "Sheet1",
+                SearchColumn = "A",
+                SearchValue = searchValue,
+                MatchMode = matchMode,
+                CaseSensitive = caseSensitive,
+            });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe(expectedOutcome);
+        ((FindRowOutput)result.OutputData!).RowNumber.ShouldBe(expectedRowNumber);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_unrecognised_match_mode_falls_back_to_exact_case_insensitive()
+    {
+        var handler = StubHandler(HttpStatusCode.OK, """
+            {
+              "values": [
+                ["Bob Smith", "bob@example.com"],
+                ["Alice Brown", "alice@example.com"]
+              ]
+            }
+            """);
+
+        var result = await BuildHarness(handler,
+            new FindRowSettings
+            {
+                SpreadsheetId = "SHEET_ID",
+                SheetName = "Sheet1",
+                SearchColumn = "A",
+                SearchValue = "bob smith",
+                MatchMode = "Fuzzy",
+            });
 
         result.Status.ShouldBe(ActionResultStatus.Success);
         result.Outcome.ShouldBe("found");

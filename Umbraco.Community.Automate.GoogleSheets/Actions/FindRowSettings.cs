@@ -38,4 +38,26 @@ public sealed class FindRowSettings
         SortOrder = 3,
         SupportsBindings = true)]
     public string SearchValue { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the match mode. Stored as a string so the dropdown picker
+    /// round-trips cleanly — parsed into <see cref="FindRowMatchMode"/> at execute time.
+    /// </summary>
+    [Field(
+        Label = "Match mode",
+        Description = "How to compare the search value against each cell. Exact (default) requires the whole value to match.",
+        SortOrder = 4,
+        EditorUiAlias = "Umb.PropertyEditorUi.Dropdown",
+        EditorConfig = """[{ "alias": "items", "value": ["Exact", "Contains", "StartsWith", "EndsWith"] }]""")]
+    public string MatchMode { get; set; } = nameof(FindRowMatchMode.Exact);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether matching is case-sensitive.
+    /// </summary>
+    [Field(
+        Label = "Case sensitive",
+        Description = "When off, 'Bob' matches 'bob'. Off by default.",
+        SortOrder = 5,
+        EditorUiAlias = "Umb.PropertyEditorUi.Toggle")]
+    public bool CaseSensitive { get; set; } = false;
 }

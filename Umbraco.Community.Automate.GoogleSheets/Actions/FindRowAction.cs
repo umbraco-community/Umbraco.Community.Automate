@@ -98,8 +98,22 @@ public sealed class FindRowAction : ActionBase<FindRowSettings, FindRowOutput>
                 var row = rows[i];
                 var cellValue = columnIndex < row.Count ? row[columnIndex] : string.Empty;
 
-                if (!string.Equals(cellValue, settings.SearchValue, StringComparison.Ordinal))
-                    continue;
+                var comparison = settings.CaseSensitive
+                    ? StringComparison.Ordinal
+                    : StringComparison.OrdinalIgnoreCase;
+
+                var matchMode = Enum.TryParse<FindRowMatchMode>(settings.MatchMode, ignoreCase: true, out var m)
+                    ? m : FindRowMatchMode.Exact;
+
+                var isMatch = matchMode switch
+                {
+                    FindRowMatchMode.Contains   => cellValue.Contains(settings.SearchValue, comparison),
+                    FindRowMatchMode.StartsWith => cellValue.StartsWith(settings.SearchValue, comparison),
+                    FindRowMatchMode.EndsWith   => cellValue.EndsWith(settings.SearchValue, comparison),
+                    _                           => string.Equals(cellValue, settings.SearchValue, comparison),
+                };
+
+                if (!isMatch) continue;
 
                 var output = new FindRowOutput
                 {
