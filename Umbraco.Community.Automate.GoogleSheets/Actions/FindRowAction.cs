@@ -119,7 +119,7 @@ public sealed class FindRowAction : ActionBase<FindRowSettings, FindRowOutput>
                 {
                     Found = true,
                     RowNumber = i + 1,
-                    Values = row,
+                    Values = [..row],
                 };
                 return SuccessWithOutcome("found", output);
             }

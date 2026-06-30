@@ -139,13 +139,13 @@ public class FindRowActionTests
                 SpreadsheetId = "SHEET_ID",
                 SheetName = "Sheet1",
                 SearchColumn = "A",
-                SearchValue = "alice",
+                SearchValue = "ALICE",
                 CaseSensitive = true,
             });
 
         result.Status.ShouldBe(ActionResultStatus.Success);
         result.Outcome.ShouldBe("found");
-        ((FindRowOutput)result.OutputData!).RowNumber.ShouldBe(1);
+        ((FindRowOutput)result.OutputData!).RowNumber.ShouldBe(3);
     }
 
     [Theory]
