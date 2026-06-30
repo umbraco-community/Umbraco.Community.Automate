@@ -161,6 +161,9 @@ public class FindRowActionTests
     [InlineData("EndsWith",   false, "doe",        "found",    3)]
     [InlineData("EndsWith",   true,  "doe",        "notFound", 0)]
     [InlineData("EndsWith",   true,  "DOE",        "found",    3)]
+    [InlineData("Contains",   false, "", "found", 1)]
+    [InlineData("StartsWith", false, "", "found", 1)]
+    [InlineData("EndsWith",   false, "", "found", 1)]
     public async Task ExecuteAsync_matches_according_to_mode_and_case_sensitivity(
         string matchMode, bool caseSensitive, string searchValue, string expectedOutcome, int expectedRowNumber)
     {

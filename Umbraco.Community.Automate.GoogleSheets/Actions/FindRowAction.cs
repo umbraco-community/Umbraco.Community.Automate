@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
@@ -88,8 +89,7 @@ public sealed class FindRowAction : ActionBase<FindRowSettings, FindRowOutput>
                 return ActionResult.Failed(new InvalidOperationException(message), category);
             }
 
-            var parsed = await System.Net.Http.Json.HttpContentJsonExtensions.ReadFromJsonAsync<ValuesResponse>(
-                response.Content, cancellationToken);
+            var parsed = await response.Content.ReadFromJsonAsync<ValuesResponse>(cancellationToken);
             var rows = parsed?.Values ?? [];
             var columnIndex = ColumnLetterParser.ToIndex(settings.SearchColumn);
 
