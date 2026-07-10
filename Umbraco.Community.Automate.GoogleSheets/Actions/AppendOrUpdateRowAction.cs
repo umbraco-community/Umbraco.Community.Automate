@@ -56,6 +56,14 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
         if (settings.Columns is not { Count: > 0 })
             return ActionResult.Failed(new ArgumentException("At least one column value is required."), StepRunErrorCategory.Validation);
 
+        var keyColumnIndex = ColumnLetterParser.ToIndex(settings.KeyColumn);
+        if (keyColumnIndex >= settings.Columns.Count)
+            return ActionResult.Failed(
+                new ArgumentException(
+                    $"Key column '{settings.KeyColumn}' is outside the {settings.Columns.Count} column value(s) provided. " +
+                    "Include a value for the key column among the column values."),
+                StepRunErrorCategory.Validation);
+
         if (SpreadsheetIdParser.LooksLikeUnrelatedUrl(settings.SpreadsheetId))
             return ActionResult.Failed(
                 new ArgumentException(
@@ -78,8 +86,8 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
 
         var spreadsheetId = SpreadsheetIdParser.Parse(settings.SpreadsheetId);
         // Derive the key value from the column index into the provided columns list.
-        var keyColumnIndex = ColumnLetterParser.ToIndex(settings.KeyColumn);
-        var keyValue = keyColumnIndex < settings.Columns.Count ? settings.Columns[keyColumnIndex] : string.Empty;
+        // Bounds-validated above, so keyColumnIndex is always a valid index into Columns here.
+        var keyValue = settings.Columns[keyColumnIndex];
 
         using var client = _httpClientFactory.CreateClient("UmbracoAutomate");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);

@@ -162,6 +162,20 @@ public class AppendOrUpdateRowActionTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_fails_validation_when_key_column_is_outside_columns_provided()
+    {
+        // KeyColumn C is index 2, but only 2 column values (indices 0-1) are provided.
+        var result = await BuildHarness(TwoCallHandler("{}", "{}"), new AppendOrUpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", KeyColumn = "C", Columns = ["a", "b"],
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.Validation);
+        result.Exception!.Message.ShouldContain("outside the 2 column value(s) provided");
+    }
+
+    [Fact]
     public async Task ExecuteAsync_fails_authentication_when_token_is_null()
     {
         var creds = new Mock<IOAuthCredentialsService>();
@@ -194,6 +208,38 @@ public class AppendOrUpdateRowActionTests
         result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
     }
 
+    [Fact]
+    public async Task ExecuteAsync_fails_with_friendly_message_when_update_put_is_forbidden()
+    {
+        var permissionDenied = """{"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}""";
+        var handler = TwoCallHandler(SheetData, permissionDenied, secondStatusCode: HttpStatusCode.Forbidden);
+
+        var result = await BuildHarness(handler, new AppendOrUpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", KeyColumn = "A", Columns = ["Bob", "bob@new.com", "Active"],
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+        result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_fails_with_friendly_message_when_append_post_is_forbidden()
+    {
+        var permissionDenied = """{"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}""";
+        var handler = TwoCallHandler(SheetData, permissionDenied, secondStatusCode: HttpStatusCode.Forbidden);
+
+        var result = await BuildHarness(handler, new AppendOrUpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", KeyColumn = "A", Columns = ["Charlie", "charlie@example.com", "Active"],
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+        result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
+    }
+
     private static Task<ActionResult> BuildHarness(HttpMessageHandler handler, AppendOrUpdateRowSettings settings)
     {
         var creds = new Mock<IOAuthCredentialsService>();
@@ -216,7 +262,8 @@ public class AppendOrUpdateRowActionTests
         return factory.Object;
     }
 
-    private static HttpMessageHandler TwoCallHandler(string firstJson, string secondJson, Action<HttpRequestMessage>? capture = null)
+    private static HttpMessageHandler TwoCallHandler(
+        string firstJson, string secondJson, Action<HttpRequestMessage>? capture = null, HttpStatusCode secondStatusCode = HttpStatusCode.OK)
     {
         var callCount = 0;
         var mock = new Mock<HttpMessageHandler>();
@@ -225,8 +272,10 @@ public class AppendOrUpdateRowActionTests
             .Returns<HttpRequestMessage, CancellationToken>((req, _) =>
             {
                 capture?.Invoke(req);
-                var json = callCount++ == 0 ? firstJson : secondJson;
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                var isFirst = callCount++ == 0;
+                var json = isFirst ? firstJson : secondJson;
+                var status = isFirst ? HttpStatusCode.OK : secondStatusCode;
+                return Task.FromResult(new HttpResponseMessage(status)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 });
