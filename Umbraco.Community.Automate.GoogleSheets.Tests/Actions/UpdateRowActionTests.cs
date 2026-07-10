@@ -193,6 +193,23 @@ public class UpdateRowActionTests
         result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
     }
 
+    [Fact]
+    public async Task ExecuteAsync_fails_with_friendly_message_on_put_permission_denied()
+    {
+        var handler = TwoCallHandler(SheetData,
+            """{"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}""",
+            putStatusCode: HttpStatusCode.Forbidden);
+
+        var result = await BuildHarness(handler, new UpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "Bob", Columns = ["x"],
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+        result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
+    }
+
     private static Task<ActionResult> BuildHarness(HttpMessageHandler handler, UpdateRowSettings settings)
     {
         var creds = new Mock<IOAuthCredentialsService>();
@@ -216,7 +233,8 @@ public class UpdateRowActionTests
     }
 
     // Returns getJson for the first call (GET) and putJson for the second (PUT).
-    private static HttpMessageHandler TwoCallHandler(string getJson, string putJson, Action<HttpRequestMessage>? capture = null)
+    private static HttpMessageHandler TwoCallHandler(
+        string getJson, string putJson, Action<HttpRequestMessage>? capture = null, HttpStatusCode putStatusCode = HttpStatusCode.OK)
     {
         var callCount = 0;
         var mock = new Mock<HttpMessageHandler>();
@@ -225,8 +243,10 @@ public class UpdateRowActionTests
             .Returns<HttpRequestMessage, CancellationToken>((req, _) =>
             {
                 capture?.Invoke(req);
-                var json = callCount++ == 0 ? getJson : putJson;
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                var isGet = callCount++ == 0;
+                var json = isGet ? getJson : putJson;
+                var status = isGet ? HttpStatusCode.OK : putStatusCode;
+                return Task.FromResult(new HttpResponseMessage(status)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 });
