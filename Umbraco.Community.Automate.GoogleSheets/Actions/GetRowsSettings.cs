@@ -37,7 +37,8 @@ public sealed class GetRowsSettings
     /// surfaced separately as <see cref="GetRowsOutput.Headers"/>.
     /// </summary>
     [Field(Label = "First row is a header",
-        Description = "When enabled, the first row is returned as Headers and excluded from Rows.",
-        SortOrder = 3)]
-    public bool HasHeaderRow { get; set; }
+        Description = "When enabled (default), the first row is returned as Headers and excluded from Rows.",
+        SortOrder = 3,
+        EditorUiAlias = "Umb.PropertyEditorUi.Toggle")]
+    public bool HasHeaderRow { get; set; } = true;
 }

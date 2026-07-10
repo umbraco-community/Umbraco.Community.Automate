@@ -60,4 +60,14 @@ public sealed class FindRowSettings
         SortOrder = 5,
         EditorUiAlias = "Umb.PropertyEditorUi.Toggle")]
     public bool CaseSensitive { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the first row should be treated as a header
+    /// and excluded from the search.
+    /// </summary>
+    [Field(Label = "First row is a header",
+        Description = "When enabled (default), the first row is treated as a header and never matched.",
+        SortOrder = 6,
+        EditorUiAlias = "Umb.PropertyEditorUi.Toggle")]
+    public bool HasHeaderRow { get; set; } = true;
 }

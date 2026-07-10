@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text;
 using Shouldly;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Community.Automate.GoogleSheets.Actions;
@@ -7,6 +9,34 @@ namespace Umbraco.Community.Automate.GoogleSheets.Tests.Actions;
 
 public class GoogleApiErrorParserTests
 {
+    [Fact]
+    public async Task TryHandleErrorAsync_returns_null_on_success()
+    {
+        using var response = new HttpResponseMessage(HttpStatusCode.OK);
+
+        var result = await GoogleApiErrorParser.TryHandleErrorAsync(response, CancellationToken.None);
+
+        result.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task TryHandleErrorAsync_returns_failed_result_on_error()
+    {
+        using var response = new HttpResponseMessage(HttpStatusCode.Forbidden)
+        {
+            Content = new StringContent(
+                """{"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}""",
+                Encoding.UTF8, "application/json"),
+        };
+
+        var result = await GoogleApiErrorParser.TryHandleErrorAsync(response, CancellationToken.None);
+
+        result.ShouldNotBeNull();
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+        result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
+    }
+
     [Fact]
     public void Parse_maps_permission_denied_to_a_friendly_message_and_invalid_response()
     {

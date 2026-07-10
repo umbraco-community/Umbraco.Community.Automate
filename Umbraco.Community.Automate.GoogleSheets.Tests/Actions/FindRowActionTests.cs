@@ -117,7 +117,7 @@ public class FindRowActionTests
             """);
 
         var result = await BuildHarness(handler,
-            new FindRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", SearchColumn = "A", SearchValue = "alice" });
+            new FindRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", SearchColumn = "A", SearchValue = "alice", HasHeaderRow = false });
 
         result.Status.ShouldBe(ActionResultStatus.Success);
         result.Outcome.ShouldBe("found");
@@ -186,6 +186,7 @@ public class FindRowActionTests
                 SearchValue = searchValue,
                 MatchMode = matchMode,
                 CaseSensitive = caseSensitive,
+                HasHeaderRow = false,
             });
 
         result.Status.ShouldBe(ActionResultStatus.Success);
@@ -213,6 +214,49 @@ public class FindRowActionTests
                 SearchColumn = "A",
                 SearchValue = "bob smith",
                 MatchMode = "Fuzzy",
+                HasHeaderRow = false,
+            });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("found");
+        ((FindRowOutput)result.OutputData!).RowNumber.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_default_HasHeaderRow_skips_a_header_matching_search_value()
+    {
+        var handler = StubHandler(HttpStatusCode.OK, """
+            {
+              "values": [
+                ["Name", "Email"],
+                ["Alice", "alice@example.com"]
+              ]
+            }
+            """);
+
+        var result = await BuildHarness(handler,
+            new FindRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", SearchColumn = "A", SearchValue = "Name" });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("notFound");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_HasHeaderRow_false_allows_matching_row_zero()
+    {
+        var handler = StubHandler(HttpStatusCode.OK, """
+            {
+              "values": [
+                ["Name", "Email"],
+                ["Alice", "alice@example.com"]
+              ]
+            }
+            """);
+
+        var result = await BuildHarness(handler,
+            new FindRowSettings
+            {
+                SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", SearchColumn = "A", SearchValue = "Name", HasHeaderRow = false,
             });
 
         result.Status.ShouldBe(ActionResultStatus.Success);

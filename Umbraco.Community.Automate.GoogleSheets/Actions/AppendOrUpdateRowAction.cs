@@ -1,9 +1,7 @@
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
-using Umbraco.Community.Automate.GoogleSheets.Connection;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -39,8 +37,8 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
     {
         var settings = context.GetSettings<AppendOrUpdateRowSettings>();
 
-        if (string.IsNullOrWhiteSpace(settings.SpreadsheetId))
-            return ActionResult.Failed(new ArgumentException("Spreadsheet is required."), StepRunErrorCategory.Validation);
+        if (SpreadsheetIdParser.ValidateSpreadsheetId(settings.SpreadsheetId) is { } spreadsheetIdError)
+            return spreadsheetIdError;
 
         if (string.IsNullOrWhiteSpace(settings.SheetName))
             return ActionResult.Failed(new ArgumentException("Sheet name is required."), StepRunErrorCategory.Validation);
@@ -64,60 +62,29 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
                     "Include a value for the key column among the column values."),
                 StepRunErrorCategory.Validation);
 
-        if (SpreadsheetIdParser.LooksLikeUnrelatedUrl(settings.SpreadsheetId))
-            return ActionResult.Failed(
-                new ArgumentException(
-                    "That doesn't look like a Google Sheets link. Paste the full URL from your " +
-                    "browser's address bar (e.g. https://docs.google.com/spreadsheets/d/.../edit) " +
-                    "or just the spreadsheet ID."),
-                StepRunErrorCategory.Validation);
-
-        var connectionSettings = context.Connection?.GetSettings<GoogleSheetsConnectionSettings>();
-        if (connectionSettings?.OAuthCredentialsId is not { } credentialId || credentialId == Guid.Empty)
-            return ActionResult.Failed(
-                new InvalidOperationException("Google account is not authenticated."),
-                StepRunErrorCategory.Authentication);
-
-        var token = await _credentialsService.GetValidAccessTokenAsync(credentialId, cancellationToken);
-        if (string.IsNullOrEmpty(token))
-            return ActionResult.Failed(
-                new InvalidOperationException("Google access token is expired or revoked. Reconnect the account."),
-                StepRunErrorCategory.Authentication);
+        var (client, authError) = await GoogleSheetsAuth.AuthenticateAsync(context, _httpClientFactory, _credentialsService, cancellationToken);
+        if (authError is not null)
+            return authError;
+        using var httpClient = client!;
 
         var spreadsheetId = SpreadsheetIdParser.Parse(settings.SpreadsheetId);
         // Derive the key value from the column index into the provided columns list.
         // Bounds-validated above, so keyColumnIndex is always a valid index into Columns here.
         var keyValue = settings.Columns[keyColumnIndex];
 
-        using var client = _httpClientFactory.CreateClient("UmbracoAutomate");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
         try
         {
             // Step 1: fetch all rows to check whether the key value already exists.
             var getUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
-            using var getResponse = await client.GetAsync(getUrl, cancellationToken);
-            if (!getResponse.IsSuccessStatusCode)
-            {
-                var error = await getResponse.Content.ReadAsStringAsync(cancellationToken);
-                var (message, category) = GoogleApiErrorParser.Parse((int)getResponse.StatusCode, error);
-                return ActionResult.Failed(new InvalidOperationException(message), category);
-            }
+            using var getResponse = await httpClient.GetAsync(getUrl, cancellationToken);
+            if (await GoogleApiErrorParser.TryHandleErrorAsync(getResponse, cancellationToken) is { } getError)
+                return getError;
 
             var parsed = await getResponse.Content.ReadFromJsonAsync<ValuesResponse>(cancellationToken);
             var rows = parsed?.Values ?? [];
 
-            var matchedRow = -1;
-            for (var i = 0; i < rows.Count; i++)
-            {
-                var row = rows[i];
-                var cellValue = keyColumnIndex < row.Count ? row[keyColumnIndex] : string.Empty;
-                if (string.Equals(cellValue, keyValue, StringComparison.Ordinal))
-                {
-                    matchedRow = i;
-                    break;
-                }
-            }
+            var matchedRow = RowMatcher.FindRowIndex(
+                rows, keyColumnIndex, keyValue, StringComparison.Ordinal, hasHeaderRow: settings.HasHeaderRow);
 
             if (matchedRow >= 0)
             {
@@ -127,13 +94,9 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
                 var putUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(updateRange)}?valueInputOption=USER_ENTERED";
                 var putPayload = new { values = new[] { settings.Columns.ToArray() } };
 
-                using var putResponse = await client.PutAsJsonAsync(putUrl, putPayload, cancellationToken);
-                if (!putResponse.IsSuccessStatusCode)
-                {
-                    var error = await putResponse.Content.ReadAsStringAsync(cancellationToken);
-                    var (message, category) = GoogleApiErrorParser.Parse((int)putResponse.StatusCode, error);
-                    return ActionResult.Failed(new InvalidOperationException(message), category);
-                }
+                using var putResponse = await httpClient.PutAsJsonAsync(putUrl, putPayload, cancellationToken);
+                if (await GoogleApiErrorParser.TryHandleErrorAsync(putResponse, cancellationToken) is { } putError)
+                    return putError;
 
                 var updateResult = await putResponse.Content.ReadFromJsonAsync<WriteValuesResponse>(cancellationToken);
                 return SuccessWithOutcome("updated", new AppendOrUpdateRowOutput
@@ -150,13 +113,9 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
                 var appendUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}:append?valueInputOption=USER_ENTERED";
                 var appendPayload = new { values = new[] { settings.Columns.ToArray() } };
 
-                using var appendResponse = await client.PostAsJsonAsync(appendUrl, appendPayload, cancellationToken);
-                if (!appendResponse.IsSuccessStatusCode)
-                {
-                    var error = await appendResponse.Content.ReadAsStringAsync(cancellationToken);
-                    var (message, category) = GoogleApiErrorParser.Parse((int)appendResponse.StatusCode, error);
-                    return ActionResult.Failed(new InvalidOperationException(message), category);
-                }
+                using var appendResponse = await httpClient.PostAsJsonAsync(appendUrl, appendPayload, cancellationToken);
+                if (await GoogleApiErrorParser.TryHandleErrorAsync(appendResponse, cancellationToken) is { } appendError)
+                    return appendError;
 
                 var appendResult = await appendResponse.Content.ReadFromJsonAsync<AppendApiResponse>(cancellationToken);
                 var updates = appendResult?.Updates;
@@ -187,9 +146,6 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
         var digits = new string(cell.SkipWhile(c => !char.IsDigit(c)).TakeWhile(char.IsDigit).ToArray());
         return int.TryParse(digits, out var n) ? n : 0;
     }
-
-    private sealed record ValuesResponse(
-        [property: JsonPropertyName("values")] List<List<string>>? Values);
 
     private sealed record WriteValuesResponse(
         [property: JsonPropertyName("updatedRange")] string? UpdatedRange,

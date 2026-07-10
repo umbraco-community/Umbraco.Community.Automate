@@ -99,6 +99,36 @@ public class UpdateRowActionTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_default_HasHeaderRow_skips_a_header_matching_lookup_value()
+    {
+        var handler = TwoCallHandler(SheetData, UpdateOk);
+
+        var result = await BuildHarness(handler, new UpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "Name", Columns = ["x"],
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("notFound");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_HasHeaderRow_false_allows_matching_and_overwriting_row_zero()
+    {
+        var handler = TwoCallHandler(SheetData, UpdateOk);
+
+        var result = await BuildHarness(handler, new UpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "Name",
+            Columns = ["x"], HasHeaderRow = false,
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("updated");
+        ((UpdateRowOutput)result.OutputData!).RowNumber.ShouldBe(1);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_fails_validation_when_spreadsheet_missing()
     {
         var result = await BuildHarness(TwoCallHandler("{}", "{}"), new UpdateRowSettings

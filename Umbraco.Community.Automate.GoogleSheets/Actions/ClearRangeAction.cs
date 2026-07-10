@@ -1,9 +1,7 @@
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
-using Umbraco.Community.Automate.GoogleSheets.Connection;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -39,31 +37,16 @@ public sealed class ClearRangeAction : ActionBase<ClearRangeSettings, ClearRange
     {
         var settings = context.GetSettings<ClearRangeSettings>();
 
-        if (string.IsNullOrWhiteSpace(settings.SpreadsheetId))
-            return ActionResult.Failed(new ArgumentException("Spreadsheet is required."), StepRunErrorCategory.Validation);
+        if (SpreadsheetIdParser.ValidateSpreadsheetId(settings.SpreadsheetId) is { } spreadsheetIdError)
+            return spreadsheetIdError;
 
         if (string.IsNullOrWhiteSpace(settings.SheetName))
             return ActionResult.Failed(new ArgumentException("Sheet name is required."), StepRunErrorCategory.Validation);
 
-        if (SpreadsheetIdParser.LooksLikeUnrelatedUrl(settings.SpreadsheetId))
-            return ActionResult.Failed(
-                new ArgumentException(
-                    "That doesn't look like a Google Sheets link. Paste the full URL from your " +
-                    "browser's address bar (e.g. https://docs.google.com/spreadsheets/d/.../edit) " +
-                    "or just the spreadsheet ID."),
-                StepRunErrorCategory.Validation);
-
-        var connectionSettings = context.Connection?.GetSettings<GoogleSheetsConnectionSettings>();
-        if (connectionSettings?.OAuthCredentialsId is not { } credentialId || credentialId == Guid.Empty)
-            return ActionResult.Failed(
-                new InvalidOperationException("Google account is not authenticated."),
-                StepRunErrorCategory.Authentication);
-
-        var token = await _credentialsService.GetValidAccessTokenAsync(credentialId, cancellationToken);
-        if (string.IsNullOrEmpty(token))
-            return ActionResult.Failed(
-                new InvalidOperationException("Google access token is expired or revoked. Reconnect the account."),
-                StepRunErrorCategory.Authentication);
+        var (client, authError) = await GoogleSheetsAuth.AuthenticateAsync(context, _httpClientFactory, _credentialsService, cancellationToken);
+        if (authError is not null)
+            return authError;
+        using var httpClient = client!;
 
         var spreadsheetId = SpreadsheetIdParser.Parse(settings.SpreadsheetId);
 
@@ -73,19 +56,12 @@ public sealed class ClearRangeAction : ActionBase<ClearRangeSettings, ClearRange
 
         var url = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(rangeSegment)}:clear";
 
-        using var client = _httpClientFactory.CreateClient("UmbracoAutomate");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
         try
         {
             // The :clear endpoint requires a POST with an empty body.
-            using var response = await client.PostAsync(url, content: null, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync(cancellationToken);
-                var (message, category) = GoogleApiErrorParser.Parse((int)response.StatusCode, error);
-                return ActionResult.Failed(new InvalidOperationException(message), category);
-            }
+            using var response = await httpClient.PostAsync(url, content: null, cancellationToken);
+            if (await GoogleApiErrorParser.TryHandleErrorAsync(response, cancellationToken) is { } responseError)
+                return responseError;
 
             var parsed = await response.Content.ReadFromJsonAsync<ClearResponse>(cancellationToken);
 

@@ -104,6 +104,37 @@ public class AppendOrUpdateRowActionTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_default_HasHeaderRow_skips_a_header_matching_key_value()
+    {
+        var handler = TwoCallHandler(SheetData, AppendOk);
+
+        var result = await BuildHarness(handler, new AppendOrUpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", KeyColumn = "A",
+            Columns = ["Name", "x@example.com", "Active"],
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("appended");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_HasHeaderRow_false_allows_matching_and_updating_row_zero()
+    {
+        var handler = TwoCallHandler(SheetData, UpdateOk);
+
+        var result = await BuildHarness(handler, new AppendOrUpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", KeyColumn = "A",
+            Columns = ["Name", "x@example.com", "Active"], HasHeaderRow = false,
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("updated");
+        ((AppendOrUpdateRowOutput)result.OutputData!).RowNumber.ShouldBe(1);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_derives_key_value_from_column_index_in_columns_list()
     {
         // KeyColumn B means index 1 — the key value should be "alice@example.com" from Columns[1].
