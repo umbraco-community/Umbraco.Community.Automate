@@ -4,12 +4,14 @@ Google Sheets connection and actions for [Umbraco Automate](https://github.com/u
 
 ## Overview
 
-Umbraco.Community.Automate.GoogleSheets is a provider package that adds Google Sheets connectivity to Umbraco Automate. It contributes a Google Sheets connection type (authenticated via OAuth) and an Append Row action that can be used as a step in automations — for example, appending a row to a spreadsheet whenever a form is submitted or content is published.
+Umbraco.Community.Automate.GoogleSheets is a provider package that adds Google Sheets connectivity to Umbraco Automate. It contributes a Google Sheets connection type (authenticated via OAuth) and Append Row, Find Row, and Update Row actions that can be used as steps in automations — for example, appending a row to a spreadsheet whenever a form is submitted, looking up a row by column value, or updating an existing row in place.
 
 ## Key Features
 
 - **Google Sheets connection type** — OAuth-based connection managed in the backoffice, powered by [Umbraco.Automate.OpenIddict](https://www.nuget.org/packages/Umbraco.Automate.OpenIddict)
 - **Append Row action** — append a row of values to a sheet from an automation step, with bindings supported on the spreadsheet, sheet name, and every column value
+- **Find Row action** — search a column for a matching value and return the first matching row, producing a `found`/`notFound` outcome for conditional branching
+- **Update Row action** — find a row by column value and overwrite its column values, producing an `updated`/`notFound` outcome for conditional branching
 - **Column list editor** — a repeatable column-value editor with an "Insert binding" picker per row, so values can reference earlier steps' outputs
 - **Automatic token management** — OAuth credentials are stored and refreshed transparently
 - **Setup status warning** — the connection editor warns and disables "Authenticate" if the provider's client ID/secret haven't been configured yet, instead of failing in the OAuth popup
@@ -45,7 +47,7 @@ The OAuth callback URI follows the convention `{your-site}/umbraco/automate/oaut
 
 The provider is registered as `GoogleSheets` rather than the generic `Google`, following the OpenIddict [multiple-instances-of-the-same-provider](https://documentation.openiddict.com/integrations/web-providers#register-multiple-instances-of-the-same-provider) pattern. This means a future Google Drive or Google Docs package can register its own OpenIddict client (with its own unique provider name and redirect URI) without colliding with this one.
 
-Once configured, create a Google Sheets connection in a workspace from the backoffice and authorize it via the OAuth popup. The **Append Row to Google Sheet** action can then reference the connection — paste the sheet's URL or ID, the tab name, and the ordered column values to append.
+Once configured, create a Google Sheets connection in a workspace from the backoffice and authorize it via the OAuth popup. The **Append Row to Google Sheet**, **Find Row in Google Sheet**, and **Update Row in Google Sheet** actions can then reference the connection — paste the sheet's URL or ID and the tab name, then supply the column values to append, the column/value to search for, or the lookup column/value and new column values to write, respectively.
 
 ## Troubleshooting
 
