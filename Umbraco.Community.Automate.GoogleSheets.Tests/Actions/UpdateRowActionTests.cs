@@ -148,6 +148,18 @@ public class UpdateRowActionTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_fails_validation_when_lookup_value_missing()
+    {
+        var result = await BuildHarness(TwoCallHandler("{}", "{}"), new UpdateRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "", Columns = ["x"],
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.Validation);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_fails_validation_when_columns_empty()
     {
         var result = await BuildHarness(TwoCallHandler("{}", "{}"), new UpdateRowSettings
