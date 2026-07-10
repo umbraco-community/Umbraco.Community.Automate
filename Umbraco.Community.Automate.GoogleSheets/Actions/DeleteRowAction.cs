@@ -53,6 +53,9 @@ public sealed class DeleteRowAction : ActionBase<DeleteRowSettings, DeleteRowOut
                 new ArgumentException($"'{settings.LookupColumn}' is not a valid column letter (e.g. A, B, AA)."),
                 StepRunErrorCategory.Validation);
 
+        if (string.IsNullOrWhiteSpace(settings.LookupValue))
+            return ActionResult.Failed(new ArgumentException("Lookup value is required."), StepRunErrorCategory.Validation);
+
         if (SpreadsheetIdParser.LooksLikeUnrelatedUrl(settings.SpreadsheetId))
             return ActionResult.Failed(
                 new ArgumentException(

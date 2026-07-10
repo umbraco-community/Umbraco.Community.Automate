@@ -153,6 +153,18 @@ public class DeleteRowActionTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_fails_validation_when_lookup_value_missing()
+    {
+        var result = await BuildHarness(SequenceHandler(["{}","{}","{}"]), new DeleteRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "",
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.Validation);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_fails_authentication_when_token_is_null()
     {
         var creds = new Mock<IOAuthCredentialsService>();
@@ -186,6 +198,42 @@ public class DeleteRowActionTests
         result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
     }
 
+    [Fact]
+    public async Task ExecuteAsync_fails_with_friendly_message_on_metadata_permission_denied()
+    {
+        var permissionDenied = """{"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}""";
+        var handler = SequenceHandler(
+            [SheetData, permissionDenied, "{}"],
+            statusCodes: [HttpStatusCode.OK, HttpStatusCode.Forbidden, HttpStatusCode.OK]);
+
+        var result = await BuildHarness(handler, new DeleteRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "Bob",
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+        result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_fails_with_friendly_message_on_batchUpdate_permission_denied()
+    {
+        var permissionDenied = """{"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}""";
+        var handler = SequenceHandler(
+            [SheetData, MetaData, permissionDenied],
+            statusCodes: [HttpStatusCode.OK, HttpStatusCode.OK, HttpStatusCode.Forbidden]);
+
+        var result = await BuildHarness(handler, new DeleteRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "Bob",
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Failed);
+        result.ErrorCategory.ShouldBe(StepRunErrorCategory.InvalidResponse);
+        result.Exception!.Message.ShouldContain("doesn't have access to that spreadsheet");
+    }
+
     private static Task<ActionResult> BuildHarness(HttpMessageHandler handler, DeleteRowSettings settings)
     {
         var creds = new Mock<IOAuthCredentialsService>();
@@ -208,8 +256,9 @@ public class DeleteRowActionTests
         return factory.Object;
     }
 
-    // Cycles through responses in order, returning each json body for successive calls.
-    private static HttpMessageHandler SequenceHandler(IReadOnlyList<string> responses, Action<HttpRequestMessage>? capture = null)
+    // Cycles through responses (and optional per-call status codes) in order, one per successive call.
+    private static HttpMessageHandler SequenceHandler(
+        IReadOnlyList<string> responses, Action<HttpRequestMessage>? capture = null, IReadOnlyList<HttpStatusCode>? statusCodes = null)
     {
         var callCount = 0;
         var mock = new Mock<HttpMessageHandler>();
@@ -218,9 +267,10 @@ public class DeleteRowActionTests
             .Returns<HttpRequestMessage, CancellationToken>((req, _) =>
             {
                 capture?.Invoke(req);
-                var json = callCount < responses.Count ? responses[callCount] : "{}";
-                callCount++;
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+                var index = callCount++;
+                var json = index < responses.Count ? responses[index] : "{}";
+                var status = statusCodes is not null && index < statusCodes.Count ? statusCodes[index] : HttpStatusCode.OK;
+                return Task.FromResult(new HttpResponseMessage(status)
                 {
                     Content = new StringContent(json, Encoding.UTF8, "application/json"),
                 });
