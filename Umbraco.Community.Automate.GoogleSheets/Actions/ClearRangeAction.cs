@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
@@ -86,8 +87,7 @@ public sealed class ClearRangeAction : ActionBase<ClearRangeSettings, ClearRange
                 return ActionResult.Failed(new InvalidOperationException(message), category);
             }
 
-            var parsed = await System.Net.Http.Json.HttpContentJsonExtensions.ReadFromJsonAsync<ClearResponse>(
-                response.Content, cancellationToken);
+            var parsed = await response.Content.ReadFromJsonAsync<ClearResponse>(cancellationToken);
 
             return Success(new ClearRangeOutput { ClearedRange = parsed?.ClearedRange });
         }
