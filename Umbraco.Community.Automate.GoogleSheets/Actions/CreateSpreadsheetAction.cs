@@ -1,9 +1,7 @@
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
-using Umbraco.Community.Automate.GoogleSheets.Connection;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -43,17 +41,10 @@ public sealed class CreateSpreadsheetAction : ActionBase<CreateSpreadsheetSettin
         if (string.IsNullOrWhiteSpace(settings.Title))
             return ActionResult.Failed(new ArgumentException("Title is required."), StepRunErrorCategory.Validation);
 
-        var connectionSettings = context.Connection?.GetSettings<GoogleSheetsConnectionSettings>();
-        if (connectionSettings?.OAuthCredentialsId is not { } credentialId || credentialId == Guid.Empty)
-            return ActionResult.Failed(
-                new InvalidOperationException("Google account is not authenticated."),
-                StepRunErrorCategory.Authentication);
-
-        var token = await _credentialsService.GetValidAccessTokenAsync(credentialId, cancellationToken);
-        if (string.IsNullOrEmpty(token))
-            return ActionResult.Failed(
-                new InvalidOperationException("Google access token is expired or revoked. Reconnect the account."),
-                StepRunErrorCategory.Authentication);
+        var (client, authError) = await GoogleSheetsAuth.AuthenticateAsync(context, _httpClientFactory, _credentialsService, cancellationToken);
+        if (authError is not null)
+            return authError;
+        using var httpClient = client!;
 
         var sheetTitles = ParseSheetNames(settings.SheetNames);
 
@@ -72,18 +63,11 @@ public sealed class CreateSpreadsheetAction : ActionBase<CreateSpreadsheetSettin
 
         var url = "https://sheets.googleapis.com/v4/spreadsheets";
 
-        using var client = _httpClientFactory.CreateClient("UmbracoAutomate");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
         try
         {
-            using var response = await client.PostAsJsonAsync(url, payload, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadAsStringAsync(cancellationToken);
-                var (message, category) = GoogleApiErrorParser.Parse((int)response.StatusCode, error);
-                return ActionResult.Failed(new InvalidOperationException(message), category);
-            }
+            using var response = await httpClient.PostAsJsonAsync(url, payload, cancellationToken);
+            if (await GoogleApiErrorParser.TryHandleErrorAsync(response, cancellationToken) is { } responseError)
+                return responseError;
 
             var parsed = await response.Content.ReadFromJsonAsync<SpreadsheetResponse>(cancellationToken);
 

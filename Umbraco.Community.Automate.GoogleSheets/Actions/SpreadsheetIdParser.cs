@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Umbraco.Automate.Core.Actions;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -29,5 +30,25 @@ public static partial class SpreadsheetIdParser
         return Uri.TryCreate(trimmed, UriKind.Absolute, out var uri)
             && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
             && !UrlPattern().IsMatch(trimmed);
+    }
+
+    /// <summary>
+    /// Validates a spreadsheet ID/URL field: required, and must not look like an unrelated link.
+    /// Returns <c>null</c> when valid, or the <see cref="ActionResult"/> to return otherwise.
+    /// </summary>
+    public static ActionResult? ValidateSpreadsheetId(string spreadsheetId)
+    {
+        if (string.IsNullOrWhiteSpace(spreadsheetId))
+            return ActionResult.Failed(new ArgumentException("Spreadsheet is required."), StepRunErrorCategory.Validation);
+
+        if (LooksLikeUnrelatedUrl(spreadsheetId))
+            return ActionResult.Failed(
+                new ArgumentException(
+                    "That doesn't look like a Google Sheets link. Paste the full URL from your " +
+                    "browser's address bar (e.g. https://docs.google.com/spreadsheets/d/.../edit) " +
+                    "or just the spreadsheet ID."),
+                StepRunErrorCategory.Validation);
+
+        return null;
     }
 }

@@ -12,6 +12,20 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// </summary>
 public static class GoogleApiErrorParser
 {
+    /// <summary>
+    /// Checks an HTTP response for failure and, if it failed, reads the body and returns the
+    /// <see cref="ActionResult"/> to return from the calling action. Returns <c>null</c> on success.
+    /// </summary>
+    public static async Task<ActionResult?> TryHandleErrorAsync(HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        if (response.IsSuccessStatusCode)
+            return null;
+
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        var (message, category) = Parse((int)response.StatusCode, body);
+        return ActionResult.Failed(new InvalidOperationException(message), category);
+    }
+
     public static (string Message, StepRunErrorCategory Category) Parse(int statusCode, string body)
     {
         var status = TryGetStatus(body);

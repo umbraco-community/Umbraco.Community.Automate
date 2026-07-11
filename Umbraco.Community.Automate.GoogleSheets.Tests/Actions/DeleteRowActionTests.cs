@@ -128,6 +128,35 @@ public class DeleteRowActionTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_default_HasHeaderRow_skips_a_header_matching_lookup_value()
+    {
+        var handler = SequenceHandler([SheetData, MetaData, BatchOk]);
+
+        var result = await BuildHarness(handler, new DeleteRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "Name",
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("notFound");
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_HasHeaderRow_false_allows_matching_and_deleting_row_zero()
+    {
+        var handler = SequenceHandler([SheetData, MetaData, BatchOk]);
+
+        var result = await BuildHarness(handler, new DeleteRowSettings
+        {
+            SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "Name", HasHeaderRow = false,
+        });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        result.Outcome.ShouldBe("deleted");
+        ((DeleteRowOutput)result.OutputData!).DeletedRowNumber.ShouldBe(1);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_fails_validation_when_spreadsheet_missing()
     {
         var result = await BuildHarness(SequenceHandler(["{}","{}","{}"]), new DeleteRowSettings

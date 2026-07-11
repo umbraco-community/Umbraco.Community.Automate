@@ -40,4 +40,14 @@ public sealed class AppendOrUpdateRowSettings
         EditorUiAlias = "UmbracoCommunityAutomateGoogleSheets.PropertyEditorUi.ColumnList",
         SupportsBindings = true)]
     public List<string> Columns { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the first row should be treated as a header
+    /// and excluded from the key lookup.
+    /// </summary>
+    [Field(Label = "First row is a header",
+        Description = "When enabled (default), the first row is treated as a header and never matched.",
+        SortOrder = 4,
+        EditorUiAlias = "Umb.PropertyEditorUi.Toggle")]
+    public bool HasHeaderRow { get; set; } = true;
 }

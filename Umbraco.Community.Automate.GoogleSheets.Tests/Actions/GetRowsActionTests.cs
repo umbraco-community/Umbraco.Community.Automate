@@ -28,7 +28,7 @@ public class GetRowsActionTests
     public async Task ExecuteAsync_returns_all_rows_and_correct_row_count()
     {
         var result = await BuildHarness(StubHandler(HttpStatusCode.OK, SheetData),
-            new GetRowsSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1" });
+            new GetRowsSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", HasHeaderRow = false });
 
         result.Status.ShouldBe(ActionResultStatus.Success);
         var output = (GetRowsOutput)result.OutputData!;
@@ -36,6 +36,20 @@ public class GetRowsActionTests
         output.Rows.Count.ShouldBe(3);
         output.Rows[0].ShouldBe(["Name", "Email", "Status"]);
         output.Headers.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_default_HasHeaderRow_separates_the_header_row()
+    {
+        var result = await BuildHarness(StubHandler(HttpStatusCode.OK, SheetData),
+            new GetRowsSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1" });
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        var output = (GetRowsOutput)result.OutputData!;
+        output.Headers.ShouldBe(["Name", "Email", "Status"]);
+        output.RowCount.ShouldBe(2);
+        output.Rows.Count.ShouldBe(2);
+        output.Rows[0].ShouldBe(["Alice", "alice@example.com", "Active"]);
     }
 
     [Fact]
