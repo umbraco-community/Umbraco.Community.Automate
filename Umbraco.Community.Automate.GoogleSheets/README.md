@@ -4,14 +4,26 @@ Google Sheets connection and actions for [Umbraco Automate](https://github.com/u
 
 ## Overview
 
-Umbraco.Community.Automate.GoogleSheets is a provider package that adds Google Sheets connectivity to Umbraco Automate. It contributes a Google Sheets connection type (authenticated via OAuth) and Append Row, Find Row, and Update Row actions that can be used as steps in automations — for example, appending a row to a spreadsheet whenever a form is submitted, looking up a row by column value, or updating an existing row in place.
+Umbraco.Community.Automate.GoogleSheets is a provider package that adds Google Sheets connectivity to Umbraco Automate. It contributes a Google Sheets connection type (authenticated via OAuth) and ten actions covering the spreadsheet lifecycle — creating spreadsheets and sheet tabs, appending/finding/updating/deleting/upserting rows, and reading or clearing ranges — so an automation can manage spreadsheet data end-to-end without leaving the workflow builder.
 
 ## Key Features
 
 - **Google Sheets connection type** — OAuth-based connection managed in the backoffice, powered by [Umbraco.Automate.OpenIddict](https://www.nuget.org/packages/Umbraco.Automate.OpenIddict)
-- **Append Row action** — append a row of values to a sheet from an automation step, with bindings supported on the spreadsheet, sheet name, and every column value
-- **Find Row action** — search a column for a matching value and return the first matching row, producing a `found`/`notFound` outcome for conditional branching
-- **Update Row action** — find a row by column value and overwrite its column values, producing an `updated`/`notFound` outcome for conditional branching
+- **Row actions** — locate and mutate individual rows by column value:
+  - **Append Row** — append a row of values to a sheet
+  - **Find Row** — search a column for a matching value; `found`/`notFound` outcomes, with configurable match mode (Exact/Contains/StartsWith/EndsWith) and case sensitivity
+  - **Update Row** — find a row and overwrite its column values; `updated`/`notFound` outcomes
+  - **Delete Row** — find a row and delete it, shifting subsequent rows up; `deleted`/`notFound` outcomes
+  - **Append or Update Row** — upsert: updates the row if a key column value already exists, otherwise appends a new row; `updated`/`appended` outcomes
+
+  Find Row, Update Row, Delete Row, and Append or Update Row all skip the header row by default (a "First row is a header" toggle, on by default) — a lookup value that happens to equal a header label won't match or mutate it. Turn the toggle off for headerless sheets.
+- **Range actions** — read or clear a sheet without a row lookup:
+  - **Get Rows** — read every row from a tab or a specific A1 range, optionally separating the header row from the data rows
+  - **Get Cell Value** — read a single cell by A1 notation (e.g. `A1`, `B5`)
+  - **Clear Range** — clear values from a tab or a specific A1 range, preserving formatting
+- **Structural actions** — manage spreadsheets and tabs themselves:
+  - **Create Google Spreadsheet** — create a new spreadsheet, optionally with named sheet tabs
+  - **Create Sheet Tab** — add a new tab to an existing spreadsheet
 - **Column list editor** — a repeatable column-value editor with an "Insert binding" picker per row, so values can reference earlier steps' outputs
 - **Automatic token management** — OAuth credentials are stored and refreshed transparently
 - **Setup status warning** — the connection editor warns and disables "Authenticate" if the provider's client ID/secret haven't been configured yet, instead of failing in the OAuth popup
@@ -47,7 +59,7 @@ The OAuth callback URI follows the convention `{your-site}/umbraco/automate/oaut
 
 The provider is registered as `GoogleSheets` rather than the generic `Google`, following the OpenIddict [multiple-instances-of-the-same-provider](https://documentation.openiddict.com/integrations/web-providers#register-multiple-instances-of-the-same-provider) pattern. This means a future Google Drive or Google Docs package can register its own OpenIddict client (with its own unique provider name and redirect URI) without colliding with this one.
 
-Once configured, create a Google Sheets connection in a workspace from the backoffice and authorize it via the OAuth popup. The **Append Row to Google Sheet**, **Find Row in Google Sheet**, and **Update Row in Google Sheet** actions can then reference the connection — paste the sheet's URL or ID and the tab name, then supply the column values to append, the column/value to search for, or the lookup column/value and new column values to write, respectively.
+Once configured, create a Google Sheets connection in a workspace from the backoffice and authorize it via the OAuth popup. Any of this package's actions can then reference that connection — paste the sheet's URL or ID (and, where relevant, the tab name) into the action's settings, along with whatever the action needs: column values to write, a column/value to search or match on, an A1 range, or a new spreadsheet/tab title.
 
 ## Troubleshooting
 
