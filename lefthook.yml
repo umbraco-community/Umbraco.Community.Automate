@@ -1,9 +1,10 @@
 pre-commit:
   commands:
     gitleaks:
-      run: gitleaks protect --staged --config .gitleaks.toml --verbose
+      run: gitleaks protect --staged --config .gitleaks.toml --redact --verbose
 
 pre-push:
-  commands:
-    gitleaks:
-      run: gitleaks protect --config .gitleaks.toml --verbose
+  scripts:
+    "gitleaks-scan-range.sh":
+      runner: bash
+      use_stdin: true
