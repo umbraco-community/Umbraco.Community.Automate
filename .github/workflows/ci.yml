@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
 
 env:
   DOTNET_VERSION: '10.0.x'
@@ -26,6 +27,9 @@ jobs:
       - run: dotnet build --no-restore --configuration Release
 
       - run: dotnet test Umbraco.Community.Automate.GoogleSheets.Tests --no-build --configuration Release
+
+      - name: Verify the package still packs
+        run: dotnet pack Umbraco.Community.Automate.GoogleSheets --no-build --configuration Release --output ./pack-check
 
   frontend-unit-tests:
     name: Frontend unit tests
