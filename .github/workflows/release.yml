@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*-v[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  resolve-and-pack:
+    name: Resolve package and pack
+    needs: ci
+    runs-on: ubuntu-latest
+    outputs:
+      project-dir: ${{ steps.resolve.outputs.project-dir }}
+      version: ${{ steps.resolve.outputs.version }}
+      title: ${{ steps.resolve.outputs.title }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Resolve package from tag
+        id: resolve
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+
+          if [[ "$TAG" =~ ^(.+-v)([0-9]+\.[0-9]+\.[0-9]+.*)$ ]]; then
+            PREFIX="${BASH_REMATCH[1]}"
+            VERSION="${BASH_REMATCH[2]}"
+          else
+            echo "Tag '$TAG' does not match the expected <prefix>-v<semver> format" >&2
+            exit 1
+          fi
+
+          MATCHES=$(grep -rl "<MinVerTagPrefix>${PREFIX}</MinVerTagPrefix>" --include="Directory.Build.props" .)
+          COUNT=$(printf '%s\n' "$MATCHES" | grep -c .)
+
+          if [ "$COUNT" -ne 1 ]; then
+            echo "Expected exactly one package with MinVerTagPrefix '$PREFIX', found $COUNT" >&2
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$MATCHES")
+          TITLE=$(grep -ohP '(?<=<Title>).*(?=</Title>)' "$PROJECT_DIR"/*.csproj | head -1)
+
+          echo "Resolved tag '$TAG' -> package '$PROJECT_DIR' (title: $TITLE, version: $VERSION)"
+          echo "project-dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+
+      - run: dotnet restore
+
+      - name: Pack
+        run: dotnet pack "${{ steps.resolve.outputs.project-dir }}" --configuration Release --output ./artifacts
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nuget-package
+          path: ./artifacts/*.*nupkg
+
+  publish:
+    name: Publish to NuGet and create GitHub Release
+    needs: resolve-and-pack
+    runs-on: ubuntu-latest
+    environment: nuget-publish
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: nuget-package
+          path: ./artifacts
+
+      - name: NuGet login (OIDC -> temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet.org
+        run: |
+          set -euo pipefail
+          for f in ./artifacts/*.nupkg; do
+            dotnet nuget push "$f" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          done
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" ./artifacts/*.nupkg ./artifacts/*.snupkg \
+            --title "${{ needs.resolve-and-pack.outputs.title }} v${{ needs.resolve-and-pack.outputs.version }}" \
+            --generate-notes
