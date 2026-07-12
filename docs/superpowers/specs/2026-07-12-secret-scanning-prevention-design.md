@@ -69,7 +69,9 @@ pre-push:
       run: gitleaks protect --config .gitleaks.toml --verbose
 ```
 
-`pre-commit` scans only staged changes (`--staged`) — the earliest possible point, before a commit object exists at all. `pre-push` re-scans (without `--staged`, so it covers the actual outgoing commits) as a second local layer that still catches anything committed with `git commit --no-verify`.
+`pre-commit` scans only staged changes (`--staged`) — the earliest possible point, before a commit object exists at all.
+
+`pre-push` is a second local layer intended to still catch anything committed with `git commit --no-verify`. The mechanism this actually requires is `gitleaks detect --log-opts=<range>`, not `gitleaks protect`: `gitleaks protect` (with or without `--staged`) only ever scans the uncommitted working-tree diff, never git history, so it cannot see anything that's already been committed — a bypassed pre-commit hook would sail straight through it. The pre-push hook instead needs to read git's native pre-push stdin protocol (one line per ref being pushed: `<local ref> <local sha1> <remote ref> <remote sha1>`) and run `gitleaks detect --log-opts=<range>` against the actual outgoing commit range (`<remote sha1>..<local sha1>` when the remote already has the ref, falling back through the remote's default branch and finally a whole-history scan for a brand-new ref with no resolvable default branch). Because Lefthook only exposes that stdin data to a `scripts:` entry (not an inline `commands:` run string), this is implemented as `.lefthook/pre-push/gitleaks-scan-range.sh`, referenced from `lefthook.yml`. Both hooks also pass `--redact` so a caught finding's rule/file/line are reported without ever printing the raw secret value to the console or logs.
 
 **`.gitleaks.toml`** (new, repo root) — extends gitleaks' default ruleset (`[extend] useDefault = true`) with an explicit rule guaranteeing this exact incident class is caught regardless of default-ruleset coverage:
 
@@ -157,3 +159,13 @@ New `CONTRIBUTING.md` section (placed near the existing "Building and testing" s
 - Confirm the pre-push hook behaves the same way for a commit made with `--no-verify` (bypassing pre-commit) that's then `git push`ed.
 - Confirm `./SetupRepo.sh` on macOS/Linux is a complete, working setup path on a fresh clone (no other manual steps required), and that it fails with the friendly message (not a stack trace) when Node isn't on `PATH`.
 - Confirm `SetupRepo.ps1` does the same on Windows (or via PowerShell Core on macOS/Linux as a syntax/logic check, if a Windows machine isn't available to test on directly).
+
+## Post-implementation notes
+
+A few details emerged during implementation that this design didn't anticipate. Rather than rewriting the sections above to pretend they were foreseen, they're logged here:
+
+- **Pre-push mechanism redesign.** The original `lefthook.yml` sample in "2. Local hooks" (`gitleaks protect` for both hooks) turned out not to work for pre-push: `gitleaks protect` only ever scans the uncommitted working-tree diff, not git history, so it never sees a commit made with `git commit --no-verify` — the exact case pre-push exists to catch. The corrected mechanism (`gitleaks detect --log-opts=<range>` driven by git's pre-push stdin protocol, implemented as `.lefthook/pre-push/gitleaks-scan-range.sh`) is described in section 2 above; see that script's own header comment for the full reasoning.
+- **`--redact` added to both hooks.** Not in the original design; added after a verification run showed an unredacted `--verbose` finding printing a real secret value into tool/terminal output. Now on both `pre-commit` and pre-push.
+- **Gitleaks prerequisite check in the `SetupRepo` scripts.** The original scripts (section 3) only checked for Node.js. In practice `npx lefthook install` wires up the hooks but doesn't install gitleaks itself, so a `gitleaks` binary check/friendly-error was added alongside the Node.js check.
+- **CONTRIBUTING.md section placement.** Landed under "Building and testing" as planned, but interleaved with the existing prerequisites content rather than as one standalone block, since contributors read setup steps linearly and the two topics overlap there.
+- **Known, accepted pre-existing secret allowlisted.** `Umbraco.Community.Automate.Demo/appsettings.json`'s `Imaging:HMACSecretKey` (committed `be847121`, already public on `origin/main`) predates this design and was deliberately not rotated or scrubbed from history — the demo site it belongs to is local-only dev scaffolding, never deployed publicly. Without an allowlist entry, the pre-push hook's whole-history fallback (used when no default-branch remote-tracking ref can be resolved at all) would hard-block on this known finding with no way for a contributor to remediate it. `.gitleaks.toml` now has a narrowly-scoped `[[allowlists]]` entry (commit + path + rule ID, `condition = "AND"`) covering only this one finding.

@@ -4,6 +4,9 @@ pre-commit:
       run: gitleaks protect --staged --config .gitleaks.toml --redact --verbose
 
 pre-push:
+  # A script, not an inline `commands:` run string, because only `scripts:`
+  # gets access to git's pre-push stdin (ref/sha1 lines) — see the header
+  # comment in .lefthook/pre-push/gitleaks-scan-range.sh for why that's needed.
   scripts:
     "gitleaks-scan-range.sh":
       runner: bash
