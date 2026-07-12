@@ -214,14 +214,18 @@ Expected: `git commit --no-verify` succeeds (pre-commit is bypassed on purpose).
 
 - [ ] **Step 10: Clean up the pre-push test — reset the bad commit and remove the scratch remote**
 
+Use a **mixed** reset (not `--hard`) here. `Umbraco.Community.Automate.Demo/appsettings.Development.json` has an uncommitted, local-only working-tree modification (real OAuth credentials a contributor uses for manual testing) that must never be touched by this plan. `git reset --hard` rewrites the working tree to match `HEAD~1` and would silently discard that modification along with the test commit. `git reset` (mixed, the default) only moves HEAD and the index — it never touches the working tree — so the uncommitted modification survives untouched. The test commit's only file (`gitleaks-verify-test.js`) becomes untracked again and is removed manually, the same pattern Step 8 already uses for the pre-commit test cleanup.
+
 ```bash
-git reset --hard HEAD~1
+git reset HEAD~1
+rm gitleaks-verify-test.js
 rm -rf /tmp/gitleaks-verify-remote.git
 git remote remove gitleaks-verify-remote
 git log -1 --oneline
+git status
 ```
 
-Expected: `git log -1` no longer shows the "bypasses pre-commit" test commit — you're back to the commit from before Step 9 (Task 1's commit). `git status` should show the same clean/pre-existing state as before Step 9 (the config files from Steps 3-5 are untracked, not yet committed, exactly as they were).
+Expected: `git log -1` no longer shows the "bypasses pre-commit" test commit — you're back to the commit from before Step 9 (Task 1's commit). `git status` should show the same clean/pre-existing state as before Step 9 (the config files from Steps 3-5 are untracked, not yet committed, exactly as they were) — including `Umbraco.Community.Automate.Demo/appsettings.Development.json` still showing as locally modified, unchanged from before this step.
 
 - [ ] **Step 11: Verify a clean commit still succeeds through the hook**
 
