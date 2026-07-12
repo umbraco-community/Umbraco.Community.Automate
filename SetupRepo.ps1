@@ -10,8 +10,16 @@ if (-not (Get-Command gitleaks -ErrorAction SilentlyContinue)) {
 
 Write-Host "Installing repo tooling (Lefthook)..."
 npm install
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "npm install failed (exit code $LASTEXITCODE). Setup did not complete."
+    exit 1
+}
 
 Write-Host "Installing git hooks..."
 npx lefthook install
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "npx lefthook install failed (exit code $LASTEXITCODE). Setup did not complete."
+    exit 1
+}
 
 Write-Host "Setup complete. Git hooks are now active for this clone."
