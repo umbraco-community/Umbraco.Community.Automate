@@ -4,15 +4,14 @@
 
 While reviewing the Umbraco.Community.Automate repo's git history (as part of investigating a security note raised during a prior code review), a real Google OAuth `ClientId`/`ClientSecret` pair was found to have been staged and gotten as far as a local `git stash` entry on 2026-06-27, before being caught. Investigation (`git ls-remote`, GitHub's commit API, GitHub's commit search API) confirmed this specific incident never reached the public GitHub remote — but the near-miss exposed a real gap: `Umbraco.Community.Automate.Demo/appsettings.Development.json` is tracked in git with placeholder values (`"e2e-test"` for `ClientId`/`ClientSecret`, needed so CI's OpenIddict registration doesn't throw), but developers need real OAuth credentials in that same file locally to manually test the actual Google OAuth consent flow — meaning every local testing session carries a live risk of a real secret ending up staged, committed, and pushed to this public repo.
 
-This repo is a monorepo intended to hold more provider packages over time, each potentially needing its own OAuth-style connection type — so this exact risk class will likely recur per-package, not just for Google Sheets. The fix needs to be structural (reduce how often a real secret is ever near a tracked file) and defense-in-depth (assume any single layer can fail or be bypassed).
+This repo is a monorepo intended to hold more provider packages over time, each potentially needing its own OAuth-style connection type — so this exact risk class will likely recur per-package, not just for Google Sheets. The fix needs to be structural (reduce how often a real secret is ever near a tracked file) and layered locally (assume the first layer can be bypassed or skipped).
 
 ## Approach
 
-Three independent layers, from earliest-possible catch to last-resort backstop:
+Two layers, both local — deliberately no CI/server-side layer (see "Explicitly out of scope"):
 
 1. **Remove the opportunity** — real credentials should never need to go into a git-tracked file at all.
 2. **Catch it locally, before a commit exists** — a pre-commit hook scans staged changes; a pre-push hook re-scans outgoing commits as a second local check.
-3. **Catch it server-side if both local layers were skipped or bypassed** — a CI job scans on every PR.
 
 ## 1. Structural fix — .NET User Secrets
 
@@ -93,22 +92,7 @@ tags = ["google", "oauth", "client-id"]
 
 **One-time contributor setup** (documented in `CONTRIBUTING.md`, see below): `npm install && npx lefthook install`.
 
-## 3. CI backstop
-
-A new step in `.github/workflows/ci.yml`'s `backend-tests` job (or a new lightweight job — implementation detail for the plan), running the raw `gitleaks` CLI directly against the pushed commits:
-
-```yaml
-- name: Scan for secrets
-  run: |
-    curl -sSfL https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_$(uname -s)_x64.tar.gz | tar -xz gitleaks
-    ./gitleaks detect --source . --config .gitleaks.toml --redact
-```
-
-(Exact install/version-pinning mechanics are a plan-level detail — the point captured here is: no `gitleaks/gitleaks-action` wrapper.)
-
-**Decision: raw CLI, not the `gitleaks/gitleaks-action` GitHub Action wrapper.** The wrapper adds PR-comment annotations and GitHub Security-tab SARIF upload, but — since `umbraco-community` is a GitHub *organization* account, not a personal account — using it requires registering for a free `GITLEAKS_LICENSE` key at gitleaks.io and storing it as an org/repo secret (verified against the Action's current README; personal accounts don't need this, org accounts do). This CI layer is explicitly the backstop that should rarely if ever actually fire, given the two local layers above it — for a check expected to almost never trigger, a failing red X with gitleaks' own direct output (file, line, matched rule) is sufficient for a maintainer to act on; it doesn't need polished UX. Avoiding the wrapper also means one external dependency fewer (a license-validation call) in the path of the highest-stakes check in the pipeline, and keeps the same CLI invocation pattern used by the local hooks — one tool, one config, one way of calling it, in three places.
-
-## 4. Documentation
+## 3. Documentation
 
 New `CONTRIBUTING.md` section (placed near the existing "Building and testing" section, since it's setup guidance contributors need before their first commit):
 
@@ -120,12 +104,12 @@ New `CONTRIBUTING.md` section (placed near the existing "Building and testing" s
 
 - Cleaning up the existing local git stash or the current uncommitted `appsettings.Development.json` working-tree change — user has explicitly said to leave both alone; this design is prevention-only.
 - Any git history rewrite (the stash never reached the public remote, so there is nothing in the *pushed* history to scrub — see Context above).
-- trufflehog, betterleaks, or the `gitleaks/gitleaks-action` wrapper — considered and explicitly not chosen, with reasoning captured above so a future revisit doesn't re-litigate from scratch.
+- A CI/server-side scanning layer — deliberately not included. The two local layers (pre-commit, pre-push) are considered sufficient; a CI check that's expected to essentially never fire, given those two layers, was judged not worth the added workflow to maintain. Can be revisited later if the local hooks ever prove insufficient in practice.
+- trufflehog, betterleaks, or the `gitleaks/gitleaks-action` wrapper — considered and explicitly not chosen (the latter specifically evaluated for the now-dropped CI layer), with reasoning captured in earlier design discussion so a future revisit doesn't re-litigate from scratch.
 
 ## Verification plan (for the implementation phase)
 
 - Confirm `dotnet user-secrets set`/`dotnet user-secrets list` work against the Demo project once `UserSecretsId` is added, and that a value set this way is visible in the running app's configuration while `appsettings.Development.json` itself is untouched.
 - Confirm the pre-commit hook actually blocks a commit: stage a file containing a synthetic string matching the custom `GOCSPX-` rule (not a real secret), attempt `git commit`, confirm it's rejected; then unstage/remove it and confirm a normal commit succeeds.
 - Confirm the pre-push hook behaves the same way for a commit made with `--no-verify` (bypassing pre-commit) that's then `git push`ed.
-- Confirm the CI gitleaks step fails the job when run against a branch containing the same synthetic test string, and passes on a clean branch.
 - Confirm `npm install && npx lefthook install` is a complete, working setup path on a fresh clone (no other manual steps required).
