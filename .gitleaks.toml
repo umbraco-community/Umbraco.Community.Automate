@@ -1,0 +1,14 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "google-oauth-client-secret"
+description = "Google OAuth 2.0 Client Secret"
+regex = '''GOCSPX-[A-Za-z0-9_-]{28}'''
+tags = ["google", "oauth", "secret"]
+
+[[rules]]
+id = "google-oauth-client-id"
+description = "Google OAuth 2.0 Client ID"
+regex = '''\d{10,}-[a-z0-9]{32}\.apps\.googleusercontent\.com'''
+tags = ["google", "oauth", "client-id"]

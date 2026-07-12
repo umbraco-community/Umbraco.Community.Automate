@@ -1,0 +1,9 @@
+pre-commit:
+  commands:
+    gitleaks:
+      run: gitleaks protect --staged --config .gitleaks.toml --verbose
+
+pre-push:
+  commands:
+    gitleaks:
+      run: gitleaks protect --config .gitleaks.toml --verbose
