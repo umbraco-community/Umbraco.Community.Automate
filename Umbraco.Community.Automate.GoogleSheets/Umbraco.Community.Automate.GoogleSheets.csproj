@@ -28,6 +28,7 @@
         <PackageReference Include="Umbraco.Automate.Core" />
         <PackageReference Include="Umbraco.Automate.OpenIddict" />
         <PackageReference Include="OpenIddict.Client.WebIntegration" />
+        <PackageReference Include="MinVer" PrivateAssets="All" />
     </ItemGroup>
 
     <!-- Ship buildTransitive props so consuming sites' CopyUmbracoJsonSchemaFiles target
