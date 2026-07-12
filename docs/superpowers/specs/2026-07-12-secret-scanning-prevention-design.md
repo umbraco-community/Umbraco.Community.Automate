@@ -90,14 +90,57 @@ regex = '''\d{10,}-[a-z0-9]{32}\.apps\.googleusercontent\.com'''
 tags = ["google", "oauth", "client-id"]
 ```
 
-**One-time contributor setup** (documented in `CONTRIBUTING.md`, see below): `npm install && npx lefthook install`.
+**One-time contributor setup:** rather than documenting `npm install && npx lefthook install` as manual steps, ship a setup script per platform so the failure mode for a missing prerequisite is a clear message instead of a cryptic `npm: command not found`.
 
-## 3. Documentation
+## 3. Setup scripts — `SetupRepo.sh` / `SetupRepo.ps1`
+
+Both at the repo root (maximally discoverable — visible alongside `README.md`/`CONTRIBUTING.md` on first clone, no need to know a `scripts/` folder exists). Deliberately narrow scope: check Node.js is present, then run the two setup commands. Not a general bootstrap script — no `dotnet restore`, no cert trust, nothing beyond what this design needs.
+
+**`SetupRepo.sh`** (macOS/Linux):
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "Node.js is required but not found. Install it from https://nodejs.org, then re-run this script." >&2
+  exit 1
+fi
+
+echo "Installing repo tooling (Lefthook)..."
+npm install
+
+echo "Installing git hooks..."
+npx lefthook install
+
+echo "Setup complete. Git hooks are now active for this clone."
+```
+
+**`SetupRepo.ps1`** (Windows):
+
+```powershell
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    Write-Error "Node.js is required but not found. Install it from https://nodejs.org, then re-run this script."
+    exit 1
+}
+
+Write-Host "Installing repo tooling (Lefthook)..."
+npm install
+
+Write-Host "Installing git hooks..."
+npx lefthook install
+
+Write-Host "Setup complete. Git hooks are now active for this clone."
+```
+
+`SetupRepo.sh` needs its executable bit set (`chmod +x SetupRepo.sh`) when committed, so `./SetupRepo.sh` works without a contributor needing to know to `chmod` it themselves first.
+
+## 4. Documentation
 
 New `CONTRIBUTING.md` section (placed near the existing "Building and testing" section, since it's setup guidance contributors need before their first commit):
 
 - Why real OAuth credentials must never go into `appsettings.Development.json`, and the `dotnet user-secrets set` commands to use instead.
-- The one-time hook setup command (`npm install && npx lefthook install`).
+- The one-time setup step: run `./SetupRepo.sh` (macOS/Linux) or `.\SetupRepo.ps1` (Windows).
 - What a caught-secret error looks like (gitleaks' console output blocking the commit/push) and how to resolve it (unstage the offending change, move the real value to User Secrets instead, re-commit).
 
 ## Explicitly out of scope
@@ -112,4 +155,5 @@ New `CONTRIBUTING.md` section (placed near the existing "Building and testing" s
 - Confirm `dotnet user-secrets set`/`dotnet user-secrets list` work against the Demo project once `UserSecretsId` is added, and that a value set this way is visible in the running app's configuration while `appsettings.Development.json` itself is untouched.
 - Confirm the pre-commit hook actually blocks a commit: stage a file containing a synthetic string matching the custom `GOCSPX-` rule (not a real secret), attempt `git commit`, confirm it's rejected; then unstage/remove it and confirm a normal commit succeeds.
 - Confirm the pre-push hook behaves the same way for a commit made with `--no-verify` (bypassing pre-commit) that's then `git push`ed.
-- Confirm `npm install && npx lefthook install` is a complete, working setup path on a fresh clone (no other manual steps required).
+- Confirm `./SetupRepo.sh` on macOS/Linux is a complete, working setup path on a fresh clone (no other manual steps required), and that it fails with the friendly message (not a stack trace) when Node isn't on `PATH`.
+- Confirm `SetupRepo.ps1` does the same on Windows (or via PowerShell Core on macOS/Linux as a syntax/logic check, if a Windows machine isn't available to test on directly).
