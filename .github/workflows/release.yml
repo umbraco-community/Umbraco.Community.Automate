@@ -92,6 +92,10 @@ jobs:
       - name: Push to NuGet.org
         run: |
           set -euo pipefail
+          # Only globs *.nupkg, but this also pushes the matching *.snupkg symbol
+          # package sitting alongside it in ./artifacts: dotnet nuget push does
+          # this automatically unless --no-symbols is passed, and NuGet.org's V3
+          # source (below) is exactly what's needed for symbol publishing.
           for f in ./artifacts/*.nupkg; do
             dotnet nuget push "$f" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
           done
