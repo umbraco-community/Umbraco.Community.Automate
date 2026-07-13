@@ -42,7 +42,7 @@ bld/
 
 # wwwroot for npm/vite-built provider frontends is entirely generated output
 # (the package source of truth lives under each provider's Client/ folder)
-Umbraco.Community.Automate.GoogleSheets/wwwroot/
+GoogleSheets/Umbraco.Community.Automate.GoogleSheets/wwwroot/
 
 # Playwright E2E artifacts
 playwright-report/

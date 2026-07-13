@@ -6,7 +6,7 @@ Monorepo for community-created [Umbraco Automate](https://github.com/umbraco/Umb
 
 | Package | Description |
 |---|---|
-| [Umbraco.Community.Automate.GoogleSheets](Umbraco.Community.Automate.GoogleSheets/README.md) | Google Sheets connection and actions (append/find/update/delete/upsert rows, read/clear ranges, create spreadsheets and tabs) |
+| [Umbraco.Community.Automate.GoogleSheets](GoogleSheets/Umbraco.Community.Automate.GoogleSheets/README.md) | Google Sheets connection and actions (append/find/update/delete/upsert rows, read/clear ranges, create spreadsheets and tabs) |
 
 ## Contributing
 

@@ -73,4 +73,4 @@ If a run fails saying Google is rate-limiting requests, this isn't an error with
 
 ## License
 
-MIT — see [LICENSE](../LICENSE) for details.
+MIT — see [LICENSE](../../LICENSE) for details.

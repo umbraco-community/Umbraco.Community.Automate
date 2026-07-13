@@ -9,7 +9,7 @@ on:
 env:
   DOTNET_VERSION: '10.0.x'
   NODE_VERSION: '22.x'
-  CLIENT_DIR: Umbraco.Community.Automate.GoogleSheets/Client
+  CLIENT_DIR: GoogleSheets/Umbraco.Community.Automate.GoogleSheets/Client
 
 jobs:
   backend-tests:
@@ -26,17 +26,17 @@ jobs:
 
       - run: dotnet build --no-restore --configuration Release
 
-      - run: dotnet test Umbraco.Community.Automate.GoogleSheets.Tests --no-build --configuration Release
+      - run: dotnet test GoogleSheets/Umbraco.Community.Automate.GoogleSheets.Tests --no-build --configuration Release
 
       - name: Verify the package still packs
-        run: dotnet pack Umbraco.Community.Automate.GoogleSheets --no-build --configuration Release --output ./pack-check
+        run: dotnet pack GoogleSheets/Umbraco.Community.Automate.GoogleSheets --no-build --configuration Release --output ./pack-check
 
   frontend-unit-tests:
     name: Frontend unit tests
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ github.workspace }}/Umbraco.Community.Automate.GoogleSheets/Client
+        working-directory: ${{ github.workspace }}/GoogleSheets/Umbraco.Community.Automate.GoogleSheets/Client
     steps:
       - uses: actions/checkout@v7
 

@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <Authors>Warren Buckley &amp; Umbraco Community</Authors>
-    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Umbraco.Community.Automate.GoogleSheets</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/GoogleSheets/Umbraco.Community.Automate.GoogleSheets</PackageProjectUrl>
     <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
