@@ -12,6 +12,7 @@
     <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.4.2" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
     <PackageVersion Include="OpenIddict.Client.WebIntegration" Version="[7.4.0, 7.999.999)" />
+    <PackageVersion Include="MinVer" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
