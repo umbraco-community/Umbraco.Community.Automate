@@ -1,0 +1,13 @@
+pre-commit:
+  commands:
+    gitleaks:
+      run: gitleaks protect --staged --config .gitleaks.toml --redact --verbose
+
+pre-push:
+  # A standalone script, not an inline `commands:` run string — not a stdin
+  # limitation (commands: supports use_stdin too), but because this branching
+  # logic reads better as its own file. See its header comment for details.
+  scripts:
+    "gitleaks-scan-range.sh":
+      runner: bash
+      use_stdin: true
