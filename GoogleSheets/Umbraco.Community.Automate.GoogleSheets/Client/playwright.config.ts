@@ -46,7 +46,7 @@ export default defineConfig({
     ],
 
     webServer: {
-        cwd: join(__dirname, '../../Umbraco.Community.Automate.Demo'),
+        cwd: join(__dirname, '../../../Umbraco.Community.Automate.Demo'),
         command: 'dotnet run --urls "https://localhost:44343;http://localhost:52012"',
         // Polled over plain HTTP because Node's built-in TCP/HTTP checker can't validate the
         // self-signed dev cert on the HTTPS port — browser tests still go over HTTPS via `baseURL`.
