@@ -97,7 +97,7 @@ Trusted Publishing is bound to this specific repository and workflow — a fork'
 
 ## Supporting multiple Umbraco versions
 
-This package depends on `Umbraco.Automate`/`Umbraco.Automate.Core`/`Umbraco.Automate.OpenIddict` directly — never on `Umbraco.Cms` itself, which is a transitive dependency pulled in through `Umbraco.Automate`. Compatibility is tracked against `Umbraco.Automate`'s own version, not Umbraco.Cms's: `Umbraco.Automate` already aligns its own major version number with the Umbraco.Cms major it targets (e.g. `17.0.0-beta.1` is built for Umbraco 17), so a provider package here inherits that signal for free without needing to duplicate a Umbraco.Cms compatibility claim of its own.
+This package depends on `Umbraco.Automate`/`Umbraco.Automate.Core`/`Umbraco.Automate.OpenIddict` directly — never on `Umbraco.Cms` itself, which is a transitive dependency pulled in through `Umbraco.Automate`. Compatibility is tracked against `Umbraco.Automate`'s own version, not Umbraco.Cms's: `Umbraco.Automate` already aligns its own major version number with the Umbraco.Cms major it targets (e.g. `17.0.0` is built for Umbraco 17), so a provider package here inherits that signal for free without needing to duplicate a Umbraco.Cms compatibility claim of its own.
 
 ### Two independent version numbers
 
@@ -110,7 +110,7 @@ These deliberately don't move together, and a package's own major version does *
 
 ### Widening the range only after verifying it
 
-A NuGet version range like `[17.0.0-beta.1, 18.0.0)` resolves to its *lowest* satisfying version during restore/build, not the newest one inside the range — widening the range's ceiling doesn't make CI start testing against it automatically. So when a new `Umbraco.Automate` version ships: build and run the full test suite against it first (locally, or via a one-off local `VersionOverride` bump), and only widen the declared range once that passes. Every version inside a declared range should have been verified at least once at the point it was added.
+A NuGet version range like `[17.0.0, 18.0.0)` resolves to its *lowest* satisfying version during restore/build, not the newest one inside the range — widening the range's ceiling doesn't make CI start testing against it automatically. So when a new `Umbraco.Automate` version ships: build and run the full test suite against it first (locally, or via a one-off local `VersionOverride` bump), and only widen the declared range once that passes. Every version inside a declared range should have been verified at least once at the point it was added.
 
 This doesn't catch everything: a *later* patch release inside an already-widened range can still break something nobody explicitly re-tested against (see the worked example below). That's a real, accepted residual risk — continuously re-testing against every new `Umbraco.Automate` patch isn't worth the process overhead here. The defensive patch practice below is how that risk gets handled when it actually materializes, not a way to prevent it.
 
@@ -142,15 +142,15 @@ When a fork is actually needed:
 
 ### Worked example: a hypothetical `Umbraco.Automate` 18.2 break
 
-Say a package currently declares `Umbraco.Automate` support as `[17.0.0-beta.1, 19.0.0)` (verified against 17.0.0 and 18.0.0/18.1.0 at various points), and is on package version `1.6.0`.
+Say a package currently declares `Umbraco.Automate` support as `[17.0.0, 19.0.0)` (verified against 17.0.0 and 18.0.0/18.1.0 at various points), and is on package version `1.6.0`.
 
 1. `Umbraco.Automate` 18.2.0 ships. A bug report comes in: something that worked on 18.1.0 and earlier now throws on 18.2.0.
-2. **First move — defensive patch:** narrow the range in `Directory.Packages.props` from `[17.0.0-beta.1, 19.0.0)` to `[17.0.0-beta.1, 18.2.0)`, bump the package to `1.6.1`, tag `googlesheets-v1.6.1`, push. This ships immediately, before any real fix exists — it just stops new installs on 18.2.0+ from pulling in a package version already known not to work for them.
-3. **Decide: fork or not?** Investigate the break. If it's fixable with a version check or a try/fallback that still works on 17.x–18.1.x too: fix it, restore the range to `[17.0.0-beta.1, 19.0.0)`, ship `1.6.2`. Done — no fork.
+2. **First move — defensive patch:** narrow the range in `Directory.Packages.props` from `[17.0.0, 19.0.0)` to `[17.0.0, 18.2.0)`, bump the package to `1.6.1`, tag `googlesheets-v1.6.1`, push. This ships immediately, before any real fix exists — it just stops new installs on 18.2.0+ from pulling in a package version already known not to work for them.
+3. **Decide: fork or not?** Investigate the break. If it's fixable with a version check or a try/fallback that still works on 17.x–18.1.x too: fix it, restore the range to `[17.0.0, 19.0.0)`, ship `1.6.2`. Done — no fork.
 4. **If it's not fixable in one build** (say 18.2.0 removed something the code genuinely needs, with no compatible shim): this is the fork point.
    - Cut `googlesheets-v1` from the `googlesheets-v1.6.0` tag (the last version that was genuinely 17.x–18.1.x-compatible, *before* the defensive narrowing in step 2).
    - On `main`, adapt the code for 18.2.0's change, set the range to `[18.2.0, 19.0.0)`, and release this as `2.0.0` — the package major bump reflects that the compatibility contract genuinely changed.
-   - `googlesheets-v1` keeps declaring `[17.0.0-beta.1, 18.2.0)` (from the defensive patch in step 2) and can still receive its own patches (tagged `googlesheets-v1.6.x`) if something else needs fixing for 17.x–18.1.x users, independently of whatever happens on `main` going forward.
+   - `googlesheets-v1` keeps declaring `[17.0.0, 18.2.0)` (from the defensive patch in step 2) and can still receive its own patches (tagged `googlesheets-v1.6.x`) if something else needs fixing for 17.x–18.1.x users, independently of whatever happens on `main` going forward.
 5. A month later, someone reports a separate, unrelated bug that also affects `googlesheets-v1` users. Fix it on a branch off `googlesheets-v1`, PR against `googlesheets-v1`, tag `googlesheets-v1.6.3`. Since the same bug also exists in `main`'s `2.x` code, that's a second, separate cherry-pick PR into `main`.
 
 ## License

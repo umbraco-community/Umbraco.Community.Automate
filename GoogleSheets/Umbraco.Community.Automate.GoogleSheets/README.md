@@ -8,7 +8,7 @@ Umbraco.Community.Automate.GoogleSheets is a provider package that adds Google S
 
 ## Requirements
 
-Supports `Umbraco.Automate` 17.x (declared range: `[17.0.0-beta.1, 18.0.0)`). See [CONTRIBUTING.md](../../CONTRIBUTING.md#supporting-multiple-umbraco-versions) for how this range is maintained and when it changes.
+Supports `Umbraco.Automate` 17.x (declared range: `[17.0.0, 18.0.0)`). See [CONTRIBUTING.md](../../CONTRIBUTING.md#supporting-multiple-umbraco-versions) for how this range is maintained and when it changes.
 
 ## Key Features
 
