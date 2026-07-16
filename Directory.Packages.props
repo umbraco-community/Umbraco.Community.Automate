@@ -4,14 +4,29 @@
     <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Umbraco.Automate" Version="17.0.0-beta.1" />
-    <PackageVersion Include="Umbraco.Automate.Core" Version="17.0.0-beta.1" />
-    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="17.0.0-beta.1" />
-    <PackageVersion Include="Umbraco.Automate.Testing" Version="17.0.0-beta.1" />
+    <!-- Umbraco.Automate, .Core, .OpenIddict, and .Testing are released together as
+         one version family upstream and always move in lockstep. Expressed as a
+         range (not an exact pin) so this package can declare "supports the whole
+         17.x-18.x line" rather than one specific patch — see CONTRIBUTING.md's
+         "Supporting multiple Umbraco versions" section for the full policy this
+         implements. Floor is the real stable 17.0.0 release. Ceiling widened to
+         19.0.0 (exclusive) after manually verifying this package builds and
+         passes its test suite forced onto 18.0.0 + Umbraco.Cms 18.0.2 - this also
+         surfaced a real transitive requirement (Umbraco.Automate.OpenIddict.Core
+         18.0.0 needs OpenIddict.Client.WebIntegration >= 7.5.0, vs our own 7.4.0
+         floor below), fixed by raising that floor to 7.5.0 - still within 17.0.0's
+         own accepted range ([7.4.0, 7.999.999)), so one build genuinely serves the
+         whole 17.x-18.x range without forking. Widen further only after manually
+         verifying against whatever prompted it - see the "widening only happens
+         after verifying" policy in CONTRIBUTING.md. -->
+    <PackageVersion Include="Umbraco.Automate" Version="[17.0.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.Core" Version="[17.0.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="[17.0.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.Testing" Version="[17.0.0, 19.0.0)" />
     <PackageVersion Include="Umbraco.Cms" Version="17.4.2" />
     <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.4.2" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
-    <PackageVersion Include="OpenIddict.Client.WebIntegration" Version="[7.4.0, 7.999.999)" />
+    <PackageVersion Include="OpenIddict.Client.WebIntegration" Version="[7.5.0, 7.999.999)" />
     <PackageVersion Include="MinVer" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>

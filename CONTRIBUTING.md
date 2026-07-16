@@ -95,6 +95,64 @@ Trusted Publishing is bound to this specific repository and workflow — a fork'
 2. Register a Trusted Publishing policy for the new package on nuget.org, scoped to this repo, the `release.yml` workflow, and the `nuget-publish` environment.
 3. No changes to `release.yml` itself are needed — it resolves the package from the tag automatically.
 
+## Supporting multiple Umbraco versions
+
+This package depends on `Umbraco.Automate`/`Umbraco.Automate.Core`/`Umbraco.Automate.OpenIddict` directly — never on `Umbraco.Cms` itself, which is a transitive dependency pulled in through `Umbraco.Automate`. Compatibility is tracked against `Umbraco.Automate`'s own version, not Umbraco.Cms's: `Umbraco.Automate` already aligns its own major version number with the Umbraco.Cms major it targets (e.g. `17.0.0` is built for Umbraco 17), so a provider package here inherits that signal for free without needing to duplicate a Umbraco.Cms compatibility claim of its own.
+
+### Two independent version numbers
+
+A package has two things that can each change independently:
+
+1. **Its own SemVer** (`major.minor.patch`) — the package's own public API/behavior contract.
+2. **Its declared `Umbraco.Automate` compatibility range** — expressed as the `Umbraco.Automate`/`.Core`/`.OpenIddict` `PackageReference` version range in `Directory.Packages.props` (or a package-specific `VersionOverride` if it needs to diverge from the repo-wide default — see NuGet's [Central Package Management docs](https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management#overriding-package-versions)), and documented in the package's own README.
+
+These deliberately don't move together, and a package's own major version does **not** mirror `Umbraco.Automate`'s major number. If it did, every `Umbraco.Automate` major release would force a matching package release just to keep the numbers in sync — even when nothing in the package actually needed to change. The default expectation: a new `Umbraco.Automate` version with zero impact on a package means only a documentation update (widen the range), not a new release.
+
+### Widening the range only after verifying it
+
+A NuGet version range like `[17.0.0, 18.0.0)` resolves to its *lowest* satisfying version during restore/build, not the newest one inside the range — widening the range's ceiling doesn't make CI start testing against it automatically. So when a new `Umbraco.Automate` version ships: build and run the full test suite against it first (locally, or via a one-off local `VersionOverride` bump), and only widen the declared range once that passes. Every version inside a declared range should have been verified at least once at the point it was added.
+
+This doesn't catch everything: a *later* patch release inside an already-widened range can still break something nobody explicitly re-tested against (see the worked example below). That's a real, accepted residual risk — continuously re-testing against every new `Umbraco.Automate` patch isn't worth the process overhead here. The defensive patch practice below is how that risk gets handled when it actually materializes, not a way to prevent it.
+
+### When to fork: one build can no longer serve the whole range
+
+Bumping a package's own major version and creating a maintenance branch is only warranted when **one build can no longer serve the whole currently-declared range**. Three different things can cause that, and all three are handled the same way:
+
+- A new `Umbraco.Automate` major breaks something.
+- A breaking change lands mid-minor, inside an already-supported range.
+- The package wants to adopt a new `Umbraco.Automate`/Umbraco capability (backend or client-side/npm) that doesn't exist across the whole currently-declared range.
+
+Before forking, always ask: **can one build still serve the whole range?** (Runtime/compile-time feature detection, a conditional code path, a try/fallback — backend: reflection or a version check; client-side/npm: check the API exists before using it, e.g. `typeof someNewThing !== 'undefined'`, and gracefully degrade on older versions.) If yes, do that instead — ship a normal patch or minor release, keep one range, no fork. Reach for a fork only when the change is central enough that dual-path logic genuinely isn't worth maintaining. This is a per-change judgment call, not a fixed rule.
+
+(True multi-targeting — one package with conditionally-compiled code per `Umbraco.Automate` version — is deliberately not used here. It adds real, permanent build complexity for a benefit almost always achievable more cheaply via feature detection.)
+
+### If a break is discovered: patch the range defensively, first
+
+The moment a break is discovered in a version inside the currently-declared range — CI failure, bug report, manual testing — the first move, before any real fix exists, is a low-ceremony patch release of the *current* line that narrows the range's ceiling to exclude the broken version. This stops NuGet from letting a new install on the broken version pull in a package release that's already known not to work for it. Do this regardless of whether the eventual fix turns out to need a fork or not — it's a protective measure, not a decision about the fix.
+
+### Maintenance branches
+
+When a fork is actually needed:
+
+- **Naming:** `<package-slug>-v<major>` (e.g. `googlesheets-v1`) — matches the existing tag prefix convention, not a specific `Umbraco.Automate`/Umbraco version, since one package major can span multiple `Umbraco.Automate` majors under the range-widening policy above.
+- **Creation:** cut from the last tag that was genuinely still compatible with the full old range, *before* any defensive narrowing or adaptation commits. `main` moves forward with the new floor and the new package major; the maintenance branch keeps the old, narrower range.
+- **Patching the old line:** a short-lived branch off the maintenance branch → PR *targets the maintenance branch*, not `main` → merge → tag a patch release from the maintenance branch's HEAD (e.g. `googlesheets-v1.4.3`) → push the tag. Tags aren't branch-scoped, so the release workflow fires exactly as it does from `main`.
+- **Cross-porting:** if a maintenance-branch fix also matters for current `main`, that's a separate, manual cherry-pick PR — not automatic.
+- **Retirement:** maintenance branches are never deleted. A line that stops getting patches just goes inert; it stays as an accurate historical record and can resume receiving patches later without recreating anything.
+
+### Worked example: a hypothetical `Umbraco.Automate` 18.2 break
+
+Say a package currently declares `Umbraco.Automate` support as `[17.0.0, 19.0.0)` (verified against 17.0.0 and 18.0.0/18.1.0 at various points), and is on package version `1.6.0`.
+
+1. `Umbraco.Automate` 18.2.0 ships. A bug report comes in: something that worked on 18.1.0 and earlier now throws on 18.2.0.
+2. **First move — defensive patch:** narrow the range in `Directory.Packages.props` from `[17.0.0, 19.0.0)` to `[17.0.0, 18.2.0)`, bump the package to `1.6.1`, tag `googlesheets-v1.6.1`, push. This ships immediately, before any real fix exists — it just stops new installs on 18.2.0+ from pulling in a package version already known not to work for them.
+3. **Decide: fork or not?** Investigate the break. If it's fixable with a version check or a try/fallback that still works on 17.x–18.1.x too: fix it, restore the range to `[17.0.0, 19.0.0)`, ship `1.6.2`. Done — no fork.
+4. **If it's not fixable in one build** (say 18.2.0 removed something the code genuinely needs, with no compatible shim): this is the fork point.
+   - Cut `googlesheets-v1` from the `googlesheets-v1.6.0` tag (the last version that was genuinely 17.x–18.1.x-compatible, *before* the defensive narrowing in step 2).
+   - On `main`, adapt the code for 18.2.0's change, set the range to `[18.2.0, 19.0.0)`, and release this as `2.0.0` — the package major bump reflects that the compatibility contract genuinely changed.
+   - `googlesheets-v1` keeps declaring `[17.0.0, 18.2.0)` (from the defensive patch in step 2) and can still receive its own patches (tagged `googlesheets-v1.6.x`) if something else needs fixing for 17.x–18.1.x users, independently of whatever happens on `main` going forward.
+5. A month later, someone reports a separate, unrelated bug that also affects `googlesheets-v1` users. Fix it on a branch off `googlesheets-v1`, PR against `googlesheets-v1`, tag `googlesheets-v1.6.3`. Since the same bug also exists in `main`'s `2.x` code, that's a second, separate cherry-pick PR into `main`.
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](LICENSE).
