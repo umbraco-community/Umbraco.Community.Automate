@@ -6,6 +6,10 @@ Google Sheets connection and actions for [Umbraco Automate](https://github.com/u
 
 Umbraco.Community.Automate.GoogleSheets is a provider package that adds Google Sheets connectivity to Umbraco Automate. It contributes a Google Sheets connection type (authenticated via OAuth) and ten actions covering the spreadsheet lifecycle — creating spreadsheets and sheet tabs, appending/finding/updating/deleting/upserting rows, and reading or clearing ranges — so an automation can manage spreadsheet data end-to-end without leaving the workflow builder.
 
+## Requirements
+
+Supports `Umbraco.Automate` 17.x (declared range: `[17.0.0-beta.1, 18.0.0)`). See [CONTRIBUTING.md](../../CONTRIBUTING.md#supporting-multiple-umbraco-versions) for how this range is maintained and when it changes.
+
 ## Key Features
 
 - **Google Sheets connection type** — OAuth-based connection managed in the backoffice, powered by [Umbraco.Automate.OpenIddict](https://www.nuget.org/packages/Umbraco.Automate.OpenIddict)
