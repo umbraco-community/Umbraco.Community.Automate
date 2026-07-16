@@ -4,10 +4,22 @@
     <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Umbraco.Automate" Version="17.0.0-beta.1" />
-    <PackageVersion Include="Umbraco.Automate.Core" Version="17.0.0-beta.1" />
-    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="17.0.0-beta.1" />
-    <PackageVersion Include="Umbraco.Automate.Testing" Version="17.0.0-beta.1" />
+    <!-- Umbraco.Automate, .Core, .OpenIddict, and .Testing are released together as
+         one version family upstream and always move in lockstep. Expressed as a
+         range (not an exact pin) so this package can declare "supports the whole
+         17.x line" rather than one specific patch — see CONTRIBUTING.md's
+         "Supporting multiple Umbraco versions" section for the full policy this
+         implements. Only 17.0.0-beta.1 exists upstream today, so this range
+         currently has exactly one satisfying version; the range still resolves to
+         it correctly (NuGet allows prerelease versions within a range whose own
+         bound is itself a prerelease). Widen the "18.0.0" ceiling only after
+         manually verifying this package still builds and passes its test suite
+         against whatever new Umbraco.Automate version prompted the change - see
+         the "widening only happens after verifying" policy in CONTRIBUTING.md. -->
+    <PackageVersion Include="Umbraco.Automate" Version="[17.0.0-beta.1, 18.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.Core" Version="[17.0.0-beta.1, 18.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="[17.0.0-beta.1, 18.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.Testing" Version="[17.0.0-beta.1, 18.0.0)" />
     <PackageVersion Include="Umbraco.Cms" Version="17.4.2" />
     <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.4.2" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
