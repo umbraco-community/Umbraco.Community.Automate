@@ -448,7 +448,7 @@ public static class TelegramApiClient
             parse_mode = "MarkdownV2",
         });
 
-        using var request = new HttpRequestMessage(HttpMethod.Post, url)
+        var request = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = new StringContent(payload, Encoding.UTF8, "application/json"),
         };
