@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Warren Buckley &amp; Umbraco Community</Authors>
+    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Telegram/Umbraco.Community.Automate.Telegram</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Tags this repo uses for Telegram releases, e.g. telegram-v1.0.0. IgnoreHeight keeps
+         this package's version independent of unrelated commits elsewhere in the monorepo. -->
+    <MinVerTagPrefix>telegram-v</MinVerTagPrefix>
+    <MinVerIgnoreHeight>true</MinVerIgnoreHeight>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+</Project>

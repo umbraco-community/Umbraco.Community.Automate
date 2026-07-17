@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Title>Umbraco Community Automate Telegram</Title>
+        <Description>Telegram connection, actions, and notification channel for Umbraco Automate</Description>
+        <PackageTags>umbraco automate automation telegram umbraco-marketplace</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Umbraco.Automate.Core" />
+        <PackageReference Include="MinVer" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+</Project>
