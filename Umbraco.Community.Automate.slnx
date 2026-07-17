@@ -3,5 +3,9 @@
     <Project Path="GoogleSheets/Umbraco.Community.Automate.GoogleSheets.Tests/Umbraco.Community.Automate.GoogleSheets.Tests.csproj" />
     <Project Path="GoogleSheets/Umbraco.Community.Automate.GoogleSheets/Umbraco.Community.Automate.GoogleSheets.csproj" />
   </Folder>
+  <Folder Name="/Telegram/">
+    <Project Path="Telegram/Umbraco.Community.Automate.Telegram.Tests/Umbraco.Community.Automate.Telegram.Tests.csproj" />
+    <Project Path="Telegram/Umbraco.Community.Automate.Telegram/Umbraco.Community.Automate.Telegram.csproj" />
+  </Folder>
   <Project Path="Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj" />
 </Solution>
