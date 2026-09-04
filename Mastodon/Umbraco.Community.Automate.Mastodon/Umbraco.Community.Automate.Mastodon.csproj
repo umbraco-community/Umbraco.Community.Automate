@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Umbraco Community Automate Mastodon</Title>
+    <Description>Mastodon connection type and action for Umbraco Automate. Lets you post statuses to any Mastodon instance as part of an automation workflow.</Description>
+    <PackageTags>umbraco automate automation mastodon fediverse umbraco-marketplace</PackageTags>
+    <PackageIcon>umbracoCommunityAutomateMastodon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Automate.Core" />
+    <PackageReference Include="Umbraco.Cms.Core" />
+    <PackageReference Include="Umbraco.Cms.Infrastructure" />
+    <PackageReference Include="MinVer" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- Ships as the NuGet package README (see PackageReadmeFile in Directory.Build.props) and
+       drives the Umbraco Marketplace listing's description, since this repo relies on the
+       auto-sourced NuGet metadata rather than a hosted umbraco-marketplace.json override. -->
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="umbracoCommunityAutomateMastodon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
