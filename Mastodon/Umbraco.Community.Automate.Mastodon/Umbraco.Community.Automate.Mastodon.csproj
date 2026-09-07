@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -8,6 +8,10 @@
     <Description>Mastodon connection type and action for Umbraco Automate. Lets you post statuses to any Mastodon instance as part of an automation workflow.</Description>
     <PackageTags>umbraco automate automation mastodon fediverse umbraco-marketplace</PackageTags>
     <PackageIcon>umbracoCommunityAutomateMastodon.png</PackageIcon>
+    <!-- Serves wwwroot/ as static web assets under this path, which is where
+         MastodonPackageManifestReader points the icons extension's js. -->
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <StaticWebAssetBasePath>App_Plugins/UmbracoCommunityAutomateMastodon</StaticWebAssetBasePath>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,7 +9,7 @@ namespace Umbraco.Community.Automate.Mastodon.ConnectionTypes;
 [ConnectionType("mastodon", "Mastodon",
     Description = "Send post to Mastodon",
     Group = "Social Networks",
-    Icon = "icon-flash")]
+    Icon = "icon-mastodon")]
 public sealed class MastodonConnectionType : ConnectionTypeBase<MastodonSettings>
 {
     private readonly MastodonClientFactory _clientFactory;
