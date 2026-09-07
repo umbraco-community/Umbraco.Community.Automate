@@ -18,6 +18,11 @@
     <PackageReference Include="Umbraco.Automate.Core" />
     <PackageReference Include="Umbraco.Cms.Core" />
     <PackageReference Include="Umbraco.Cms.Infrastructure" />
+    <!-- Don't pull this out again! I removed it thinking it was a hangover from my own
+         repo, but it's what actually versions the package. release.yml packs straight off
+         the mastodon-v* tag and never passes a version, so with MinVer gone everything
+         ships as 1.0.0 and NuGet quietly skips it as a duplicate. -->
+    <PackageReference Include="MinVer" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Ships as the NuGet package README (see PackageReadmeFile in Directory.Build.props) and
