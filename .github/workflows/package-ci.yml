@@ -42,7 +42,7 @@ on:
 
 jobs:
   backend:
-    name: ${{ inputs.name }} / backend
+    name: backend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -65,7 +65,7 @@ jobs:
         run: dotnet pack "${{ inputs.project-dir }}" --configuration Release --output ./pack-check
 
   frontend:
-    name: ${{ inputs.name }} / frontend
+    name: frontend
     if: inputs.client-dir != ''
     runs-on: ubuntu-latest
     defaults:
@@ -87,7 +87,7 @@ jobs:
       - run: npm test
 
   e2e:
-    name: ${{ inputs.name }} / e2e
+    name: e2e
     if: inputs.run-e2e
     runs-on: ubuntu-latest
     steps:

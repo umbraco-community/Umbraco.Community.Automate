@@ -135,7 +135,9 @@ jobs:
           echo "any=$([ "$COUNT" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
   package:
-    name: Package
+    # Without an explicit name GitHub renders the entire matrix object into the job
+    # title, e.g. 'Package (GoogleSheets, GoogleSheets, GoogleSheets/Umbraco...)'.
+    name: ${{ matrix.package.name }}
     needs: discover
     if: needs.discover.outputs.any == 'true'
     strategy:
