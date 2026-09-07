@@ -1,109 +1,179 @@
 name: CI
 
+# Single entry point, so release.yml still gates on one `uses: ./.github/workflows/ci.yml`
+# and adding a package never means editing release.yml.
+#
+# Packages are discovered from the folder layout rather than listed here, so a new package
+# needs no change to this file at all: drop it in following the existing convention
+# (<Area>/Umbraco.Community.Automate.<Area>/ with a sibling .Tests project) and it is picked
+# up on the next run.
+
 on:
   pull_request:
     branches: [main]
   workflow_dispatch:
   workflow_call:
 
-env:
-  DOTNET_VERSION: '10.0.x'
-  NODE_VERSION: '22.x'
-  CLIENT_DIR: GoogleSheets/Umbraco.Community.Automate.GoogleSheets/Client
-
 jobs:
-  backend-tests:
-    name: Backend unit tests
+  discover:
+    name: Discover affected packages
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.discover.outputs.packages }}
+      any: ${{ steps.discover.outputs.any }}
+    steps:
+      # Full history so the merge-base diff below can see the base branch.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Discover packages and work out which are affected
+        id: discover
+        run: |
+          set -euo pipefail
+
+          # A package is any directory with its own Directory.Build.props — the same marker
+          # release.yml already relies on to map a tag back to a package.
+          mapfile -t PROJECT_DIRS < <(
+            find . -mindepth 3 -maxdepth 3 -name Directory.Build.props -not -path './.git/*' \
+              | xargs -r -n1 dirname | sed 's#^\./##' | sort
+          )
+
+          if [ ${#PROJECT_DIRS[@]} -eq 0 ]; then
+            echo "Found no packages — expected at least one Directory.Build.props" >&2
+            exit 1
+          fi
+
+          ALL='[]'
+          AREAS=()
+
+          for PROJECT_DIR in "${PROJECT_DIRS[@]}"; do
+            AREA="${PROJECT_DIR%%/*}"                      # e.g. Mastodon
+            TESTS_DIR="${PROJECT_DIR}.Tests"
+            CLIENT_DIR=""
+            RUN_E2E=false
+
+            if [ ! -d "$TESTS_DIR" ]; then
+              echo "Package '$PROJECT_DIR' has no test project at '$TESTS_DIR'" >&2
+              exit 1
+            fi
+
+            # Optional frontend. Only packages with a Client folder get frontend jobs, and
+            # only one with Playwright specs owns the E2E suite.
+            if [ -d "$PROJECT_DIR/Client" ]; then
+              CLIENT_DIR="$PROJECT_DIR/Client"
+              if compgen -G "$CLIENT_DIR/tests/e2e/*.spec.ts" > /dev/null; then
+                RUN_E2E=true
+              fi
+            fi
+
+            AREAS+=("$AREA")
+            ALL=$(jq -c \
+              --arg name "$AREA" \
+              --arg area "$AREA" \
+              --arg project "$PROJECT_DIR" \
+              --arg tests "$TESTS_DIR" \
+              --arg client "$CLIENT_DIR" \
+              --argjson e2e "$RUN_E2E" \
+              '. + [{name: $name, area: $area, project: $project, tests: $tests, client: $client, e2e: $e2e}]' \
+              <<< "$ALL")
+          done
+
+          echo "Discovered packages:"
+          jq -r '.[] | "  \(.name)  project=\(.project)  client=\(.client // "-")  e2e=\(.e2e)"' <<< "$ALL"
+
+          # Only a pull_request has a diff to narrow by. A tag build (release.yml calls this)
+          # or a manual dispatch has no meaningful base, so everything runs.
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "Event is ${{ github.event_name }} — running every package."
+            echo "packages=$ALL" >> "$GITHUB_OUTPUT"
+            echo "any=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          BASE_SHA='${{ github.event.pull_request.base.sha }}'
+          CHANGED=$(git diff --name-only "$BASE_SHA"...HEAD)
+
+          echo "Changed files:"
+          sed 's/^/  /' <<< "$CHANGED"
+
+          # Fail safe: anything NOT inside a package folder is treated as a shared change and
+          # runs the lot. That covers Directory.Packages.props, the Demo site (which both
+          # packages are referenced by), these workflows, and anything added in future —
+          # without a hand-maintained list of shared paths to forget to update.
+          SHARED=false
+          AFFECTED_AREAS=()
+
+          while IFS= read -r FILE; do
+            [ -z "$FILE" ] && continue
+            MATCHED=false
+            for AREA in "${AREAS[@]}"; do
+              if [[ "$FILE" == "$AREA/"* ]]; then
+                AFFECTED_AREAS+=("$AREA")
+                MATCHED=true
+                break
+              fi
+            done
+            if [ "$MATCHED" = false ]; then
+              echo "Shared change detected: $FILE"
+              SHARED=true
+              break
+            fi
+          done <<< "$CHANGED"
+
+          if [ "$SHARED" = true ]; then
+            echo "Shared file touched — running every package."
+            SELECTED="$ALL"
+          else
+            UNIQUE=$(printf '%s\n' "${AFFECTED_AREAS[@]:-}" | sort -u | jq -R . | jq -s -c .)
+            SELECTED=$(jq -c --argjson areas "$UNIQUE" '[.[] | select(.area as $a | $areas | index($a))]' <<< "$ALL")
+            echo "Affected packages: $(jq -r '[.[].name] | join(", ") // "(none)"' <<< "$SELECTED")"
+          fi
+
+          COUNT=$(jq 'length' <<< "$SELECTED")
+          echo "packages=$SELECTED" >> "$GITHUB_OUTPUT"
+          echo "any=$([ "$COUNT" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  package:
+    # Without an explicit name GitHub renders the entire matrix object into the job
+    # title, e.g. 'Package (GoogleSheets, GoogleSheets, GoogleSheets/Umbraco...)'.
+    name: ${{ matrix.package.name }}
+    needs: discover
+    if: needs.discover.outputs.any == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.discover.outputs.packages) }}
+    uses: ./.github/workflows/package-ci.yml
+    with:
+      name: ${{ matrix.package.name }}
+      project-dir: ${{ matrix.package.project }}
+      tests-dir: ${{ matrix.package.tests }}
+      client-dir: ${{ matrix.package.client }}
+      run-e2e: ${{ matrix.package.e2e }}
+
+  # Single stable name to require in branch protection: it succeeds when every matrix leg
+  # succeeded, and — unlike listing each leg — does not need updating as packages come and go.
+  # Also covers the legitimately-nothing-to-do case, where `package` is skipped.
+  ci:
+    name: CI
+    needs: [discover, package]
+    if: always()
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - name: Check results
+        run: |
+          set -euo pipefail
+          echo "discover: ${{ needs.discover.result }}"
+          echo "package:  ${{ needs.package.result }}"
 
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          if [ "${{ needs.discover.result }}" != "success" ]; then
+            echo "Package discovery failed." >&2
+            exit 1
+          fi
 
-      - run: dotnet restore
-
-      - run: dotnet build --no-restore --configuration Release
-
-      - run: dotnet test GoogleSheets/Umbraco.Community.Automate.GoogleSheets.Tests --no-build --configuration Release
-
-      - name: Verify the package still packs
-        run: dotnet pack GoogleSheets/Umbraco.Community.Automate.GoogleSheets --no-build --configuration Release --output ./pack-check
-
-  frontend-unit-tests:
-    name: Frontend unit tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ github.workspace }}/GoogleSheets/Umbraco.Community.Automate.GoogleSheets/Client
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.CLIENT_DIR }}/package-lock.json
-
-      - run: npm ci
-
-      - run: npx playwright install --with-deps chromium
-
-      - run: npm test
-
-  e2e-tests:
-    name: Playwright E2E tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      # Kestrel needs a cert to bind the HTTPS port the Demo site (and Playwright's baseURL)
-      # use. Trust isn't required: playwright.config.ts already sets `ignoreHTTPSErrors: true`.
-      - run: dotnet dev-certs https
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.CLIENT_DIR }}/package-lock.json
-
-      - working-directory: ${{ github.workspace }}/${{ env.CLIENT_DIR }}
-        run: npm ci
-
-      # wwwroot is generated output (gitignored) — the Demo site serves whatever's already
-      # built there as static web assets, so a fresh checkout has no column-list editor bundle
-      # until this runs. Skipping this step is why the UI tests below failed in the first run:
-      # the custom element never registered, so its rows never rendered.
-      - working-directory: ${{ github.workspace }}/${{ env.CLIENT_DIR }}
-        run: npm run build
-
-      - working-directory: ${{ github.workspace }}/${{ env.CLIENT_DIR }}
-        run: npx playwright install --with-deps chromium
-
-      # playwright.config.ts's `webServer` block starts the Demo site itself (with
-      # AUTOMATE_E2E_MODE=1) and waits for /umbraco/api/health/ready, so this step doesn't
-      # need to boot it separately. Credentials match the Demo site's fixed unattended-install
-      # admin account (Umbraco.Community.Automate.Demo/appsettings.Development.json) — not a
-      # secret, since it only ever exists in this throwaway, freshly-seeded SQLite instance.
-      - working-directory: ${{ github.workspace }}/${{ env.CLIENT_DIR }}
-        env:
-          URL: https://localhost:44343
-          UMBRACO_USER_LOGIN: admin@example.com
-          UMBRACO_USER_PASSWORD: password1234
-        run: npx playwright test
-
-      # test-results/ holds traces and screenshots for any failing test regardless of which
-      # reporter ran (playwright.config.ts uses the 'line' reporter in CI, which never writes
-      # playwright-report/ — that's an HTML-reporter-only output).
-      - if: always()
-        uses: actions/upload-artifact@v7
-        with:
-          name: playwright-test-results
-          path: ${{ env.CLIENT_DIR }}/test-results/
-          retention-days: 7
-          if-no-files-found: ignore
+          # 'skipped' is a pass: it means the diff touched no package.
+          case "${{ needs.package.result }}" in
+            success|skipped) echo "All good." ;;
+            *) echo "One or more packages failed." >&2; exit 1 ;;
+          esac
