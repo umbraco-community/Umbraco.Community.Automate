@@ -55,10 +55,19 @@ public class MastodonSettingsValidatorTests
     [Theory]
     [InlineData("https://mastodon.social")]
     [InlineData("https://mastodon.social/")]
-    [InlineData("http://localhost:8080")]
     public void Valid_settings_pass(string instanceUrl)
     {
         var settings = new MastodonSettings { InstanceUrl = instanceUrl, AccessToken = "token" };
+
+        var error = MastodonSettingsValidator.Validate(settings);
+
+        Assert.Null(error);
+    }
+
+    [Fact]
+    public void Http_instance_url_is_allowed_for_local_or_self_hosted_instances()
+    {
+        var settings = new MastodonSettings { InstanceUrl = "http://localhost:8080", AccessToken = "token" };
 
         var error = MastodonSettingsValidator.Validate(settings);
 
