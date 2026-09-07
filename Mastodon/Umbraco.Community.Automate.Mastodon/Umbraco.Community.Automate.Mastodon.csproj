@@ -25,6 +25,9 @@
        auto-sourced NuGet metadata rather than a hosted umbraco-marketplace.json override. -->
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="" />
+    <!-- PackageIcon only names the file inside the .nupkg; the file still has to be packed
+         into it, or pack fails with NU5046. -->
+    <None Include="community-automate-128.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
