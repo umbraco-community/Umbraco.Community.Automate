@@ -1,0 +1,144 @@
+name: Package CI
+
+# Reusable, per-package CI. Called once per package by ci.yml's matrix, so the steps
+# below live here exactly once no matter how many packages the repo grows.
+#
+# Reusable workflows do NOT inherit `env` from the caller, so tool versions come in as
+# inputs with defaults rather than being read from ci.yml's env block.
+
+on:
+  workflow_call:
+    inputs:
+      name:
+        description: Display name of the package, used in job names.
+        required: true
+        type: string
+      project-dir:
+        description: Path to the package project directory.
+        required: true
+        type: string
+      tests-dir:
+        description: Path to the package's test project directory.
+        required: true
+        type: string
+      client-dir:
+        description: Path to the package's Client folder, or '' when it has no frontend.
+        required: false
+        default: ''
+        type: string
+      run-e2e:
+        description: Whether this package owns the Playwright E2E suite.
+        required: false
+        default: false
+        type: boolean
+      dotnet-version:
+        required: false
+        default: '10.0.x'
+        type: string
+      node-version:
+        required: false
+        default: '22.x'
+        type: string
+
+jobs:
+  backend:
+    name: ${{ inputs.name }} / backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      # Scoped to this package rather than the whole solution: building the test project
+      # pulls in the package it references, so a matrix leg only builds what it tests.
+      - run: dotnet restore "${{ inputs.tests-dir }}"
+
+      - run: dotnet build "${{ inputs.tests-dir }}" --no-restore --configuration Release
+
+      - run: dotnet test "${{ inputs.tests-dir }}" --no-build --configuration Release
+
+      # Catches packaging-only breakage that compiling never would — a PackageIcon whose
+      # file was never packed, a missing README, bad static web asset paths.
+      - name: Verify the package still packs
+        run: dotnet pack "${{ inputs.project-dir }}" --configuration Release --output ./pack-check
+
+  frontend:
+    name: ${{ inputs.name }} / frontend
+    if: inputs.client-dir != ''
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.client-dir }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.client-dir }}/package-lock.json
+
+      - run: npm ci
+
+      - run: npx playwright install --with-deps chromium
+
+      - run: npm test
+
+  e2e:
+    name: ${{ inputs.name }} / e2e
+    if: inputs.run-e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet-version }}
+
+      # Kestrel needs a cert to bind the HTTPS port the Demo site (and Playwright's baseURL)
+      # use. Trust isn't required: playwright.config.ts already sets `ignoreHTTPSErrors: true`.
+      - run: dotnet dev-certs https
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: ${{ inputs.client-dir }}/package-lock.json
+
+      - working-directory: ${{ inputs.client-dir }}
+        run: npm ci
+
+      # wwwroot is generated output (gitignored) — the Demo site serves whatever's already
+      # built there as static web assets, so a fresh checkout has no column-list editor bundle
+      # until this runs. Skipping this step is why the UI tests below failed in the first run:
+      # the custom element never registered, so its rows never rendered.
+      - working-directory: ${{ inputs.client-dir }}
+        run: npm run build
+
+      - working-directory: ${{ inputs.client-dir }}
+        run: npx playwright install --with-deps chromium
+
+      # playwright.config.ts's `webServer` block starts the Demo site itself (with
+      # AUTOMATE_E2E_MODE=1) and waits for /umbraco/api/health/ready, so this step doesn't
+      # need to boot it separately. Credentials match the Demo site's fixed unattended-install
+      # admin account (Umbraco.Community.Automate.Demo/appsettings.Development.json) — not a
+      # secret, since it only ever exists in this throwaway, freshly-seeded SQLite instance.
+      - working-directory: ${{ inputs.client-dir }}
+        env:
+          URL: https://localhost:44343
+          UMBRACO_USER_LOGIN: admin@example.com
+          UMBRACO_USER_PASSWORD: password1234
+        run: npx playwright test
+
+      # test-results/ holds traces and screenshots for any failing test regardless of which
+      # reporter ran (playwright.config.ts uses the 'line' reporter in CI, which never writes
+      # playwright-report/ — that's an HTML-reporter-only output).
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-test-results-${{ inputs.name }}
+          path: ${{ inputs.client-dir }}/test-results/
+          retention-days: 7
+          if-no-files-found: ignore
