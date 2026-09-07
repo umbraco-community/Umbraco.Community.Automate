@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Authors>Owain Williams &amp; Umbraco Community</Authors>
+    <Authors>Owain Williams, Umbraco Community</Authors>
     <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Mastodon/Umbraco.Community.Automate.Mastodon</PackageProjectUrl>
     <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
