@@ -18,7 +18,6 @@
     <PackageReference Include="Umbraco.Automate.Core" />
     <PackageReference Include="Umbraco.Cms.Core" />
     <PackageReference Include="Umbraco.Cms.Infrastructure" />
-    <PackageReference Include="MinVer" PrivateAssets="All" />
   </ItemGroup>
 
   <!-- Ships as the NuGet package README (see PackageReadmeFile in Directory.Build.props) and
