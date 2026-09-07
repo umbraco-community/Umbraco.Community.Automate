@@ -46,27 +46,11 @@ public class MastodonPackageManifestReaderTests
         var icons = await GetIconsExtensionAsync();
         var fileName = Path.GetFileName(icons.GetProperty("js").GetString()!);
 
-        var wwwroot = Path.Combine(ProjectDirectory(), "wwwroot");
+        var wwwroot = MastodonPackagePaths.Wwwroot;
 
         // Nothing builds these — they are hand-written static web assets, so a rename or a
         // stray delete would otherwise only surface as a broken icon in the backoffice.
         Assert.True(File.Exists(Path.Combine(wwwroot, fileName)), $"Missing wwwroot/{fileName}");
         Assert.True(File.Exists(Path.Combine(wwwroot, "mastodon.icon.js")), "Missing wwwroot/mastodon.icon.js");
-    }
-
-    private static string ProjectDirectory()
-    {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-
-        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "Umbraco.Community.Automate.Mastodon.csproj")))
-        {
-            var sibling = Path.Combine(dir.FullName, "Umbraco.Community.Automate.Mastodon");
-            if (Directory.Exists(sibling))
-                return sibling;
-
-            dir = dir.Parent;
-        }
-
-        return dir?.FullName ?? throw new DirectoryNotFoundException("Could not locate the Mastodon project directory.");
     }
 }

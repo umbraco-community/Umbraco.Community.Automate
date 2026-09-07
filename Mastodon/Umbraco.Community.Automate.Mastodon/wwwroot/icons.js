@@ -3,7 +3,7 @@
 // Registered by MastodonPackageManifestReader.
 export default [
     {
-        name: "icon-mastodon",
+        name: "icon-automate-mastodon",
         path: () => import("./mastodon.icon.js"),
         keywords: ["mastodon", "fediverse", "social", "toot", "post"],
     },

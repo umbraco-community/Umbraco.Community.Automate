@@ -9,7 +9,7 @@ namespace Umbraco.Community.Automate.Mastodon.Actions;
 [Action("mastodonSendPost", "Send Mastodon Post",
     ConnectionTypeAlias = "mastodon",
     Description = "Sends a Mastodon Post",
-    Icon = "icon-mastodon",
+    Icon = "icon-automate-mastodon",
     Group = "Social Networks")]
 public class SendMastodonPostAction : ActionBase<MastodonPostSettings>
 {
