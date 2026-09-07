@@ -3,5 +3,9 @@
     <Project Path="GoogleSheets/Umbraco.Community.Automate.GoogleSheets.Tests/Umbraco.Community.Automate.GoogleSheets.Tests.csproj" />
     <Project Path="GoogleSheets/Umbraco.Community.Automate.GoogleSheets/Umbraco.Community.Automate.GoogleSheets.csproj" />
   </Folder>
+  <Folder Name="/Skoda/">
+    <Project Path="Skoda/Umbraco.Community.Automate.Skoda.Assets/Umbraco.Community.Automate.Skoda.Assets.csproj" Id="11d2e177-a44e-4506-b500-71a74f364173" />
+    <Project Path="Skoda/Umbraco.Community.Automate.Skoda/Umbraco.Community.Automate.Skoda.csproj" Id="fcdaea52-2888-4bd9-94a0-96b8590dbe4b" />
+  </Folder>
   <Project Path="Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj" />
 </Solution>

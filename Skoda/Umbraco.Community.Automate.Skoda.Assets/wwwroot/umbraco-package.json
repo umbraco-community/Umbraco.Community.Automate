@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/umbraco-package.json",
+  "name": "Umbraco Community Automate Skoda",
+  "extensions": [
+    {
+      "type": "icons",
+      "alias": "UmbracoCommunityAutomateSkoda.Icons",
+      "name": "Umbraco Community Automate Skoda Icons",
+      "js": "/App_Plugins/UmbracoCommunityAutomateSkoda/Icons/icons.js"
+    }
+  ]
+}
