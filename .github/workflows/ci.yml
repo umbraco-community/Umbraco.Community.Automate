@@ -28,8 +28,12 @@ jobs:
 
       - run: dotnet test GoogleSheets/Umbraco.Community.Automate.GoogleSheets.Tests --no-build --configuration Release
 
-      - name: Verify the package still packs
-        run: dotnet pack GoogleSheets/Umbraco.Community.Automate.GoogleSheets --no-build --configuration Release --output ./pack-check
+      - run: dotnet test Mastodon/Umbraco.Community.Automate.Mastodon.Tests --no-build --configuration Release
+
+      - name: Verify the packages still pack
+        run: |
+          dotnet pack GoogleSheets/Umbraco.Community.Automate.GoogleSheets --no-build --configuration Release --output ./pack-check
+          dotnet pack Mastodon/Umbraco.Community.Automate.Mastodon --no-build --configuration Release --output ./pack-check
 
   frontend-unit-tests:
     name: Frontend unit tests

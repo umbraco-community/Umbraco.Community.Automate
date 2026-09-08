@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GoogleSheets\Umbraco.Community.Automate.GoogleSheets\Umbraco.Community.Automate.GoogleSheets.csproj" />
+    <ProjectReference Include="..\Mastodon\Umbraco.Community.Automate.Mastodon\Umbraco.Community.Automate.Mastodon.csproj" />
   </ItemGroup>
 
   <ItemGroup>

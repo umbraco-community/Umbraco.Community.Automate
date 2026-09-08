@@ -1,0 +1,29 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Owain Williams, Umbraco Community</Authors>
+    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Mastodon/Umbraco.Community.Automate.Mastodon</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Tags this repo uses for Mastodon releases, e.g. mastodon-v2.1.0.
+         IgnoreHeight: this package is only ever versioned via a deliberate tag
+         push, never by auto-incrementing between tags, so MinVer's commit-
+         height-based pre-release suffixing — which would also react to
+         unrelated packages' commits in this monorepo's shared history — is
+         turned off. See MinVer's own README FAQ on independent versioning of
+         multiple projects in a single repository via distinct tag prefixes. -->
+    <MinVerTagPrefix>mastodon-v</MinVerTagPrefix>
+    <MinVerIgnoreHeight>true</MinVerIgnoreHeight>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Produce a .snupkg (portable PDB symbol package) alongside the .nupkg
+         so consumers can step into this package's source when debugging. -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+</Project>

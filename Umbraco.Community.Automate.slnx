@@ -3,5 +3,9 @@
     <Project Path="GoogleSheets/Umbraco.Community.Automate.GoogleSheets.Tests/Umbraco.Community.Automate.GoogleSheets.Tests.csproj" />
     <Project Path="GoogleSheets/Umbraco.Community.Automate.GoogleSheets/Umbraco.Community.Automate.GoogleSheets.csproj" />
   </Folder>
+  <Folder Name="/Mastodon/">
+    <Project Path="Mastodon/Umbraco.Community.Automate.Mastodon.Tests/Umbraco.Community.Automate.Mastodon.Tests.csproj" />
+    <Project Path="Mastodon/Umbraco.Community.Automate.Mastodon/Umbraco.Community.Automate.Mastodon.csproj" />
+  </Folder>
   <Project Path="Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj" />
 </Solution>
