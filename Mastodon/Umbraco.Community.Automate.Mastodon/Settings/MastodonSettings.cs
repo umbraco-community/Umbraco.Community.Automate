@@ -9,7 +9,7 @@ public sealed class MastodonSettings
         Description = "",
         EditorUiAlias = "Umb.PropertyEditorUi.Label",
         EditorConfig = """
-            [{ "alias": "labelTemplate", "value": "**Instance Url**<br>The base URL of your Mastodon instance (e.g. https://umbracocommunity.social). If set in appsettings, reference it like $Umbraco:Automate:Variables:MastodonInstance<br><br>**Access Token**<br>If set in appsettings, reference it like $Umbraco:Automate:Secrets:MastodonAccessToken" }]
+            [{ "alias": "labelTemplate", "value": "**Instance Url**<br>The base URL of your Mastodon instance (e.g. https://umbracocommunity.social). If set in appsettings, reference it like $Umbraco:Community:Automate:Mastodon:Variables:InstanceUrl<br><br>**Access Token**<br>If set in appsettings, reference it like $Umbraco:Community:Automate:Mastodon:Secrets:AccessToken" }]
             """,
         SortOrder = 0
         )]

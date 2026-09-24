@@ -2,7 +2,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Community.Automate.Mastodon.Actions;
 using Umbraco.Community.Automate.Mastodon.ConnectionTypes;
 using Umbraco.Community.Automate.Mastodon.Factory;
+using Umbraco.Community.Automate.Mastodon.Settings;
 using Umbraco.Automate.Core.Actions;
+using Umbraco.Automate.Core.Configuration;
 using Umbraco.Automate.Core.Connections;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -24,5 +26,21 @@ public class MastodonComposer : IComposer
             .Add<MastodonConnectionType>();
 
         builder.Services.AddSingleton<IPackageManifestReader, MastodonPackageManifestReader>();
+
+        // Automate only resolves $-references under allow-listed prefixes
+        builder.Services.PostConfigure<AutomateOptions>(options =>
+        {
+            options.AllowedConfigurationKeyPrefixes =
+            [
+                .. options.AllowedConfigurationKeyPrefixes,
+                MastodonConfiguration.VariablesPath,
+                MastodonConfiguration.SecretsPath,
+            ];
+            options.SecretConfigurationKeyPrefixes =
+            [
+                .. options.SecretConfigurationKeyPrefixes,
+                MastodonConfiguration.SecretsPath,
+            ];
+        });
     }
 }
