@@ -85,6 +85,17 @@ This repo uses [MinVer](https://github.com/adamralph/minver) to derive each pack
 4. Once approved, it publishes to nuget.org using [NuGet Trusted Publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing) — GitHub's OIDC token is exchanged for a short-lived NuGet API key, so no long-lived API key is ever stored as a repository secret.
 5. It creates a GitHub Release for the tag, titled from the package's `<Title>` (e.g. "Umbraco Community Automate Google Sheets v1.0.0"), with GitHub's auto-generated release notes and the `.nupkg`/`.snupkg` attached as downloadable assets.
 
+### Who owns the packages, and who can release
+
+Publishing does not depend on any one person's nuget.org account being the one that releases:
+
+- **Anyone with push access to this repo can start a release** by pushing a tag, and the `nuget-publish` environment's reviewers approve it. The person who tags never needs nuget.org credentials.
+- The packages are pushed as the **package owner** named in the nuget.org Trusted Publishing policy (currently the `Umbraco-Community` organization).
+- The `NUGET_USER` secret must be the username of the **account that created that policy**, not the package owner's name. Using the owner (e.g. the organization) gives `HTTP 401 ... No matching trust policy` at the NuGet login step.
+- A tag with a hyphen (e.g. `devto-v1.0.0-beta.1`) is published to NuGet as a pre-release and flagged as a pre-release on the GitHub Release.
+
+To avoid depending on a single person: add more than one reviewer to the `nuget-publish` environment (and consider "prevent self-review"), add co-owners to each package on nuget.org, and make sure someone besides the policy creator can manage the policy.
+
 ### Why a fork can't publish a release
 
 Trusted Publishing is bound to this specific repository and workflow — a fork's copy of `release.yml` would request an OIDC token identifying it as `<forker>/Umbraco.Community.Automate`, which nuget.org's trust policy for this package rejects outright, regardless of what the workflow file says. Combined with the fact that a tag pushed to a fork never triggers a workflow run in the upstream repo at all, the actual access boundary for cutting a release is simply **push access to this repository** — the same permission that already lets someone merge to `main`. The `nuget-publish` environment's required-reviewer approval adds a second, deliberate confirmation on top of that.

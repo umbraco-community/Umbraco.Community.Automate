@@ -105,7 +105,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           # This job has no checkout, so gh can't infer the repo from a .git folder.
           GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.resolve-and-pack.outputs.version }}
         run: |
+          set -euo pipefail
+          # A semver with a hyphen (e.g. 1.0.0-beta.1) is a pre-release.
+          PRERELEASE=()
+          if [[ "$VERSION" == *-* ]]; then
+            PRERELEASE=(--prerelease)
+          fi
+
           gh release create "${{ github.ref_name }}" ./artifacts/*.nupkg ./artifacts/*.snupkg \
-            --title "${{ needs.resolve-and-pack.outputs.title }} v${{ needs.resolve-and-pack.outputs.version }}" \
-            --generate-notes
+            --title "${{ needs.resolve-and-pack.outputs.title }} v$VERSION" \
+            --generate-notes \
+            "${PRERELEASE[@]}"
