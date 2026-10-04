@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json.schemastore.org/umbraco-package.json",
+  "id": "Umbraco.Community.Automate.DevTo",
+  "name": "Umbraco Community Automate DEV",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "icons",
+      "alias": "UmbracoCommunityAutomateDevTo.Icons",
+      "name": "DEV Icons",
+      "js": "/App_Plugins/UmbracoCommunityAutomateDevTo/icons/icons.js"
+    },
+    {
+      "type": "localization",
+      "alias": "UmbracoCommunityAutomateDevTo.Localization.En",
+      "name": "DEV English",
+      "meta": { "culture": "en" },
+      "js": "/App_Plugins/UmbracoCommunityAutomateDevTo/lang/en.js"
+    },
+    {
+      "type": "propertyEditorUi",
+      "alias": "UmbracoCommunityAutomateDevTo.PropertyEditorUi.BodyProperties",
+      "name": "DEV Body Properties",
+      "element": "/App_Plugins/UmbracoCommunityAutomateDevTo/body-properties.element.js",
+      "meta": {
+        "label": "DEV Body Properties",
+        "icon": "icon-automate-devto",
+        "group": "Automate"
+      }
+    },
+    {
+      "type": "modal",
+      "alias": "UmbracoCommunityAutomateDevTo.Modal.Preview",
+      "name": "DEV Preview",
+      "element": "/App_Plugins/UmbracoCommunityAutomateDevTo/preview-modal.element.js"
+    },
+    {
+      "type": "workspaceInfoApp",
+      "alias": "UmbracoCommunityAutomateDevTo.WorkspaceInfoApp.Document.ArticleLinks",
+      "name": "DEV Article Links",
+      "element": "/App_Plugins/UmbracoCommunityAutomateDevTo/article-links.element.js",
+      "weight": 90,
+      "conditions": [{ "alias": "Umb.Condition.WorkspaceAlias", "match": "Umb.Workspace.Document" }]
+    }
+  ]
+}

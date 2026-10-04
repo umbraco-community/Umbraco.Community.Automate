@@ -58,6 +58,23 @@ jobs:
           echo "project-dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "title=$TITLE" >> "$GITHUB_OUTPUT"
+          if [ -f "$PROJECT_DIR/Client/package.json" ]; then
+            echo "client-dir=$PROJECT_DIR/Client" >> "$GITHUB_OUTPUT"
+          fi
+
+      # A package with a backoffice front end ships its build output (wwwroot/), which isn't
+      # committed, so build it before packing or the package goes out without its icons and editors.
+      - if: steps.resolve.outputs.client-dir != ''
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22.x'
+          cache: npm
+          cache-dependency-path: ${{ steps.resolve.outputs.client-dir }}/package-lock.json
+
+      - if: steps.resolve.outputs.client-dir != ''
+        name: Build the front end
+        working-directory: ${{ steps.resolve.outputs.client-dir }}
+        run: npm ci && npm run build
 
       - run: dotnet restore
 

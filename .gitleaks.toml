@@ -19,8 +19,10 @@ tags = ["google", "oauth", "client-id"]
 # history, because the demo site it belongs to is a local-only dev scaffold
 # that is never deployed publicly. Scoped narrowly to this exact commit,
 # file, and rule so it does not mask any other/new finding. See
-# docs/superpowers/specs/2026-07-12-secret-scanning-prevention-design.md
-# ("Post-implementation notes") for context.
+# .github/design-notes/specs/2026-07-12-secret-scanning-prevention-design.md
+# ("Post-implementation notes") for context. The path below is where the file
+# lived in that commit, which is where the Demo site is again now. It is
+# tied to the allowlisted commit, so it must not change.
 [[allowlists]]
 description = "Accepted: Demo project's non-deployed Imaging:HMACSecretKey (commit be847121)"
 targetRules = ["generic-api-key"]

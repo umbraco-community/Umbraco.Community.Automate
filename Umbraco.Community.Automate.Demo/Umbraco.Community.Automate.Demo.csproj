@@ -5,19 +5,34 @@
     <Nullable>enable</Nullable>
     <CompressionEnabled>false</CompressionEnabled> <!-- Disable compression. E.g. for umbraco backoffice files. These files should be precompressed by node and not let dotnet handle it -->
     <UserSecretsId>f843ebec-4b5e-4008-9a3b-3543afb90170</UserSecretsId>
+    <!-- Setup/DemoSetup.cs imports the uSync samples only where uSync is referenced. -->
+    <DefineConstants Condition="'$(UmbracoMajor)' == '17'">$(DefineConstants);USYNC</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Umbraco.Automate" />
+    <!-- Google Sheets' OAuth dependency, matched to the site's Automate version: left to itself
+         NuGet picks the bottom of the package's range, and an older OpenIddict alongside a newer
+         Automate breaks backoffice sign-in. -->
+    <PackageReference Include="Umbraco.Automate.OpenIddict" VersionOverride="17.1.5" Condition="'$(UmbracoMajor)' == '17'" />
+    <PackageReference Include="Umbraco.Automate.OpenIddict" VersionOverride="18.1.5" Condition="'$(UmbracoMajor)' == '18'" />
     <PackageReference Include="Umbraco.Cms" />
     <PackageReference Include="Umbraco.Cms.DevelopmentMode.Backoffice" />
+    <!-- Sample workspace and automations, from uSync/. uSync.Automate is Umbraco 17 only. -->
+    <PackageReference Include="uSync" Condition="'$(UmbracoMajor)' == '17'" />
+    <PackageReference Include="uSync.Automate" Condition="'$(UmbracoMajor)' == '17'" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DevTo\Umbraco.Community.Automate.DevTo\Umbraco.Community.Automate.DevTo.csproj" />
-    <ProjectReference Include="..\GoogleSheets\Umbraco.Community.Automate.GoogleSheets\Umbraco.Community.Automate.GoogleSheets.csproj" />
-    <ProjectReference Include="..\Mastodon\Umbraco.Community.Automate.Mastodon\Umbraco.Community.Automate.Mastodon.csproj" />
-    <ProjectReference Include="..\Skoda\src\Umbraco.Community.Automate.Skoda\Umbraco.Community.Automate.Skoda.csproj" />
+    <ProjectReference Include="..\Packages\DevTo\Umbraco.Community.Automate.DevTo\Umbraco.Community.Automate.DevTo.csproj" />
+    <ProjectReference Include="..\Packages\GoogleSheets\Umbraco.Community.Automate.GoogleSheets\Umbraco.Community.Automate.GoogleSheets.csproj" />
+    <ProjectReference Include="..\Packages\Mastodon\Umbraco.Community.Automate.Mastodon\Umbraco.Community.Automate.Mastodon.csproj" />
+    <ProjectReference Include="..\Packages\Pushover\Umbraco.Community.Automate.Pushover\Umbraco.Community.Automate.Pushover.csproj" />
+    <ProjectReference Include="..\Packages\Skoda\Umbraco.Community.Automate.Skoda\Umbraco.Community.Automate.Skoda.csproj" />
+    <ProjectReference Include="..\Packages\WeatherApi\Umbraco.Community.Automate.WeatherApi\Umbraco.Community.Automate.WeatherApi.csproj" />
+    <ProjectReference Include="..\Packages\_Development\KitchenSink\Umbraco.Community.Automate.Examples.KitchenSink\Umbraco.Community.Automate.Examples.KitchenSink.csproj" />
+    <ProjectReference Include="..\Packages\_Development\Simple\Umbraco.Community.Automate.Examples.Simple\Umbraco.Community.Automate.Examples.Simple.csproj" />
+    <ProjectReference Include="..\Packages\_Development\TestConnection\Umbraco.Community.Automate.TestConnection\Umbraco.Community.Automate.TestConnection.csproj" />
   </ItemGroup>
 
   <ItemGroup>

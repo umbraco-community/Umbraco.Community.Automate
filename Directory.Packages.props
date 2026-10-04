@@ -3,18 +3,58 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageFloatingVersionsEnabled>true</CentralPackageFloatingVersionsEnabled>
   </PropertyGroup>
+
+  <!--
+    Umbraco 17 and 18 both run on net10.0, so every package ships one build for both: compiled
+    against the lowest supported versions (NuGet restores the bottom of a range) and published
+    with ranges that stop short of 19, which hasn't been tested.
+
+    -p:UmbracoMajor=18 builds and tests any project against 18 instead. CI does that for every
+    package (tools/test-umbraco-compat.sh), and also runs the 17 build on 18, which is what an
+    Umbraco 18 site actually does. The 18 build is never packed.
+
+    The Demo site runs on 17, the main version people build for. -p:UmbracoMajor=18 runs it on 18.
+  -->
+  <PropertyGroup>
+    <UmbracoMajor Condition="'$(UmbracoMajor)' == ''">17</UmbracoMajor>
+  </PropertyGroup>
+
+  <!-- Floors are what Umbraco.Automate.Core 17.0.0 itself requires. -->
+  <ItemGroup Condition="'$(UmbracoMajor)' == '17'">
+    <PackageVersion Include="Umbraco.Automate.Core" Version="[17.0.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="[17.0.0, 19.0.0)" />
+    <!-- The floor Umbraco.Automate.OpenIddict 17 needs; Umbraco 18 itself needs 7.6. -->
+    <PackageVersion Include="OpenIddict.Client.WebIntegration" Version="[7.4.0, 8.0.0)" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="[17.4.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="[17.4.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="[17.4.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.Testing" Version="17.0.0" />
+    <!-- Demo site only. -->
+    <PackageVersion Include="Umbraco.Automate" Version="17.5.0" />
+    <PackageVersion Include="Umbraco.Cms" Version="17.7.0" />
+    <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.7.0" />
+    <!-- Demo site only: imports its sample workspace and automations. uSync.Automate has no
+         Umbraco 18 release yet, so the Demo only uses them on 17. -->
+    <PackageVersion Include="uSync" Version="17.4.3" />
+    <PackageVersion Include="uSync.Automate" Version="17.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UmbracoMajor)' == '18'">
+    <PackageVersion Include="Umbraco.Automate.Core" Version="[18.4.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="[18.0.0, 19.0.0)" />
+    <PackageVersion Include="OpenIddict.Client.WebIntegration" Version="[7.6.0, 8.0.0)" />
+    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="[18.2.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Cms.Core" Version="[18.2.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="[18.2.0, 19.0.0)" />
+    <PackageVersion Include="Umbraco.Automate.Testing" Version="18.4.0" />
+    <!-- Demo site only. -->
+    <PackageVersion Include="Umbraco.Automate" Version="18.5.0" />
+    <PackageVersion Include="Umbraco.Cms" Version="18.2.0" />
+    <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="18.2.0" />
+  </ItemGroup>
+
   <ItemGroup>
-    <PackageVersion Include="Umbraco.Automate" Version="17.0.0" />
-    <PackageVersion Include="Umbraco.Automate.Core" Version="17.0.0" />
-    <PackageVersion Include="Umbraco.Automate.OpenIddict" Version="17.0.0-beta.1" />
-    <PackageVersion Include="Umbraco.Automate.Testing" Version="17.0.0-beta.1" />
-    <PackageVersion Include="Umbraco.Cms" Version="17.4.2" />
-    <PackageVersion Include="Umbraco.Cms.Api.Management" Version="17.4.2" />
-    <PackageVersion Include="Umbraco.Cms.Core" Version="17.4.2" />
-    <PackageVersion Include="Umbraco.Cms.Infrastructure" Version="17.4.2" />
-    <PackageVersion Include="Umbraco.Cms.DevelopmentMode.Backoffice" Version="17.4.2" />
     <PackageVersion Include="Microsoft.ICU.ICU4C.Runtime" Version="72.1.0.3" />
-    <PackageVersion Include="OpenIddict.Client.WebIntegration" Version="[7.4.0, 7.999.999)" />
     <PackageVersion Include="MinVer" Version="7.0.0" />
     <PackageVersion Include="ReverseMarkdown" Version="6.2.1" />
   </ItemGroup>
@@ -25,4 +65,9 @@
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="Shouldly" Version="4.2.1" />
   </ItemGroup>
+
+  <Target Name="CheckUmbracoMajor" BeforeTargets="Restore;CollectPackageReferences"
+          Condition="'$(UmbracoMajor)' != '17' And '$(UmbracoMajor)' != '18'">
+    <Error Text="UmbracoMajor must be 17 or 18 (was '$(UmbracoMajor)')." />
+  </Target>
 </Project>

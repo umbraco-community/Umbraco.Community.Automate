@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/umbraco-package.json",
+  "id": "Umbraco.Community.Automate.Mastodon",
+  "name": "Umbraco Community Automate Mastodon",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "icons",
+      "alias": "UmbracoCommunityAutomateMastodon.Icons",
+      "name": "Mastodon Icons",
+      "js": "/App_Plugins/UmbracoCommunityAutomateMastodon/icons/icons.js"
+    }
+  ]
+}

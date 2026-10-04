@@ -5,8 +5,8 @@ name: CI
 #
 # Packages are discovered from the folder layout rather than listed here, so a new package
 # needs no change to this file at all: drop it in following the existing convention
-# (<Area>/Umbraco.Community.Automate.<Area>/ with a sibling .Tests project) and it is picked
-# up on the next run.
+# (Packages/<Area>/Umbraco.Community.Automate.<Area>/ with a sibling .Tests project, e.g.
+# Packages/Mastodon/) and it is picked up on the next run.
 
 on:
   pull_request:
@@ -27,15 +27,36 @@ jobs:
         with:
           fetch-depth: 0
 
+      # A nudge for reviewers, never a failure: package PRs should touch one package, and
+      # workflow changes deserve a closer look. Maintainers can ignore it for repo-wide work.
+      - name: Check pull request scope
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          CHANGED=$(git diff --name-only '${{ github.event.pull_request.base.sha }}'...HEAD)
+
+          # Packages/<Area>/..., or Packages/_Development/<Name>/... for the examples and tools.
+          PACKAGES=$(grep -oE '^Packages/(_Development/)?[^/]+/' <<< "$CHANGED" | sort -u || true)
+          COUNT=$(grep -c . <<< "$PACKAGES" || true)
+          if [ "$COUNT" -gt 1 ]; then
+            echo "::warning title=More than one package::This PR changes $COUNT packages ($(tr '\n' ' ' <<< "$PACKAGES")). Package PRs should change one package; split it up unless this is a repo-wide change."
+          fi
+
+          if grep -q '^\.github/workflows/' <<< "$CHANGED"; then
+            echo "::warning title=Workflows changed::This PR changes files in .github/workflows/. Package PRs shouldn't need to: CI discovers packages from the folder layout."
+          fi
+
       - name: Discover packages and work out which are affected
         id: discover
         run: |
           set -euo pipefail
 
           # A package is any directory with its own Directory.Build.props — the same marker
-          # release.yml already relies on to map a tag back to a package.
+          # release.yml already relies on to map a tag back to a package. Packages sit at
+          # Packages/<Area>/<Project>/, e.g. Packages/Mastodon/Umbraco.Community.Automate.Mastodon,
+          # and the examples and tools one level deeper, e.g. Packages/_Development/Simple/<Project>.
           mapfile -t PROJECT_DIRS < <(
-            find . -mindepth 3 -maxdepth 3 -name Directory.Build.props -not -path './.git/*' \
+            find . -mindepth 4 -maxdepth 5 -name Directory.Build.props -not -path './.git/*' -not -path '*/node_modules/*' \
               | xargs -r -n1 dirname | sed 's#^\./##' | sort
           )
 
@@ -48,20 +69,20 @@ jobs:
           AREAS=()
 
           for PROJECT_DIR in "${PROJECT_DIRS[@]}"; do
-            AREA="${PROJECT_DIR%%/*}"                      # e.g. Mastodon
+            AREA="${PROJECT_DIR%/*}"                       # e.g. Packages/Mastodon
+            NAME="${AREA##*/}"                             # e.g. Mastodon
             TESTS_DIR="${PROJECT_DIR}.Tests"
             CLIENT_DIR=""
             RUN_E2E=false
-            COMPAT_SCRIPT=""
 
             if [ ! -d "$TESTS_DIR" ]; then
               echo "Package '$PROJECT_DIR' has no test project at '$TESTS_DIR'" >&2
               exit 1
             fi
 
-            # Optional frontend. Only packages with a Client folder containing a package.json
-            # get frontend jobs (a Client folder alone isn't enough: DevTo's is its C# API
-            # client), and only one with Playwright specs owns the E2E suite.
+            # Optional frontend. Client/ is reserved for a package's backoffice front end (C# API
+            # clients live in Api/), so a Client folder with a package.json gets frontend jobs,
+            # and only one with Playwright specs owns the E2E suite.
             if [ -f "$PROJECT_DIR/Client/package.json" ]; then
               CLIENT_DIR="$PROJECT_DIR/Client"
               if compgen -G "$CLIENT_DIR/tests/e2e/*.spec.ts" > /dev/null; then
@@ -69,22 +90,15 @@ jobs:
               fi
             fi
 
-            # Optional Umbraco-version compatibility check: a package opts in by keeping a
-            # test-umbraco-compat.sh at the root of its area folder (e.g. DevTo/).
-            if [ -f "$AREA/test-umbraco-compat.sh" ]; then
-              COMPAT_SCRIPT="$AREA/test-umbraco-compat.sh"
-            fi
-
             AREAS+=("$AREA")
             ALL=$(jq -c \
-              --arg name "$AREA" \
+              --arg name "$NAME" \
               --arg area "$AREA" \
               --arg project "$PROJECT_DIR" \
               --arg tests "$TESTS_DIR" \
               --arg client "$CLIENT_DIR" \
               --argjson e2e "$RUN_E2E" \
-              --arg compat "$COMPAT_SCRIPT" \
-              '. + [{name: $name, area: $area, project: $project, tests: $tests, client: $client, e2e: $e2e, compat: $compat}]' \
+              '. + [{name: $name, area: $area, project: $project, tests: $tests, client: $client, e2e: $e2e}]' \
               <<< "$ALL")
           done
 
@@ -160,7 +174,6 @@ jobs:
       tests-dir: ${{ matrix.package.tests }}
       client-dir: ${{ matrix.package.client }}
       run-e2e: ${{ matrix.package.e2e }}
-      compat-script: ${{ matrix.package.compat }}
 
   # Single stable name to require in branch protection: it succeeds when every matrix leg
   # succeeded, and — unlike listing each leg — does not need updating as packages come and go.

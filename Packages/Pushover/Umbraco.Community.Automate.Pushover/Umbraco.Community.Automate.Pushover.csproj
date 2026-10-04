@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Umbraco Community Automate Pushover</Title>
+    <Description>Pushover connection and action for Umbraco Automate: send push notifications to phones and desktops from an automation, with titles, links, sounds and priorities.</Description>
+    <PackageTags>umbraco automate automation pushover notifications push umbraco-marketplace</PackageTags>
+    <PackageIcon>community-automate-128.png</PackageIcon>
+    <!-- Serves wwwroot/ (umbraco-package.json and the icon) as static web assets under this path. -->
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <StaticWebAssetBasePath>App_Plugins/UmbracoCommunityAutomatePushover</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Automate.Core" />
+    <PackageReference Include="Umbraco.Cms.Core" />
+    <!-- Versions the package from its git tag (see Directory.Build.props). Without it every
+         release packs as 1.0.0 and NuGet skips it as a duplicate. -->
+    <PackageReference Include="MinVer" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Umbraco.Community.Automate.Pushover.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- README.md is the NuGet / Umbraco Marketplace description. -->
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="community-automate-128.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

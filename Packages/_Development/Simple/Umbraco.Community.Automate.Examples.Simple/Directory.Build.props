@@ -1,0 +1,12 @@
+<Project>
+  <!-- This file is what makes CI discover the package (it builds and tests it on every PR).
+       Unlike a real connection there's no MinVerTagPrefix and it isn't packable, so it can
+       never be released: it's a reference to copy, not something to install. -->
+  <PropertyGroup>
+    <Authors>Umbraco Community</Authors>
+    <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+</Project>

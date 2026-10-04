@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/umbraco-package.json",
+  "id": "Umbraco.Community.Automate.Examples.KitchenSink",
+  "name": "Umbraco Community Automate Kitchen Sink Example",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "icons",
+      "alias": "UmbracoCommunityAutomateExamplesKitchenSink.Icons",
+      "name": "Kitchen Sink Example Icons",
+      "js": "/App_Plugins/UmbracoCommunityAutomateExamplesKitchenSink/icons/icons.js"
+    },
+    {
+      "name": "Umbraco Community Automate Kitchen Sink Example",
+      "alias": "UmbracoCommunityAutomateExamplesKitchenSink.Bundle",
+      "type": "bundle",
+      "js": "/App_Plugins/UmbracoCommunityAutomateExamplesKitchenSink/umbraco-community-automate-examples-kitchen-sink-manifests.js"
+    }
+  ]
+}

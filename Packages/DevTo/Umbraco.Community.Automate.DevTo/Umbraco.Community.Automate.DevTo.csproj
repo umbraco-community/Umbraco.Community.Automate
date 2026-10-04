@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Umbraco Community Automate DEV</Title>
+    <Description>DEV Community (dev.to) connection type and action for Umbraco Automate. Cross-post Umbraco content to DEV as articles — Markdown, Rich Text, Block List and Block Grid content is converted to Markdown, with a canonical URL pointing back at your site.</Description>
+    <PackageTags>umbraco automate automation devto dev.to forem blog cross-post umbraco-marketplace</PackageTags>
+    <!-- Must match the /App_Plugins/... paths in wwwroot/umbraco-package.json. -->
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <StaticWebAssetBasePath>App_Plugins/UmbracoCommunityAutomateDevTo</StaticWebAssetBasePath>
+    <PackageIcon>community-automate-128.png</PackageIcon>
+    <Authors>ScottishCoder, Umbraco-Community</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Automate.Core" />
+    <PackageReference Include="Umbraco.Cms.Api.Management" />
+    <PackageReference Include="Umbraco.Cms.Core" />
+    <PackageReference Include="Umbraco.Cms.Infrastructure" />
+    <PackageReference Include="ReverseMarkdown" />
+    <!-- Versions the package from devto-v* tags; without it every release packs as 1.0.0. -->
+    <PackageReference Include="MinVer" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Umbraco.Community.Automate.DevTo.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="community-automate-128.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

@@ -42,7 +42,8 @@ bld/
 
 # wwwroot for npm/vite-built provider frontends is entirely generated output
 # (the package source of truth lives under each provider's Client/ folder)
-GoogleSheets/Umbraco.Community.Automate.GoogleSheets/wwwroot/
+Packages/GoogleSheets/Umbraco.Community.Automate.GoogleSheets/wwwroot/
+Packages/_Development/KitchenSink/Umbraco.Community.Automate.Examples.KitchenSink/wwwroot/
 
 # Playwright E2E artifacts
 playwright-report/
@@ -217,6 +218,8 @@ PublishScripts/
 **/[Pp]ackages/*
 # except build/, which is used as an MSBuild target.
 !**/[Pp]ackages/build/
+# except this repo's own Packages/ folder, which holds the source of its NuGet packages.
+!/Packages/*
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/[Pp]ackages/repositories.config
 # NuGet v3's project.json files produces more ignorable files
@@ -489,3 +492,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Local credential overrides for the Demo site (see appsettings.Local.example.json). Never commit.
+appsettings.Local.json

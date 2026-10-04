@@ -49,7 +49,7 @@ public static class AutomateE2EEndpoints
             {
                 Alias = ConnectionAlias,
                 Name = "E2E Google Sheets",
-                Type = "googleSheets",
+                Type = "community.googleSheets",
                 Settings = new Dictionary<string, object?>
                 {
                     ["OAuthCredentialsId"] = credentials.Id,

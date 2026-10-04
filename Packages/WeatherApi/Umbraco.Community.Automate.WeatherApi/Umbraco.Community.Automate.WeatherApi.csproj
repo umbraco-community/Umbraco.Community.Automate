@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Umbraco Community Automate WeatherAPI</Title>
+    <Description>WeatherAPI.com connection type and actions for Umbraco Automate. Get the current weather or today's forecast for a location as part of an automation workflow.</Description>
+    <PackageTags>umbraco automate automation weatherapi weather umbraco-marketplace</PackageTags>
+    <PackageIcon>community-automate-128.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Automate.Core" />
+    <PackageReference Include="Umbraco.Cms.Core" />
+    <!-- Versions the package from its weatherapi-v* tag (see Directory.Build.props). -->
+    <PackageReference Include="MinVer" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Umbraco.Community.Automate.WeatherApi.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="community-automate-128.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

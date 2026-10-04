@@ -1,0 +1,20 @@
+# Who is asked to review changes to each part of the repo.
+# The last matching line wins, so the package lines below override the default.
+# When you add a package, add a line for it with its maintainers.
+
+# Default: the repo maintainers review anything not listed below.
+*                       @suedeapple @warrenbuckley @OwainWilliams
+
+# Packages, reviewed by their authors.
+/Packages/DevTo/        @OwainWilliams
+/Packages/GoogleSheets/ @warrenbuckley
+/Packages/Mastodon/     @OwainWilliams
+/Packages/Pushover/     @suedeapple
+/Packages/Skoda/        @erikjanwestendorp
+/Packages/WeatherApi/   @suedeapple
+
+# Shared files every package depends on.
+/Packages/_Development/   @suedeapple @warrenbuckley @OwainWilliams
+/.github/                 @suedeapple @warrenbuckley @OwainWilliams
+/.claude/                 @suedeapple @warrenbuckley @OwainWilliams
+/Directory.Packages.props @suedeapple @warrenbuckley @OwainWilliams

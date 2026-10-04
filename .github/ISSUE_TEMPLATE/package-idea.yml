@@ -1,0 +1,56 @@
+name: Package or action idea
+description: Suggest a new service to connect to, or a new action or trigger for an existing package.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome whether or not you plan to build them. If you'd like to build it yourself, [CONTRIBUTING](https://github.com/umbraco-community/Umbraco.Community.Automate/blob/main/.github/CONTRIBUTING.md#adding-a-new-package) explains how. The quickest way is the `umbraco-automate` skill for Claude Code: ask it "Using the Umbraco Automate skill, create me a package for <service>".
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of idea is it?
+      options:
+        - A new package (a service that isn't covered yet)
+        - A new action or trigger for an existing package
+        - An improvement to an existing action or trigger
+    validations:
+      required: true
+
+  - type: input
+    id: service
+    attributes:
+      label: Service or package
+      description: The external service (with a link to its API docs, if there is one), or the existing package.
+      placeholder: "Bluesky (https://docs.bsky.app)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: What should automations be able to do?
+      description: Describe it from a site editor's point of view, e.g. "When a blog post is published, post its title and link to Bluesky."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: auth
+    attributes:
+      label: How does the service authenticate?
+      options:
+        - API key or token
+        - OAuth
+        - No authentication
+        - Not sure
+        - Not applicable (an Umbraco-only action or trigger)
+
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: Would you like to build it?
+      options:
+        - Yes, I'd like to open a pull request
+        - Maybe, with some help
+        - No, just suggesting it
