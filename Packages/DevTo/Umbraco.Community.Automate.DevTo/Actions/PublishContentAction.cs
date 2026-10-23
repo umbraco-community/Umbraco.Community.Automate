@@ -13,7 +13,7 @@ using UmbracoConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Community.Automate.DevTo.Actions;
 
-[Action("devto.publishContent", "Publish Content to DEV",
+[Action("community.devto.publishContent", "Publish Content to DEV",
     ConnectionTypeAlias = DevToConnectionType.ConnectionTypeAlias,
     Description = "Cross-posts a content item to DEV, converting Markdown, Rich Text, Block List and Block Grid content to Markdown.",
     Icon = "icon-automate-devto",

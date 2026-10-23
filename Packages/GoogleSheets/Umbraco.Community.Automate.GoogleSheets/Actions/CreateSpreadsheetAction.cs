@@ -8,13 +8,13 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// <summary>
 /// Creates a new Google Sheets spreadsheet and returns its ID and URL.
 /// </summary>
-[Action("googleSheets.createSpreadsheet", "Create Google Spreadsheet",
+[Action("community.googleSheets.createSpreadsheet", "Create Google Spreadsheet",
     Description = "Creates a new Google Sheets spreadsheet with an optional set of named sheet tabs. " +
                   "A new document is created every time this step runs — it does not check for an existing spreadsheet with the same title. " +
                   "To avoid duplicates, add a condition before this step that skips it when a spreadsheet ID is already stored.",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class CreateSpreadsheetAction : ActionBase<CreateSpreadsheetSettings, CreateSpreadsheetOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;

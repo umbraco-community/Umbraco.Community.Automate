@@ -351,7 +351,7 @@ public class FindRowActionTests
             .WithService(CreateHttpClientFactory(StubHandler(HttpStatusCode.OK, "{}")))
             .WithService(creds.Object)
             .WithSettings(new FindRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", SearchColumn = "A", SearchValue = "x" })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -394,7 +394,7 @@ public class FindRowActionTests
             .WithService(CreateHttpClientFactory(handler))
             .WithService(creds.Object)
             .WithSettings(settings)
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
     }
 

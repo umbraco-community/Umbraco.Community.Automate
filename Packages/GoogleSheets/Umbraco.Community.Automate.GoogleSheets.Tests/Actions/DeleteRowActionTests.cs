@@ -204,7 +204,7 @@ public class DeleteRowActionTests
             .WithService(CreateHttpClientFactory(SequenceHandler(["{}","{}","{}"])))
             .WithService(creds.Object)
             .WithSettings(new DeleteRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "x" })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -273,7 +273,7 @@ public class DeleteRowActionTests
             .WithService(CreateHttpClientFactory(handler))
             .WithService(creds.Object)
             .WithSettings(settings)
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
     }
 

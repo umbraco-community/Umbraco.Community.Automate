@@ -32,7 +32,7 @@ public class DevToArticleCheckerTests
     private static ConfiguredConnection Configured(Guid id)
         => (ConfiguredConnection)Activator.CreateInstance(
             typeof(ConfiguredConnection), BindingFlags.Instance | BindingFlags.NonPublic, null,
-            [Connection(id, "devto"), Mock.Of<IConnectionType>(), new DevToConnectionSettings { ApiKey = "secret-key" }], null)!;
+            [Connection(id, "community.devto"), Mock.Of<IConnectionType>(), new DevToConnectionSettings { ApiKey = "secret-key" }], null)!;
 
     private static Connection Connection(Guid id, string type) => new() { Id = id, Alias = type + id.ToString("N")[..6], Name = type, Type = type };
 
@@ -98,7 +98,7 @@ public class DevToArticleCheckerTests
     {
         _links.Save(_content, new DevToArticleLink(null, 7, "https://dev.to/owain/post", true, Posted));
         _connections.Setup(c => c.GetAllConnectionsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync([Connection(ConnectionId, "devto"), Connection(Guid.NewGuid(), "mastodon")]);
+            .ReturnsAsync([Connection(ConnectionId, "community.devto"), Connection(Guid.NewGuid(), "community.mastodon")]);
         _api.RespondWithArticles(new { id = 7, url = "https://dev.to/owain/post", published = true });
 
         var result = await Checker().CheckAsync(_content, CancellationToken.None);
@@ -112,7 +112,7 @@ public class DevToArticleCheckerTests
     {
         _links.Save(_content, new DevToArticleLink(null, 7, "https://dev.to/owain/post", true, Posted));
         _connections.Setup(c => c.GetAllConnectionsAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync([Connection(ConnectionId, "devto"), Connection(Guid.NewGuid(), "devto")]);
+            .ReturnsAsync([Connection(ConnectionId, "community.devto"), Connection(Guid.NewGuid(), "community.devto")]);
 
         var result = await Checker().CheckAsync(_content, CancellationToken.None);
 

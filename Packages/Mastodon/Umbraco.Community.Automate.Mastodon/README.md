@@ -93,8 +93,10 @@ dotnet remove package OC.Automate.Mastodon
 dotnet add package Umbraco.Community.Automate.Mastodon
 ```
 
-The connection type alias (`mastodon`) and action alias (`mastodonSendPost`) are unchanged, so
-existing automations keep working across the rename.
+The connection type alias (`mastodon` → `community.mastodon`) and action alias (`mastodonSendPost` →
+`community.mastodon.sendPost`) now carry a `community.` prefix, keeping community packages' aliases
+apart from Umbraco's own built-in step types. **This is breaking**: saved connections and automation
+steps created before this change reference the old aliases and must be recreated.
 
 ### Configuration Structure
 - **Old (1.x)**: `OC:Automate:Mastodon:AccessTokens:connectionName` or `Umbraco:Automate:Providers:OCAutomateMastodon:AccessTokens:connectionName`

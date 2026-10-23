@@ -212,7 +212,7 @@ public class UpdateRowActionTests
             .WithService(CreateHttpClientFactory(TwoCallHandler("{}", "{}")))
             .WithService(creds.Object)
             .WithSettings(new UpdateRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", LookupColumn = "A", LookupValue = "x", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -262,7 +262,7 @@ public class UpdateRowActionTests
             .WithService(CreateHttpClientFactory(handler))
             .WithService(creds.Object)
             .WithSettings(settings)
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
     }
 

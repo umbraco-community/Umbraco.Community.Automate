@@ -101,7 +101,7 @@ public class ClearRangeActionTests
             .WithService(CreateHttpClientFactory(StubHandler(HttpStatusCode.OK, "{}")))
             .WithService(creds.Object)
             .WithSettings(new ClearRangeSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1" })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -130,7 +130,7 @@ public class ClearRangeActionTests
             .WithService(CreateHttpClientFactory(handler))
             .WithService(creds.Object)
             .WithSettings(settings)
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
     }
 

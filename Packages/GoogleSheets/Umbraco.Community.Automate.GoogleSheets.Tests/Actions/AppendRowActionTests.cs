@@ -37,7 +37,7 @@ public class AppendRowActionTests
                 SheetName = "Sheet1",
                 Columns = ["alice", "alice@example.com"],
             })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = credentialId })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = credentialId })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Success);
@@ -59,7 +59,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(Mock.Of<IOAuthCredentialsService>())
             .WithSettings(new AppendRowSettings { SpreadsheetId = "", SheetName = "Sheet1" })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -79,7 +79,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(creds.Object)
             .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -102,7 +102,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(creds.Object)
             .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -126,7 +126,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(creds.Object)
             .WithSettings(new AppendRowSettings { SpreadsheetId = "DOES_NOT_EXIST", SheetName = "Sheet1", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -150,7 +150,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(creds.Object)
             .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Not A Real Tab", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -174,7 +174,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(creds.Object)
             .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -202,7 +202,7 @@ public class AppendRowActionTests
                 SheetName = "Sheet1",
                 Columns = ["x"],
             })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -227,7 +227,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(creds.Object)
             .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Success);
@@ -251,7 +251,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(creds.Object)
             .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -272,7 +272,7 @@ public class AppendRowActionTests
             .WithService(httpClientFactory)
             .WithService(creds.Object)
             .WithSettings(new AppendRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);

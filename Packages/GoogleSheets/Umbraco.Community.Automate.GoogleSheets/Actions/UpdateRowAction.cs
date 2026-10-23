@@ -9,11 +9,11 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// Finds the first row in a Google Sheet where a column matches a value, then overwrites
 /// that row's column values. Produces an "updated" or "notFound" outcome for branching.
 /// </summary>
-[Action("googleSheets.updateRow", "Update Row in Google Sheet",
+[Action("community.googleSheets.updateRow", "Update Row in Google Sheet",
     Description = "Finds a row by column value and updates its column values.",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class UpdateRowAction : ActionBase<UpdateRowSettings, UpdateRowOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;

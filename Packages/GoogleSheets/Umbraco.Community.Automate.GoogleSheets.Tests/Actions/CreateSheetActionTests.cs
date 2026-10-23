@@ -119,7 +119,7 @@ public class CreateSheetActionTests
             .WithService(CreateHttpClientFactory(StubHandler(HttpStatusCode.OK, "{}")))
             .WithService(creds.Object)
             .WithSettings(new CreateSheetSettings { SpreadsheetId = "SHEET_ID", SheetTitle = "Tab" })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -148,7 +148,7 @@ public class CreateSheetActionTests
             .WithService(CreateHttpClientFactory(handler))
             .WithService(creds.Object)
             .WithSettings(settings)
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
     }
 

@@ -45,7 +45,7 @@ function appendRowStepConfig(step: AppendRowStep) {
     return {
         id: step.id,
         alias: step.alias,
-        actionAlias: 'googleSheets.appendRow',
+        actionAlias: 'community.googleSheets.appendRow',
         name: 'Append Row to Google Sheet',
         connectionId: step.connectionId,
         settings: {

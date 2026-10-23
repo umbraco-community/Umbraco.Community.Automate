@@ -7,11 +7,11 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// <summary>
 /// Reads rows from a Google Sheet tab, optionally restricted to an A1 range.
 /// </summary>
-[Action("googleSheets.getRows", "Get Rows from Google Sheet",
+[Action("community.googleSheets.getRows", "Get Rows from Google Sheet",
     Description = "Reads rows from a sheet tab or a specific range.",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class GetRowsAction : ActionBase<GetRowsSettings, GetRowsOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;
