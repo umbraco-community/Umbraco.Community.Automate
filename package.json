@@ -1,7 +1,0 @@
-{
-  "name": "umbraco-community-automate-tooling",
-  "private": true,
-  "devDependencies": {
-    "lefthook": "^1"
-  }
-}

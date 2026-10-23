@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 #
-# Lefthook pre-push hook: scans the commit range that is actually about to be
-# pushed for leaked secrets, using gitleaks.
+# Git pre-push hook: scans the commit range that is actually about to be
+# pushed for leaked secrets, using gitleaks. Enabled by .githooks/setup.sh
+# (or setup.ps1), which points git's core.hooksPath at this folder.
 #
-# Why this exists as a script (not an inline `gitleaks protect` command):
-# `gitleaks protect` only ever looks at the *uncommitted working-tree diff*
+# Why this scans commits rather than running `gitleaks protect` like
+# pre-commit does: `gitleaks protect` only ever looks at the *uncommitted working-tree diff*
 # (like `git diff`). It never inspects commits, so a secret committed with
 # `git commit --no-verify` on an otherwise-clean working tree would sail
 # through undetected - defeating the point of a pre-push safety net. Instead
@@ -15,8 +16,7 @@
 # Git invokes pre-push hooks with the remote name and URL as $1/$2, and
 # feeds one line per ref being pushed on stdin, in the form:
 #   <local ref> <local sha1> <remote ref> <remote sha1>
-# (see githooks(5), "pre-push"). Lefthook only forwards stdin to this script
-# because `use_stdin: true` is set for it in lefthook.yml.
+# (see githooks(5), "pre-push").
 
 set -euo pipefail
 

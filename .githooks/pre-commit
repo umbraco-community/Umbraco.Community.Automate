@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#
+# Git pre-commit hook: scans the staged changes for leaked secrets with
+# gitleaks before the commit is created. Enabled by .githooks/setup.sh (or
+# setup.ps1), which points git's core.hooksPath at this folder.
+
+set -euo pipefail
+
+exec gitleaks protect --staged --config .gitleaks.toml --redact --verbose
