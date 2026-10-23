@@ -26,6 +26,20 @@ dotnet test GoogleSheets/Umbraco.Community.Automate.GoogleSheets.Tests
 
 If a package has a `Client/` folder, run its frontend unit tests with `npm test` from that folder (`npm ci` first). CI also runs a Playwright E2E pass against the Demo site — see `.github/workflows/ci.yml` for the exact steps if you need to reproduce it locally.
 
+## Umbraco version compatibility
+
+Every package ships one build for Umbraco 17 and 18. It's compiled against the lowest supported versions and published with ranges that stop short of 19; both sets of versions live in the root `Directory.Packages.props`, switched by `-p:UmbracoMajor=18`:
+
+```bash
+dotnet test GoogleSheets/Umbraco.Community.Automate.GoogleSheets.Tests -p:UmbracoMajor=18
+```
+
+CI checks every package on both: it tests against 17 and 18, runs the 17 build on 18, and checks every Umbraco API the 17 build calls still exists in 18. To run the same check yourself (it needs bash, so on Windows use Git Bash or WSL):
+
+```bash
+./tools/test-umbraco-compat.sh GoogleSheets/Umbraco.Community.Automate.GoogleSheets
+```
+
 ## Making a change
 
 1. Branch off `main` — branch names follow `<type>/<short-description>`, e.g. `feat/google-sheets-clear-range`, `fix/oauth-token-refresh`, `docs/readme-cleanup`.
