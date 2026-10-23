@@ -7,7 +7,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Connection;
 /// <summary>
 /// Connection type for Google Sheets using OAuth via OpenIddict WebIntegration.
 /// </summary>
-[ConnectionType("googleSheets", "Google Sheets",
+[ConnectionType("community.googleSheets", "Google Sheets",
     Group = "Productivity",
     Icon = "icon-google-sheets",
     Description = "Connect to Google Sheets")]

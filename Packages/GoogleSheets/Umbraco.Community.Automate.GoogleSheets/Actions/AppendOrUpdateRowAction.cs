@@ -9,11 +9,11 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// Searches a Google Sheet for a row matching the key column value.
 /// Updates the row if found; appends a new row if not. Produces "updated" or "appended" outcomes.
 /// </summary>
-[Action("googleSheets.appendOrUpdateRow", "Append or Update Row in Google Sheet",
+[Action("community.googleSheets.appendOrUpdateRow", "Append or Update Row in Google Sheet",
     Description = "Updates a row if a matching key column value is found, otherwise appends a new row.",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettings, AppendOrUpdateRowOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;

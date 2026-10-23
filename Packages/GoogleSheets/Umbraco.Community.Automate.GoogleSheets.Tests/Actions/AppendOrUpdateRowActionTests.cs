@@ -217,7 +217,7 @@ public class AppendOrUpdateRowActionTests
             .WithService(CreateHttpClientFactory(TwoCallHandler("{}", "{}")))
             .WithService(creds.Object)
             .WithSettings(new AppendOrUpdateRowSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", KeyColumn = "A", Columns = ["x"] })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -281,7 +281,7 @@ public class AppendOrUpdateRowActionTests
             .WithService(CreateHttpClientFactory(handler))
             .WithService(creds.Object)
             .WithSettings(settings)
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
     }
 

@@ -110,7 +110,7 @@ public class GetCellValueActionTests
             .WithService(CreateHttpClientFactory(StubHandler(HttpStatusCode.OK, "{}")))
             .WithService(creds.Object)
             .WithSettings(new GetCellValueSettings { SpreadsheetId = "SHEET_ID", SheetName = "Sheet1", Cell = "A1" })
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
 
         result.Status.ShouldBe(ActionResultStatus.Failed);
@@ -139,7 +139,7 @@ public class GetCellValueActionTests
             .WithService(CreateHttpClientFactory(handler))
             .WithService(creds.Object)
             .WithSettings(settings)
-            .WithConnection("googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
+            .WithConnection("community.googleSheets", new GoogleSheetsConnectionSettings { OAuthCredentialsId = Guid.NewGuid() })
             .ExecuteAsync();
     }
 

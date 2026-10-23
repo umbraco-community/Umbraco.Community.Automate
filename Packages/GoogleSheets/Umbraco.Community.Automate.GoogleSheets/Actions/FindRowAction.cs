@@ -8,11 +8,11 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// Searches a Google Sheet column for a matching value and returns the first matching row.
 /// Produces a "found" or "notFound" outcome for conditional branching.
 /// </summary>
-[Action("googleSheets.findRow", "Find Row in Google Sheet",
+[Action("community.googleSheets.findRow", "Find Row in Google Sheet",
     Description = "Searches a column for a matching value and returns the first matching row.",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class FindRowAction : ActionBase<FindRowSettings, FindRowOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;

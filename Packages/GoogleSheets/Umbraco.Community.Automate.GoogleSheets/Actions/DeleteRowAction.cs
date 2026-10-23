@@ -9,11 +9,11 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// Finds the first row in a Google Sheet where a column matches a value, then deletes
 /// that row and shifts subsequent rows up. Produces a "deleted" or "notFound" outcome.
 /// </summary>
-[Action("googleSheets.deleteRow", "Delete Row from Google Sheet",
+[Action("community.googleSheets.deleteRow", "Delete Row from Google Sheet",
     Description = "Finds a row by column value and deletes it, shifting subsequent rows up.",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class DeleteRowAction : ActionBase<DeleteRowSettings, DeleteRowOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;

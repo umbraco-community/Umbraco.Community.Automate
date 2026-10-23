@@ -9,11 +9,11 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// Appends a row of values to a Google Sheet using the Sheets API.
 /// Requires a Google Sheets connection with the <c>https://www.googleapis.com/auth/spreadsheets</c> scope.
 /// </summary>
-[Action("googleSheets.appendRow", "Append Row to Google Sheet",
+[Action("community.googleSheets.appendRow", "Append Row to Google Sheet",
     Description = "Appends a row of values to a Google Sheet.",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class AppendRowAction : ActionBase<AppendRowSettings, AppendRowOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;

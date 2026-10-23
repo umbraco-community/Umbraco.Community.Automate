@@ -65,6 +65,8 @@ Posting to a different [Forem](https://forem.com) community? Change **Instance U
 > **Reference not resolving?** The reference must start with `$Umbraco:Automate:Variables:DevTo:` or `$Umbraco:Automate:Secrets:DevTo:`, and the key must exist in configuration. The Markdown preview only resolves `Variables`, never `Secrets`.
 >
 > **Upgrading from an earlier beta?** Earlier betas read from `Umbraco:Community:Automate:DevTo:Variables` / `:Secrets`. Move those values to `Umbraco:Automate:Variables:DevTo` / `Umbraco:Automate:Secrets:DevTo`, and update any field that still references the old `$Umbraco:Community:Automate:DevTo:...` paths.
+>
+> Earlier betas also used unprefixed aliases (`devto` / `devto.publishContent`). They are now `community.devto` / `community.devto.publishContent`. Existing connections and automation steps must be recreated.
 
 ## Cross-posting blog posts
 

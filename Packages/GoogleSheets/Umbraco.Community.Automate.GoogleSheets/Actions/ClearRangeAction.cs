@@ -9,11 +9,11 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// Clears all values in a Google Sheet tab or a specific A1 range, preserving
 /// cell formatting and row structure.
 /// </summary>
-[Action("googleSheets.clearRange", "Clear Range in Google Sheet",
+[Action("community.googleSheets.clearRange", "Clear Range in Google Sheet",
     Description = "Clears all values in a sheet tab or a specific A1 range. Formatting is preserved.",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class ClearRangeAction : ActionBase<ClearRangeSettings, ClearRangeOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;

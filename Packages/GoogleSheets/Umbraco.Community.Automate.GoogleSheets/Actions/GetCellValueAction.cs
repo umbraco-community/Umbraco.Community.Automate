@@ -7,11 +7,11 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 /// <summary>
 /// Reads the value of a single cell from a Google Sheet.
 /// </summary>
-[Action("googleSheets.getCellValue", "Get Cell Value from Google Sheet",
+[Action("community.googleSheets.getCellValue", "Get Cell Value from Google Sheet",
     Description = "Reads the value of a single cell by A1 notation (e.g. A1, B5).",
     Group = "Productivity",
     Icon = "icon-google-sheets",
-    ConnectionTypeAlias = "googleSheets")]
+    ConnectionTypeAlias = "community.googleSheets")]
 public sealed class GetCellValueAction : ActionBase<GetCellValueSettings, GetCellValueOutput>
 {
     private readonly IHttpClientFactory _httpClientFactory;

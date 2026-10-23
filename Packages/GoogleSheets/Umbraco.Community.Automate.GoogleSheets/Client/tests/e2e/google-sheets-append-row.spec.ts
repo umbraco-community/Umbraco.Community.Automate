@@ -75,7 +75,7 @@ test.describe('Google Sheets append row automation', () => {
 
         const run = await automateApi.getRunDetail(runId!);
         expect(run.stepRuns).toHaveLength(1);
-        expect(run.stepRuns[0].actionAlias).toBe('googleSheets.appendRow');
+        expect(run.stepRuns[0].actionAlias).toBe('community.googleSheets.appendRow');
         expect(run.stepRuns[0].status).toBe('Completed');
 
         // Also confirm the real Runs tab in the automation editor reflects the same outcome.

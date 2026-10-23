@@ -85,7 +85,7 @@ public class PublishContentActionTests
             .WithService(new DevToArticleLinks(_keyValues))
             .WithService<ILogger<PublishContentAction>>(NullLogger<PublishContentAction>.Instance)
             .WithSettings(settings)
-            .WithConnection("devto", connection ?? new DevToConnectionSettings { ApiKey = "secret-key" })
+            .WithConnection("community.devto", connection ?? new DevToConnectionSettings { ApiKey = "secret-key" })
             .ExecuteAsync();
     }
 
