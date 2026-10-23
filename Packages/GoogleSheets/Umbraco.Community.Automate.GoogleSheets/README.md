@@ -84,4 +84,4 @@ One build supports both Umbraco 17 and 18: it's compiled against 17, and every c
 
 ## License
 
-MIT — see [LICENSE](../../LICENSE) for details.
+MIT — see [LICENSE](../../../LICENSE) for details.

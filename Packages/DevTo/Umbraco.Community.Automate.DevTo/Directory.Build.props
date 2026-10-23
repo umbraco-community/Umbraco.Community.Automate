@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <Authors>Owain Williams, Umbraco Community</Authors>
-    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/DevTo/Umbraco.Community.Automate.DevTo</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Packages/DevTo/Umbraco.Community.Automate.DevTo</PackageProjectUrl>
     <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
