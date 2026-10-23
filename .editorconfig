@@ -1,0 +1,22 @@
+# Keeps formatting the same across every package, whichever editor a contributor uses.
+# Line endings are set in .gitattributes.
+root = true
+
+[*]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+
+[*.{ts,js,mjs}]
+indent_style = space
+indent_size = 4
+
+[*.{csproj,props,targets,slnx}]
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
