@@ -252,7 +252,7 @@ public class PublishContentActionTests
     {
         BlogPost();
 
-        var result = await Execute(Settings(), new DevToConnectionSettings { ApiKey = "$Umbraco:Community:Automate:DevTo:Secrets:Missing" });
+        var result = await Execute(Settings(), new DevToConnectionSettings { ApiKey = "$Umbraco:Automate:Secrets:DevTo:Missing" });
 
         result.ErrorCategory.ShouldBe(StepRunErrorCategory.ConfigurationError);
         _api.Requests.ShouldBeEmpty();
