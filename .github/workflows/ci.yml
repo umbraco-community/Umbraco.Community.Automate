@@ -33,7 +33,8 @@ jobs:
           set -euo pipefail
 
           # A package is any directory with its own Directory.Build.props — the same marker
-          # release.yml already relies on to map a tag back to a package.
+          # release.yml already relies on to map a tag back to a package. Every package also
+          # gets the Umbraco-version compatibility check (tools/test-umbraco-compat.sh).
           mapfile -t PROJECT_DIRS < <(
             find . -mindepth 3 -maxdepth 3 -name Directory.Build.props -not -path './.git/*' \
               | xargs -r -n1 dirname | sed 's#^\./##' | sort
@@ -52,7 +53,6 @@ jobs:
             TESTS_DIR="${PROJECT_DIR}.Tests"
             CLIENT_DIR=""
             RUN_E2E=false
-            COMPAT_SCRIPT=""
 
             if [ ! -d "$TESTS_DIR" ]; then
               echo "Package '$PROJECT_DIR' has no test project at '$TESTS_DIR'" >&2
@@ -69,12 +69,6 @@ jobs:
               fi
             fi
 
-            # Optional Umbraco-version compatibility check: a package opts in by keeping a
-            # test-umbraco-compat.sh at the root of its area folder (e.g. DevTo/).
-            if [ -f "$AREA/test-umbraco-compat.sh" ]; then
-              COMPAT_SCRIPT="$AREA/test-umbraco-compat.sh"
-            fi
-
             AREAS+=("$AREA")
             ALL=$(jq -c \
               --arg name "$AREA" \
@@ -83,8 +77,7 @@ jobs:
               --arg tests "$TESTS_DIR" \
               --arg client "$CLIENT_DIR" \
               --argjson e2e "$RUN_E2E" \
-              --arg compat "$COMPAT_SCRIPT" \
-              '. + [{name: $name, area: $area, project: $project, tests: $tests, client: $client, e2e: $e2e, compat: $compat}]' \
+              '. + [{name: $name, area: $area, project: $project, tests: $tests, client: $client, e2e: $e2e}]' \
               <<< "$ALL")
           done
 
@@ -160,7 +153,6 @@ jobs:
       tests-dir: ${{ matrix.package.tests }}
       client-dir: ${{ matrix.package.client }}
       run-e2e: ${{ matrix.package.e2e }}
-      compat-script: ${{ matrix.package.compat }}
 
   # Single stable name to require in branch protection: it succeeds when every matrix leg
   # succeeded, and — unlike listing each leg — does not need updating as packages come and go.

@@ -31,11 +31,6 @@ on:
         required: false
         default: false
         type: boolean
-      compat-script:
-        description: Path to a script that checks Umbraco version compatibility, or '' to skip.
-        required: false
-        default: ''
-        type: string
       dotnet-version:
         required: false
         default: '10.0.x'
@@ -71,7 +66,6 @@ jobs:
 
   compat:
     name: umbraco-compat
-    if: inputs.compat-script != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -80,9 +74,9 @@ jobs:
         with:
           dotnet-version: ${{ inputs.dotnet-version }}
 
-      # e.g. the DEV package ships one build for Umbraco 17 and 18. This tests it on both,
-      # runs the 17 build against 18, and checks every Umbraco API it calls still exists in 18.
-      - run: ./${{ inputs.compat-script }}
+      # Every package ships one build for Umbraco 17 and 18. This tests it on both, runs the
+      # 17 build against 18, and checks every Umbraco API it calls still exists in 18.
+      - run: ./tools/test-umbraco-compat.sh "${{ inputs.project-dir }}"
 
   frontend:
     name: frontend
