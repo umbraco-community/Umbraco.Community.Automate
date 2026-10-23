@@ -32,8 +32,8 @@ public class DevToControllerTests
     private readonly IConfiguration _configuration = new ConfigurationBuilder()
         .AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Umbraco:Community:Automate:DevTo:Variables:SiteUrl"] = "https://owain.codes",
-            ["Umbraco:Community:Automate:DevTo:Secrets:SiteUrl"] = "https://secret.example",
+            ["Umbraco:Automate:Variables:DevTo:SiteUrl"] = "https://owain.codes",
+            ["Umbraco:Automate:Secrets:DevTo:SiteUrl"] = "https://secret.example",
         })
         .Build();
 
@@ -99,10 +99,10 @@ public class DevToControllerTests
 
     [Fact]
     public async Task Preview_resolves_automate_variables()
-        => Ok(await Preview("$Umbraco:Community:Automate:DevTo:Variables:SiteUrl")).CanonicalUrl.ShouldBe("https://owain.codes/blog/my-blog-post/");
+        => Ok(await Preview("$Umbraco:Automate:Variables:DevTo:SiteUrl")).CanonicalUrl.ShouldBe("https://owain.codes/blog/my-blog-post/");
 
     [Theory]
-    [InlineData("$Umbraco:Community:Automate:DevTo:Secrets:SiteUrl")]
+    [InlineData("$Umbraco:Automate:Secrets:DevTo:SiteUrl")]
     [InlineData("$ConnectionStrings:umbracoDbDSN")]
     [InlineData("${ steps.getContent.properties.siteUrl }")]
     public async Task Preview_never_resolves_secrets_other_configuration_or_bindings(string siteUrl)

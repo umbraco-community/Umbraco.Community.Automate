@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Automate.Core.Actions;
-using Umbraco.Automate.Core.Configuration;
 using Umbraco.Automate.Core.Connections;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -33,21 +32,5 @@ public class DevToComposer : IComposer
             .Add<DevToConnectionType>();
 
         builder.Services.AddSingleton<IPackageManifestReader, DevToPackageManifestReader>();
-
-        // Automate only resolves $-references under allow-listed prefixes
-        builder.Services.PostConfigure<AutomateOptions>(options =>
-        {
-            options.AllowedConfigurationKeyPrefixes =
-            [
-                .. options.AllowedConfigurationKeyPrefixes,
-                DevToConfiguration.VariablesPath,
-                DevToConfiguration.SecretsPath,
-            ];
-            options.SecretConfigurationKeyPrefixes =
-            [
-                .. options.SecretConfigurationKeyPrefixes,
-                DevToConfiguration.SecretsPath,
-            ];
-        });
     }
 }

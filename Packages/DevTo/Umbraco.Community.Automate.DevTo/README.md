@@ -22,20 +22,20 @@ On DEV, go to **Settings → Extensions → DEV Community API Keys**, give the k
 
 ### 2. Store the key as a secret
 
-Rather than pasting values into the backoffice, store them in the package's `Umbraco:Community:Automate:DevTo` section, split into **Variables** (non-sensitive values) and **Secrets** (sensitive values). The package registers both with Umbraco Automate's configuration allow-list, so no extra setup is needed; `Secrets` can only be referenced from sensitive fields such as **API Key**.
+Rather than pasting values into the backoffice, store them under a `DevTo` key in Umbraco Automate's shared **Variables** (non-sensitive) and **Secrets** (sensitive) sections. Automate resolves `$` references from its shared `Umbraco:Automate:Variables` and `Umbraco:Automate:Secrets` sections out of the box, so there's nothing to register; `Secrets` can only be referenced from sensitive fields such as **API Key**.
 
 ```json
 {
   "Umbraco": {
-    "Community": {
-      "Automate": {
+    "Automate": {
+      "Variables": {
         "DevTo": {
-          "Variables": {
-            "SiteUrl": "https://your-site.com"
-          },
-          "Secrets": {
-            "ApiKey": "your-api-key"
-          }
+          "SiteUrl": "https://your-site.com"
+        }
+      },
+      "Secrets": {
+        "DevTo": {
+          "ApiKey": "your-api-key"
         }
       }
     }
@@ -46,23 +46,25 @@ Rather than pasting values into the backoffice, store them in the package's `Umb
 For production, use environment variables instead:
 
 ```
-Umbraco__Community__Automate__DevTo__Secrets__ApiKey=your-api-key
-Umbraco__Community__Automate__DevTo__Variables__SiteUrl=https://your-site.com
+Umbraco__Automate__Secrets__DevTo__ApiKey=your-api-key
+Umbraco__Automate__Variables__DevTo__SiteUrl=https://your-site.com
 ```
 
-Reference these values from the backoffice with a `$` prefix, e.g. `$Umbraco:Community:Automate:DevTo:Variables:SiteUrl`.
+Reference these values from the backoffice with a `$` prefix, e.g. `$Umbraco:Automate:Variables:DevTo:SiteUrl`.
 
 `SiteUrl` is only needed if Umbraco can't generate absolute URLs for your content (see [URLs](#urls)).
 
 ### 3. Create the connection
 
 1. Go to **Automate → Connections** and create a new **DEV Community** connection.
-2. **API Key**: `$Umbraco:Community:Automate:DevTo:Secrets:ApiKey`
+2. **API Key**: `$Umbraco:Automate:Secrets:DevTo:ApiKey`
 3. Click **Test connection**. You should see "Connected as @yourname".
 
 Posting to a different [Forem](https://forem.com) community? Change **Instance URL** under *Advanced*.
 
-> **Reference not resolving?** The reference must start with `$Umbraco:Community:Automate:DevTo:Variables:` or `$Umbraco:Community:Automate:DevTo:Secrets:`, and the key must exist in configuration. If you previously used Automate's shared `Umbraco:Automate:Variables` / `Umbraco:Automate:Secrets` sections, move those values here; the Markdown preview only resolves `Variables` from the new section.
+> **Reference not resolving?** The reference must start with `$Umbraco:Automate:Variables:DevTo:` or `$Umbraco:Automate:Secrets:DevTo:`, and the key must exist in configuration. The Markdown preview only resolves `Variables`, never `Secrets`.
+>
+> **Upgrading from an earlier beta?** Earlier betas read from `Umbraco:Community:Automate:DevTo:Variables` / `:Secrets`. Move those values to `Umbraco:Automate:Variables:DevTo` / `Umbraco:Automate:Secrets:DevTo`, and update any field that still references the old `$Umbraco:Community:Automate:DevTo:...` paths.
 
 ## Cross-posting blog posts
 
@@ -84,7 +86,7 @@ Create an automation:
 | Series | Links articles together as a series on DEV. |
 | Content Key | *Advanced.* The item to post. Defaults to `${ trigger.contentKey }`. |
 | Culture | *Advanced.* For variant content. Blank uses the default culture. |
-| Site URL | *Advanced.* Your public base URL, e.g. `$Umbraco:Community:Automate:DevTo:Variables:SiteUrl`. |
+| Site URL | *Advanced.* Your public base URL, e.g. `$Umbraco:Automate:Variables:DevTo:SiteUrl`. |
 | Canonical URL | *Advanced.* Override the canonical URL. |
 | Existing Article ID | *Advanced.* Update this DEV article instead of looking one up. |
 
@@ -128,7 +130,7 @@ Its output is available to later steps:
 Click **Preview…** under Body Properties and pick a published item to see the Markdown and canonical
 URL the step would post, or the error it would fail with. DEV isn't called. Bindings only have values
 during a run, so the preview uses what a blank setting would for any that use one (Site URL, Culture,
-Canonical URL); `$Umbraco:Community:Automate:DevTo:Variables:…` references are resolved, secrets never are.
+Canonical URL); `$Umbraco:Automate:Variables:DevTo:…` references are resolved, secrets never are.
 
 ### Finding the article on DEV
 
@@ -189,7 +191,7 @@ public class DevToConvertersComposer : IComposer
 
 ## URLs
 
-DEV needs absolute URLs for the canonical link, links and images. By default the action uses the absolute URL Umbraco generates for the content, which works when the site has a domain assigned (**Culture and Hostnames**) or `Umbraco:CMS:WebRouting:UmbracoApplicationUrl` is set. Otherwise, set **Site URL** on the step, e.g. to `$Umbraco:Community:Automate:DevTo:Variables:SiteUrl`.
+DEV needs absolute URLs for the canonical link, links and images. By default the action uses the absolute URL Umbraco generates for the content, which works when the site has a domain assigned (**Culture and Hostnames**) or `Umbraco:CMS:WebRouting:UmbracoApplicationUrl` is set. Otherwise, set **Site URL** on the step, e.g. to `$Umbraco:Automate:Variables:DevTo:SiteUrl`.
 
 ## Errors and retries
 

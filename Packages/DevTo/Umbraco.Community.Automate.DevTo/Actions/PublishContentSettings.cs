@@ -65,7 +65,7 @@ public sealed class PublishContentSettings
     public string? Culture { get; set; }
 
     [Field(Label = "Site URL",
-        Description = "Your site's public base URL, used for the canonical URL, links and images. Leave blank to use the URL Umbraco generates (requires a domain or UmbracoApplicationUrl). Can reference configuration, e.g. $Umbraco:Community:Automate:DevTo:Variables:SiteUrl",
+        Description = "Your site's public base URL, used for the canonical URL, links and images. Leave blank to use the URL Umbraco generates (requires a domain or UmbracoApplicationUrl). Can reference configuration, e.g. $Umbraco:Automate:Variables:DevTo:SiteUrl",
         SortOrder = 9,
         SupportsBindings = true,
         Group = "Advanced")]

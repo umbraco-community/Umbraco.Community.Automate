@@ -14,7 +14,7 @@ public static class DevToConnectionSettingsValidator
             return "An API key is required.";
 
         if (settings.ApiKey.TrimStart().StartsWith('$'))
-            return $"The API key reference '{settings.ApiKey}' could not be resolved. Check the key exists under Umbraco:Community:Automate:DevTo:Secrets.";
+            return $"The API key reference '{settings.ApiKey}' could not be resolved. Check the key exists under Umbraco:Automate:Secrets:DevTo.";
 
         if (!HttpUrl.IsValid(settings.InstanceUrl))
             return $"'{settings.InstanceUrl}' is not a valid instance URL. Use a full URL such as {DevToConnectionSettings.DefaultInstanceUrl}.";

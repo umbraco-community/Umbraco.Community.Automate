@@ -8,7 +8,7 @@ public sealed class DevToConnectionSettings
 
     [Field(Label = "API Key",
         Description = "Your DEV API key, from [Settings → Extensions](https://dev.to/settings/extensions) on DEV. " +
-                      "Recommended: reference a secret instead of pasting it, e.g. $Umbraco:Community:Automate:DevTo:Secrets:ApiKey",
+                      "Recommended: reference a secret instead of pasting it, e.g. $Umbraco:Automate:Secrets:DevTo:ApiKey",
         SortOrder = 0,
         IsSensitive = true)]
     public string ApiKey { get; set; } = string.Empty;
