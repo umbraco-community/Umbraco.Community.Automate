@@ -5,8 +5,8 @@ name: CI
 #
 # Packages are discovered from the folder layout rather than listed here, so a new package
 # needs no change to this file at all: drop it in following the existing convention
-# (<Area>/Umbraco.Community.Automate.<Area>/ with a sibling .Tests project) and it is picked
-# up on the next run.
+# (Packages/<Area>/Umbraco.Community.Automate.<Area>/ with a sibling .Tests project) and it
+# is picked up on the next run.
 
 on:
   pull_request:
@@ -33,10 +33,12 @@ jobs:
           set -euo pipefail
 
           # A package is any directory with its own Directory.Build.props — the same marker
-          # release.yml already relies on to map a tag back to a package. Every package also
-          # gets the Umbraco-version compatibility check (tools/test-umbraco-compat.sh).
+          # release.yml already relies on to map a tag back to a package. Packages sit at
+          # Packages/<Area>/<Project>/, e.g. Packages/Mastodon/Umbraco.Community.Automate.Mastodon.
+          # Every package also gets the Umbraco-version compatibility check
+          # (tools/test-umbraco-compat.sh).
           mapfile -t PROJECT_DIRS < <(
-            find . -mindepth 3 -maxdepth 3 -name Directory.Build.props -not -path './.git/*' \
+            find . -mindepth 4 -maxdepth 4 -name Directory.Build.props -not -path './.git/*' \
               | xargs -r -n1 dirname | sed 's#^\./##' | sort
           )
 
@@ -49,7 +51,8 @@ jobs:
           AREAS=()
 
           for PROJECT_DIR in "${PROJECT_DIRS[@]}"; do
-            AREA="${PROJECT_DIR%%/*}"                      # e.g. Mastodon
+            AREA="${PROJECT_DIR%/*}"                       # e.g. Packages/Mastodon
+            NAME="${AREA##*/}"                             # e.g. Mastodon
             TESTS_DIR="${PROJECT_DIR}.Tests"
             CLIENT_DIR=""
             RUN_E2E=false
@@ -71,7 +74,7 @@ jobs:
 
             AREAS+=("$AREA")
             ALL=$(jq -c \
-              --arg name "$AREA" \
+              --arg name "$NAME" \
               --arg area "$AREA" \
               --arg project "$PROJECT_DIR" \
               --arg tests "$TESTS_DIR" \

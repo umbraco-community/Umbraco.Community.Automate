@@ -6,7 +6,7 @@
 *              @warrenbuckley @OwainWilliams @erikjanwestendorp
 
 # Packages, reviewed by their authors.
-/DevTo/        @OwainWilliams
-/GoogleSheets/ @warrenbuckley
-/Mastodon/     @OwainWilliams
-/Skoda/        @erikjanwestendorp
+/Packages/DevTo/        @OwainWilliams
+/Packages/GoogleSheets/ @warrenbuckley
+/Packages/Mastodon/     @OwainWilliams
+/Skoda/                 @erikjanwestendorp

@@ -10,7 +10,7 @@
 #      covering the code paths the tests in step 3 don't reach.
 #
 # Usage: tools/test-umbraco-compat.sh <package project dir>
-#   e.g. tools/test-umbraco-compat.sh Mastodon/Umbraco.Community.Automate.Mastodon
+#   e.g. tools/test-umbraco-compat.sh Packages/Mastodon/Umbraco.Community.Automate.Mastodon
 # Runs from anywhere; needs the .NET 10 SDK and bash (Git Bash on Windows).
 set -euo pipefail
 
