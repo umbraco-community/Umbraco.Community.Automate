@@ -1,0 +1,74 @@
+name: Bug report
+description: Something in one of the packages doesn't work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. **Never paste API keys, tokens, OAuth secrets or connection strings**, not even partly: issues are public. For a security problem, follow [SECURITY.md](https://github.com/umbraco-community/Umbraco.Community.Automate/blob/main/.github/SECURITY.md) instead.
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options:
+        - DevTo
+        - Google Sheets
+        - Mastodon
+        - Skoda
+        - Repo, CI or docs
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: The package, Umbraco Automate and Umbraco CMS versions.
+      placeholder: "Umbraco.Community.Automate.Mastodon 1.0.0, Umbraco Automate 17.0.0, Umbraco CMS 17.4.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you saw, including any error message from the step's run under **Automation → Runs**.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The trigger and the steps in your automation, and the settings you used (with any secrets removed).
+      placeholder: |
+        1. Trigger: Content Published, document type "blogPost"
+        2. Step: Send Mastodon Post, content "${ trigger.contentName }"
+        3. Publish a blog post
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Relevant lines from the Umbraco log, if any. Remove anything sensitive first.
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I've removed any API keys, tokens or other secrets from this issue.
+          required: true
+        - label: I've checked the package README's Troubleshooting section.
