@@ -138,5 +138,5 @@ One build supports both Umbraco 17 and 18: it's compiled against 17, and every c
 
 ## Links
 
-- [Source code](https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Mastodon/Umbraco.Community.Automate.Mastodon)
+- [Source code](https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Packages/Mastodon/Umbraco.Community.Automate.Mastodon)
 - [Report an issue](https://github.com/umbraco-community/Umbraco.Community.Automate/issues)

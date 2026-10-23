@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <Authors>Owain Williams, Umbraco Community</Authors>
-    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Mastodon/Umbraco.Community.Automate.Mastodon</PackageProjectUrl>
+    <Authors>Warren Buckley &amp; Umbraco Community</Authors>
+    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Packages/GoogleSheets/Umbraco.Community.Automate.GoogleSheets</PackageProjectUrl>
     <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -9,14 +9,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Tags this repo uses for Mastodon releases, e.g. mastodon-v2.1.0.
+    <!-- Tags this repo uses for GoogleSheets releases, e.g. googlesheets-v1.0.0.
          IgnoreHeight: this package is only ever versioned via a deliberate tag
          push, never by auto-incrementing between tags, so MinVer's commit-
          height-based pre-release suffixing — which would also react to
          unrelated packages' commits in this monorepo's shared history — is
          turned off. See MinVer's own README FAQ on independent versioning of
          multiple projects in a single repository via distinct tag prefixes. -->
-    <MinVerTagPrefix>mastodon-v</MinVerTagPrefix>
+    <MinVerTagPrefix>googlesheets-v</MinVerTagPrefix>
     <MinVerIgnoreHeight>true</MinVerIgnoreHeight>
   </PropertyGroup>
 
