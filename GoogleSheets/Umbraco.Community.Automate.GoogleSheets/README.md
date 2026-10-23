@@ -32,7 +32,10 @@ Umbraco.Community.Automate.GoogleSheets is a provider package that adds Google S
 
 ```bash
 dotnet add package Umbraco.Community.Automate.GoogleSheets
+dotnet add package Umbraco.Automate.OpenIddict --version <your Umbraco Automate version>
 ```
+
+The second line matters: this package works with Umbraco Automate 17 and 18, so on its own NuGet installs the oldest version of Automate's OAuth support it allows. Installing the `Umbraco.Automate.OpenIddict` version that matches your site's `Umbraco.Automate` major keeps the two in step — if they're out of step, backoffice sign-in can fail with "Your session has timed out".
 
 ## Configuration
 
@@ -70,6 +73,14 @@ If a run fails with a message that Google "couldn't find a spreadsheet" at the g
 If a run fails saying the sheet/tab name doesn't match, first verify the tab name in your spreadsheet matches exactly — including capitalisation. If the tab name is right, the connected account may not have permission to access the spreadsheet; this error can surface for cross-domain access (e.g. a personal Google account trying to append to a Google Workspace spreadsheet it hasn't been granted access to).
 
 If a run fails saying Google is rate-limiting requests, this isn't an error with your setup — the [Sheets API has a fixed request quota](https://developers.google.com/workspace/sheets/api/limits), and the run will need to be retried after a short wait.
+
+## Compatibility
+
+| Package version | Umbraco Automate | Umbraco CMS |
+|---|---|---|
+| 1.x | 17.x – 18.x | 17.4 – 18.x |
+
+One build supports both Umbraco 17 and 18: it's compiled against 17, and every change is tested on both, including running the 17 build on 18. Umbraco 19 isn't supported until it has been tested.
 
 ## License
 

@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\UmbracoVersions.props" />
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
@@ -15,7 +14,7 @@
         </PackageReference>
         <PackageReference Include="Moq" />
         <PackageReference Include="Shouldly" />
-        <PackageReference Include="Umbraco.Automate.Testing" VersionOverride="$(UmbracoAutomateTestingVersion)" />
+        <PackageReference Include="Umbraco.Automate.Testing" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Umbraco.Community.Automate.DevTo\Umbraco.Community.Automate.DevTo.csproj" />
