@@ -99,6 +99,21 @@ jobs:
           echo "Changed files:"
           sed 's/^/  /' <<< "$CHANGED"
 
+          # A nudge for reviewers, never a failure: package PRs should touch one package, and
+          # workflow changes deserve a closer look. Maintainers can ignore it for repo-wide work.
+          TOUCHED_AREAS=()
+          for AREA in "${AREAS[@]}"; do
+            if grep -q "^$AREA/" <<< "$CHANGED"; then
+              TOUCHED_AREAS+=("$AREA")
+            fi
+          done
+          if [ "${#TOUCHED_AREAS[@]}" -gt 1 ]; then
+            echo "::warning title=More than one package::This PR changes ${#TOUCHED_AREAS[@]} packages (${TOUCHED_AREAS[*]}). Package PRs should change one package; split it up unless this is a repo-wide change."
+          fi
+          if grep -q '^\.github/workflows/' <<< "$CHANGED"; then
+            echo "::warning title=Workflows changed::This PR changes files in .github/workflows/. Package PRs shouldn't need to: CI discovers packages from the folder layout."
+          fi
+
           # Fail safe: anything NOT inside a package folder is treated as a shared change and
           # runs the lot. That covers Directory.Packages.props, the Demo site (which both
           # packages are referenced by), these workflows, and anything added in future —
