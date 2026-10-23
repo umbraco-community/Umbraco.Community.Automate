@@ -46,17 +46,17 @@ These values transparently override the tracked placeholder values in `appsettin
 
 ### One-time setup
 
-Run the setup script for your platform once per clone:
+[Install gitleaks](https://github.com/gitleaks/gitleaks#installing) if you don't already have it, then run the setup script for your platform once per clone:
 
 ```bash
-./SetupRepo.sh        # macOS/Linux
+./.githooks/setup.sh        # macOS/Linux
 ```
 
 ```powershell
-.\SetupRepo.ps1       # Windows
+.\.githooks\setup.ps1       # Windows
 ```
 
-This installs [Lefthook](https://github.com/evilmartians/lefthook) and wires up `pre-commit`/`pre-push` git hooks that run [gitleaks](https://github.com/gitleaks/gitleaks) against your changes automatically — a second, local layer of defense in case a real secret ever ends up staged despite the above.
+This points git at `.githooks/`, which runs [gitleaks](https://github.com/gitleaks/gitleaks) against your changes before every commit and push — a second, local layer of defense in case a real secret ever ends up staged despite the above. No Node install needed for this step.
 
 ### If a commit or push is blocked
 
