@@ -21,8 +21,5 @@ public class DevToComposer : IComposer
         builder.Services.AddSingleton<DevToContentRenderer>();
 
         builder.Services.AddSingleton<IPackageManifestReader, DevToPackageManifestReader>();
-
-        // No connection type or action registration: Automate discovers classes with
-        // [ConnectionType] and [Action] attributes on its own. Only services go here.
     }
 }
