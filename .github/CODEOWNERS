@@ -1,0 +1,12 @@
+# Who is asked to review changes to each part of the repo.
+# The last matching line wins, so the package lines below override the default.
+# When you add or move a package, add or update its line here.
+
+# Default: the repo maintainers review anything not listed below.
+*              @warrenbuckley @OwainWilliams @erikjanwestendorp
+
+# Packages, reviewed by their authors.
+/DevTo/        @OwainWilliams
+/GoogleSheets/ @warrenbuckley
+/Mastodon/     @OwainWilliams
+/Skoda/        @erikjanwestendorp
