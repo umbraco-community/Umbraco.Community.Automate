@@ -1,4 +1,5 @@
 ﻿using Umbraco.Automate.Core.Settings;
+using Umbraco.Community.Automate.Skoda.Configuration;
 
 namespace Umbraco.Community.Automate.Skoda.Connections;
 
@@ -9,7 +10,7 @@ public sealed class SkodaConnectionSettings
         Description = "The API key generated in the MyŠkoda app.",
         IsSensitive = true,
         SortOrder = 0)]
-    public string ApiKey { get; set; } = string.Empty;
+    public string ApiKey { get; set; } = SkodaConfiguration.ApiKeyReference;
 
     [Field(
         Label = "VIN",

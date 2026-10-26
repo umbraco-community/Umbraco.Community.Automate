@@ -47,6 +47,25 @@ public class SkodaConnectionTypeTests
     }
 
     [Fact]
+    public void New_connections_default_to_the_configuration_reference()
+        => Assert.Equal("$Umbraco:Automate:Secrets:Skoda:ApiKey", new SkodaConnectionSettings().ApiKey);
+
+    [Fact]
+    public async Task ValidateAsync_explains_an_unresolved_api_key_reference_without_calling_the_api()
+    {
+        var sut = CreateSut(out var client);
+
+        // A reference arriving unresolved (Automate normally resolves it, or reports the missing key, first).
+        var result = await sut.ValidateAsync(
+            new SkodaConnectionSettings { Vin = Vin, ValidateConnection = true },
+            CancellationToken.None);
+
+        Assert.Equal(ConnectionValidationStatus.Failure, result.Status);
+        Assert.Contains("Umbraco:Automate:Secrets:Skoda:ApiKey", result.Message);
+        Assert.Empty(client.Invocations);
+    }
+
+    [Fact]
     public async Task ValidateAsync_returns_warning_without_calling_the_api_when_validation_is_disabled()
     {
         var sut = CreateSut(out var client);

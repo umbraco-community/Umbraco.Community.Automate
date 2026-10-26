@@ -16,6 +16,10 @@ public class StartAuxiliaryHeatingActionTests
     private const string Vin = "TMBJB9NY5RF999999";
 
     [Fact]
+    public void New_steps_read_the_S_PIN_from_configuration()
+        => new StartAuxiliaryHeatingSettings().Spin.ShouldBe("$Umbraco:Automate:Secrets:Skoda:Spin");
+
+    [Fact]
     public async Task ExecuteAsync_builds_configuration_from_settings()
     {
         var client = new Mock<ISkodaClient>();
