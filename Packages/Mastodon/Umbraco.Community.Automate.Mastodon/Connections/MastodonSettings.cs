@@ -12,7 +12,7 @@ public sealed class MastodonSettings
 {
     [Field(
         Label = "Instance URL",
-        Description = "The base URL of your Mastodon instance, e.g. https://mastodon.social.",
+        Description = "The base URL of your Mastodon instance, e.g. https://umbracocommunity.social.",
         SortOrder = 1)]
     public string InstanceUrl { get; set; } = MastodonConfiguration.InstanceUrlReference;
 
