@@ -1,10 +1,9 @@
-using Umbraco.Community.Automate.Mastodon.Factory;
-using Umbraco.Community.Automate.Mastodon.Settings;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Connections;
+using Umbraco.Community.Automate.Mastodon.Api;
 
-namespace Umbraco.Community.Automate.Mastodon.ConnectionTypes;
+namespace Umbraco.Community.Automate.Mastodon.Connections;
 
 [ConnectionType("community.mastodon", "Mastodon",
     Description = "Send post to Mastodon",

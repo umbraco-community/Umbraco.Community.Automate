@@ -1,4 +1,4 @@
-using Umbraco.Community.Automate.Mastodon.Settings;
+using Umbraco.Community.Automate.Mastodon.Connections;
 using Xunit;
 
 namespace Umbraco.Community.Automate.Mastodon.Tests;

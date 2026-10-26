@@ -1,8 +1,9 @@
 using Microsoft.Extensions.Logging;
-using Umbraco.Community.Automate.Mastodon.Factory;
-using Umbraco.Community.Automate.Mastodon.Settings;
 using System.Net.Http.Json;
 using Umbraco.Automate.Core.Actions;
+using Umbraco.Community.Automate.Mastodon.Api;
+using Umbraco.Community.Automate.Mastodon.Connections;
+using Umbraco.Community.Automate.Mastodon.Models;
 
 namespace Umbraco.Community.Automate.Mastodon.Actions;
 

@@ -1,4 +1,4 @@
-namespace Umbraco.Community.Automate.Mastodon.Settings;
+namespace Umbraco.Community.Automate.Mastodon.Connections;
 
 /// <summary>
 /// Shared validation for <see cref="MastodonSettings"/>, used by both the

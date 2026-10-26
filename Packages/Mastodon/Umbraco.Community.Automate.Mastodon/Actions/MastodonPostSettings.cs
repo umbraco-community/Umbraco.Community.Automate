@@ -1,6 +1,6 @@
 using Umbraco.Automate.Core.Settings;
 
-namespace Umbraco.Community.Automate.Mastodon.Settings;
+namespace Umbraco.Community.Automate.Mastodon.Actions;
 
 public sealed class MastodonPostSettings
 {

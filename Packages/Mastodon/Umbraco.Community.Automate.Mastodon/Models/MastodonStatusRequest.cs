@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Umbraco.Community.Automate.Mastodon.Settings;
+using Umbraco.Community.Automate.Mastodon.Actions;
 
-namespace Umbraco.Community.Automate.Mastodon.Actions;
+namespace Umbraco.Community.Automate.Mastodon.Models;
 
 /// <summary>
 /// Request body for the Mastodon <c>POST /api/v1/statuses</c> endpoint.

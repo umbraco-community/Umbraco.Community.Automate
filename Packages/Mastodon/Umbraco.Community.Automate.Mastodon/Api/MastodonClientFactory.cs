@@ -1,7 +1,7 @@
-using Umbraco.Community.Automate.Mastodon.Settings;
 using System.Net.Http.Headers;
+using Umbraco.Community.Automate.Mastodon.Connections;
 
-namespace Umbraco.Community.Automate.Mastodon.Factory;
+namespace Umbraco.Community.Automate.Mastodon.Api;
 
 public sealed class MastodonClientFactory
 {
