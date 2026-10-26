@@ -1,6 +1,7 @@
-using Umbraco.Community.Automate.DevTo.Client;
+using Umbraco.Community.Automate.DevTo.Api;
+using Umbraco.Community.Automate.DevTo.Configuration;
 
-namespace Umbraco.Community.Automate.DevTo.Settings;
+namespace Umbraco.Community.Automate.DevTo.Connections;
 
 public static class DevToConnectionSettingsValidator
 {
@@ -14,10 +15,10 @@ public static class DevToConnectionSettingsValidator
             return "An API key is required.";
 
         if (settings.ApiKey.TrimStart().StartsWith('$'))
-            return $"The API key reference '{settings.ApiKey}' could not be resolved. Check the key exists under Umbraco:Automate:Secrets:DevTo.";
+            return $"The API key reference '{settings.ApiKey}' could not be resolved. Check the key exists under {DevToConfiguration.SecretsPath}.";
 
         if (!HttpUrl.IsValid(settings.InstanceUrl))
-            return $"'{settings.InstanceUrl}' is not a valid instance URL. Use a full URL such as {DevToConnectionSettings.DefaultInstanceUrl}.";
+            return $"'{settings.InstanceUrl}' is not a valid instance URL. Use a full URL such as {DevToConfiguration.DefaultInstanceUrl}.";
 
         return null;
     }

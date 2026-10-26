@@ -22,7 +22,7 @@ On DEV, go to **Settings → Extensions → DEV Community API Keys**, give the k
 
 ### 2. Store the key as a secret
 
-Rather than pasting values into the backoffice, store them under a `DevTo` key in Umbraco Automate's shared **Variables** (non-sensitive) and **Secrets** (sensitive) sections. Automate resolves `$` references from its shared `Umbraco:Automate:Variables` and `Umbraco:Automate:Secrets` sections out of the box, so there's nothing to register; `Secrets` can only be referenced from sensitive fields such as **API Key**.
+New connections are pre-filled with a reference to configuration, so if you store the key there you don't need to type anything into the backoffice. Values go under a `DevTo` key in Umbraco Automate's shared **Variables** (non-sensitive) and **Secrets** (sensitive) sections. Automate resolves `$` references from its shared `Umbraco:Automate:Variables` and `Umbraco:Automate:Secrets` sections out of the box, so there's nothing to register; `Secrets` can only be referenced from sensitive fields such as **API Key**.
 
 ```json
 {
@@ -57,7 +57,7 @@ Reference these values from the backoffice with a `$` prefix, e.g. `$Umbraco:Aut
 ### 3. Create the connection
 
 1. Go to **Automate → Connections** and create a new **DEV Community** connection.
-2. **API Key**: `$Umbraco:Automate:Secrets:DevTo:ApiKey`
+2. **API Key** is already filled in with `$Umbraco:Automate:Secrets:DevTo:ApiKey`, a reference to the value you stored in step 2. Leave it as-is, or replace it with the key itself to store it on the connection.
 3. Click **Test connection**. You should see "Connected as @yourname".
 
 Posting to a different [Forem](https://forem.com) community? Change **Instance URL** under *Advanced*.

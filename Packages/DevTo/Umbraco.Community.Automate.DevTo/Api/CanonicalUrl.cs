@@ -1,4 +1,4 @@
-namespace Umbraco.Community.Automate.DevTo.Client;
+namespace Umbraco.Community.Automate.DevTo.Api;
 
 /// <summary>
 /// Compares canonical URLs the way a person would: scheme, host case and a trailing slash

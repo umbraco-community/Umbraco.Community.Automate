@@ -1,4 +1,4 @@
-namespace Umbraco.Community.Automate.DevTo.Settings;
+namespace Umbraco.Community.Automate.DevTo.Configuration;
 
 /// <summary>
 /// Where this package's values live in configuration. They sit under Umbraco Automate's shared
@@ -10,4 +10,10 @@ public static class DevToConfiguration
 {
     public const string VariablesPath = "Umbraco:Automate:Variables:DevTo";
     public const string SecretsPath = "Umbraco:Automate:Secrets:DevTo";
+
+    /// <summary>The reference new connections start with, so a key in configuration is used without any typing.</summary>
+    public const string ApiKeyReference = "$" + SecretsPath + ":ApiKey";
+
+    /// <summary>The Forem instance new connections start with. Other Forem sites can be entered instead.</summary>
+    public const string DefaultInstanceUrl = "https://dev.to";
 }

@@ -1,7 +1,7 @@
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Community.Automate.DevTo.Client;
+using Umbraco.Community.Automate.DevTo.Api;
 using Umbraco.Extensions;
 
 namespace Umbraco.Community.Automate.DevTo.Content;

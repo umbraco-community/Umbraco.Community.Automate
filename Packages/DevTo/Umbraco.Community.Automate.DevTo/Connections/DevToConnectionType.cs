@@ -1,9 +1,8 @@
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.Core.Connections;
-using Umbraco.Community.Automate.DevTo.Client;
-using Umbraco.Community.Automate.DevTo.Settings;
+using Umbraco.Community.Automate.DevTo.Api;
 
-namespace Umbraco.Community.Automate.DevTo.ConnectionTypes;
+namespace Umbraco.Community.Automate.DevTo.Connections;
 
 [ConnectionType(ConnectionTypeAlias, "DEV Community",
     Description = "Publish articles to DEV (dev.to).",

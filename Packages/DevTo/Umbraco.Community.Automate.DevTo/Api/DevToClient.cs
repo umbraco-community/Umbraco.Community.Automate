@@ -5,9 +5,10 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
-using Umbraco.Community.Automate.DevTo.Settings;
+using Umbraco.Community.Automate.DevTo.Connections;
+using Umbraco.Community.Automate.DevTo.Models;
 
-namespace Umbraco.Community.Automate.DevTo.Client;
+namespace Umbraco.Community.Automate.DevTo.Api;
 
 /// <summary>The parts of the Forem (DEV) API this package uses. Failures throw <see cref="DevToApiException"/>.</summary>
 public sealed class DevToClient

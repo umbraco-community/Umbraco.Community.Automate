@@ -4,11 +4,10 @@ using Umbraco.Automate.Core.Security;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Community.Automate.DevTo.Api;
 using Umbraco.Community.Automate.DevTo.Articles;
-using Umbraco.Community.Automate.DevTo.Client;
-using Umbraco.Community.Automate.DevTo.ConnectionTypes;
+using Umbraco.Community.Automate.DevTo.Connections;
 using Umbraco.Community.Automate.DevTo.Content;
-using Umbraco.Community.Automate.DevTo.Settings;
 using UmbracoConstants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Community.Automate.DevTo.Actions;

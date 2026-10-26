@@ -1,6 +1,6 @@
 using Umbraco.Automate.Core.Actions;
 
-namespace Umbraco.Community.Automate.DevTo.Client;
+namespace Umbraco.Community.Automate.DevTo.Api;
 
 /// <summary>
 /// A failed call to the Forem API, already classified so actions can hand the category

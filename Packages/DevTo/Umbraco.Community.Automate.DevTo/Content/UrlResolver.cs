@@ -47,7 +47,7 @@ internal static partial class UrlResolver
         });
 
     [GeneratedRegex(
-        """(?<code>^(?<fence>`{3,}|~{3,})[^\n]*\n.*?^\k<fence>[ \t]*$|`[^`\n]+`)"""
+        """(?<code>^(?<fence>`{3,}|~{3,})[^\n]*\n.*?^\k<fence>[ \t]*\r?$|`[^`\n]+`)"""
         + """|(?<inlinePrefix>\]\()(?<inlineUrl>/(?!/)[^)\s]*)"""
         + """|(?<referencePrefix>^[ \t]{0,3}\[[^\]\n]+\]:[ \t]*)(?<referenceUrl>/(?!/)\S*)"""
         + """|(?<attributePrefix>\b(?:src|href)=["'])(?<attributeUrl>/(?!/)[^"']*)""",
