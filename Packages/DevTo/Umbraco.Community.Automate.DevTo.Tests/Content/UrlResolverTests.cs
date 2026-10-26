@@ -57,6 +57,24 @@ public class UrlResolverTests
             """);
     }
 
+    [Theory]
+    [InlineData("\n")]
+    [InlineData("\r\n")]
+    public void AbsolutizeMarkdown_leaves_code_samples_untouched_with_any_line_ending(string newline)
+    {
+        // Built explicitly so the test doesn't depend on how this file was checked out:
+        // Markdown with Windows line endings must keep its fenced code as written too.
+        string Lines(params string[] lines) => string.Join(newline, lines);
+
+        var markdown = Lines("```html", "<a href=\"/contact\">Contact</a>", "```", "", "Then [read more](/blog/more).");
+
+        var result = UrlResolver.AbsolutizeMarkdown(markdown, Site);
+
+        Assert.Equal(
+            Lines("```html", "<a href=\"/contact\">Contact</a>", "```", "", "Then [read more](https://owain.codes/blog/more)."),
+            result);
+    }
+
     [Fact]
     public void AbsolutizeMarkdown_rewrites_reference_style_link_definitions()
         => UrlResolver.AbsolutizeMarkdown("Read the [docs][1].\n\n[1]: /docs/intro \"Intro\"\n  [logo]: /media/logo.png", Site)
