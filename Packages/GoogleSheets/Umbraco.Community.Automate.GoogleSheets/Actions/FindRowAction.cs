@@ -13,7 +13,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.findRow", "Find Row in Google Sheet",
     Description = "Searches a column for a matching value and returns the first matching row.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class FindRowAction : ActionBase<FindRowSettings, FindRowOutput>
 {

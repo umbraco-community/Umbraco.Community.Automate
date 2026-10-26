@@ -12,7 +12,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.getRows", "Get Rows from Google Sheet",
     Description = "Reads rows from a sheet tab or a specific range.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class GetRowsAction : ActionBase<GetRowsSettings, GetRowsOutput>
 {

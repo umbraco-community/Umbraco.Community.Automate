@@ -14,7 +14,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.updateRow", "Update Row in Google Sheet",
     Description = "Finds a row by column value and updates its column values.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class UpdateRowAction : ActionBase<UpdateRowSettings, UpdateRowOutput>
 {

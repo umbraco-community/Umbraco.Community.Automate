@@ -14,7 +14,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.deleteRow", "Delete Row from Google Sheet",
     Description = "Finds a row by column value and deletes it, shifting subsequent rows up.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class DeleteRowAction : ActionBase<DeleteRowSettings, DeleteRowOutput>
 {

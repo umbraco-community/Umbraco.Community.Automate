@@ -13,7 +13,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.createSheet", "Create Sheet Tab in Google Spreadsheet",
     Description = "Adds a new sheet tab to an existing spreadsheet.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class CreateSheetAction : ActionBase<CreateSheetSettings, CreateSheetOutput>
 {

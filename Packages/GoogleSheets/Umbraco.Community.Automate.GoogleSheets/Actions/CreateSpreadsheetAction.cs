@@ -15,7 +15,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
                   "A new document is created every time this step runs — it does not check for an existing spreadsheet with the same title. " +
                   "To avoid duplicates, add a condition before this step that skips it when a spreadsheet ID is already stored.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class CreateSpreadsheetAction : ActionBase<CreateSpreadsheetSettings, CreateSpreadsheetOutput>
 {
