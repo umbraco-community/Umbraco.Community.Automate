@@ -1,6 +1,6 @@
-using Umbraco.Community.Automate.DevTo.Client;
+using Umbraco.Community.Automate.DevTo.Api;
 
-namespace Umbraco.Community.Automate.DevTo.Settings;
+namespace Umbraco.Community.Automate.DevTo.Connections;
 
 public static class DevToConnectionSettingsValidator
 {

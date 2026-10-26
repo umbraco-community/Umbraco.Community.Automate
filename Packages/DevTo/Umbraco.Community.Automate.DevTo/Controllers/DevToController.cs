@@ -10,8 +10,8 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Security.Authorization;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Community.Automate.DevTo.Articles;
+using Umbraco.Community.Automate.DevTo.Configuration;
 using Umbraco.Community.Automate.DevTo.Content;
-using Umbraco.Community.Automate.DevTo.Settings;
 
 namespace Umbraco.Community.Automate.DevTo.Controllers;
 

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Umbraco.Community.Automate.DevTo.Client;
+namespace Umbraco.Community.Automate.DevTo.Models;
 
 /// <summary>
 /// Body of <c>POST /api/articles</c> and <c>PUT /api/articles/{id}</c>. Null members are

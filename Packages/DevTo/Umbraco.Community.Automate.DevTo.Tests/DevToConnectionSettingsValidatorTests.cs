@@ -1,5 +1,5 @@
 using Shouldly;
-using Umbraco.Community.Automate.DevTo.Settings;
+using Umbraco.Community.Automate.DevTo.Connections;
 using Xunit;
 
 namespace Umbraco.Community.Automate.DevTo.Tests;

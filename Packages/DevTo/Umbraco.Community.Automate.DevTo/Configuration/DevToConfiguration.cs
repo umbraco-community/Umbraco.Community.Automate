@@ -1,4 +1,4 @@
-namespace Umbraco.Community.Automate.DevTo.Settings;
+namespace Umbraco.Community.Automate.DevTo.Configuration;
 
 /// <summary>
 /// Where this package's values live in configuration. They sit under Umbraco Automate's shared

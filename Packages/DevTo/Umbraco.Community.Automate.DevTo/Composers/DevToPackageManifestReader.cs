@@ -32,7 +32,7 @@ public class DevToPackageManifestReader : IPackageManifestReader
                         type = "icons",
                         alias = "UmbracoCommunityAutomateDevTo.Icons",
                         name = "DEV Icons",
-                        js = $"{AppPluginPath}/icons.js",
+                        js = $"{AppPluginPath}/icons/icons.js",
                     },
                     new
                     {

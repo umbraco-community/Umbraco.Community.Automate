@@ -1,6 +1,6 @@
 using Umbraco.Automate.Core.Settings;
 
-namespace Umbraco.Community.Automate.DevTo.Settings;
+namespace Umbraco.Community.Automate.DevTo.Connections;
 
 public sealed class DevToConnectionSettings
 {

@@ -5,11 +5,10 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Infrastructure.Manifest;
 using Umbraco.Community.Automate.DevTo.Actions;
+using Umbraco.Community.Automate.DevTo.Api;
 using Umbraco.Community.Automate.DevTo.Articles;
-using Umbraco.Community.Automate.DevTo.Client;
-using Umbraco.Community.Automate.DevTo.ConnectionTypes;
+using Umbraco.Community.Automate.DevTo.Connections;
 using Umbraco.Community.Automate.DevTo.Content;
-using Umbraco.Community.Automate.DevTo.Settings;
 
 namespace Umbraco.Community.Automate.DevTo.Composers;
 

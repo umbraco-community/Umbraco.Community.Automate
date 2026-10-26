@@ -9,7 +9,7 @@ using Umbraco.Automate.Core.Connections;
 using Umbraco.Automate.Core.Settings;
 using Umbraco.Community.Automate.DevTo.Actions;
 using Umbraco.Community.Automate.DevTo.Composers;
-using Umbraco.Community.Automate.DevTo.ConnectionTypes;
+using Umbraco.Community.Automate.DevTo.Connections;
 using Umbraco.Community.Automate.DevTo.Controllers;
 using Umbraco.Community.Automate.DevTo.Tests.Helpers;
 using Xunit;
@@ -23,7 +23,7 @@ namespace Umbraco.Community.Automate.DevTo.Tests;
 public class DevToBackofficeTests
 {
     private static string[] RegisteredIconNames()
-        => Regex.Matches(File.ReadAllText(Path.Combine(DevToPackagePaths.Wwwroot, "icons.js")), @"name:\s*""([^""]+)""")
+        => Regex.Matches(File.ReadAllText(Path.Combine(DevToPackagePaths.Wwwroot, "icons", "icons.js")), @"name:\s*""([^""]+)""")
             .Select(m => m.Groups[1].Value)
             .ToArray();
 
@@ -54,9 +54,9 @@ public class DevToBackofficeTests
     {
         var js = (await GetExtensionAsync("icons")).GetProperty("js").GetString()!;
 
-        Assert.Equal("/App_Plugins/UmbracoCommunityAutomateDevTo/icons.js", js);
-        Assert.True(File.Exists(Path.Combine(DevToPackagePaths.Wwwroot, "icons.js")));
-        Assert.True(File.Exists(Path.Combine(DevToPackagePaths.Wwwroot, "devto.icon.js")));
+        Assert.Equal("/App_Plugins/UmbracoCommunityAutomateDevTo/icons/icons.js", js);
+        Assert.True(File.Exists(Path.Combine(DevToPackagePaths.Wwwroot, "icons", "icons.js")));
+        Assert.True(File.Exists(Path.Combine(DevToPackagePaths.Wwwroot, "icons", "devto.icon.js")));
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class DevToBackofficeTests
     public static TheoryData<Type> SettingsTypes => new()
     {
         typeof(PublishContentSettings),
-        typeof(Settings.DevToConnectionSettings),
+        typeof(Connections.DevToConnectionSettings),
     };
 
     /// <summary>

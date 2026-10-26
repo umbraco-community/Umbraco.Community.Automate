@@ -1,4 +1,4 @@
-namespace Umbraco.Community.Automate.DevTo.Client;
+namespace Umbraco.Community.Automate.DevTo.Api;
 
 internal static class HttpUrl
 {

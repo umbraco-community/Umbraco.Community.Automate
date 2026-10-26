@@ -1,5 +1,6 @@
-using Umbraco.Community.Automate.DevTo.Client;
-using Umbraco.Community.Automate.DevTo.Settings;
+using Umbraco.Community.Automate.DevTo.Api;
+using Umbraco.Community.Automate.DevTo.Connections;
+using Umbraco.Community.Automate.DevTo.Models;
 
 namespace Umbraco.Community.Automate.DevTo.Articles;
 
