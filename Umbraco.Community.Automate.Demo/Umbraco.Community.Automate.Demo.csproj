@@ -17,7 +17,7 @@
     <ProjectReference Include="..\Packages\DevTo\Umbraco.Community.Automate.DevTo\Umbraco.Community.Automate.DevTo.csproj" />
     <ProjectReference Include="..\Packages\GoogleSheets\Umbraco.Community.Automate.GoogleSheets\Umbraco.Community.Automate.GoogleSheets.csproj" />
     <ProjectReference Include="..\Packages\Mastodon\Umbraco.Community.Automate.Mastodon\Umbraco.Community.Automate.Mastodon.csproj" />
-    <ProjectReference Include="..\Skoda\src\Umbraco.Community.Automate.Skoda\Umbraco.Community.Automate.Skoda.csproj" />
+    <ProjectReference Include="..\Packages\Skoda\Umbraco.Community.Automate.Skoda\Umbraco.Community.Automate.Skoda.csproj" />
   </ItemGroup>
 
   <ItemGroup>
