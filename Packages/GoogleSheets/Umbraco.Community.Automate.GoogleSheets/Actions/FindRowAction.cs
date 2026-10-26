@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -11,7 +13,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.findRow", "Find Row in Google Sheet",
     Description = "Searches a column for a matching value and returns the first matching row.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class FindRowAction : ActionBase<FindRowSettings, FindRowOutput>
 {
@@ -56,7 +58,7 @@ public sealed class FindRowAction : ActionBase<FindRowSettings, FindRowOutput>
         using var httpClient = client!;
 
         var spreadsheetId = SpreadsheetIdParser.Parse(settings.SpreadsheetId);
-        var url = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
+        var url = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
 
         try
         {

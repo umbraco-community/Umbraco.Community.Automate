@@ -2,6 +2,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -12,7 +14,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.appendRow", "Append Row to Google Sheet",
     Description = "Appends a row of values to a Google Sheet.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class AppendRowAction : ActionBase<AppendRowSettings, AppendRowOutput>
 {
@@ -60,7 +62,7 @@ public sealed class AppendRowAction : ActionBase<AppendRowSettings, AppendRowOut
         using var httpClient = client!;
 
         var spreadsheetId = SpreadsheetIdParser.Parse(settings.SpreadsheetId);
-        var url = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}:append?valueInputOption=USER_ENTERED";
+        var url = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}:append?valueInputOption=USER_ENTERED";
         var payload = new { values = new[] { settings.Columns.ToArray() } };
 
         try

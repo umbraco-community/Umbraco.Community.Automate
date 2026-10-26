@@ -2,6 +2,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -13,7 +15,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
                   "A new document is created every time this step runs — it does not check for an existing spreadsheet with the same title. " +
                   "To avoid duplicates, add a condition before this step that skips it when a spreadsheet ID is already stored.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class CreateSpreadsheetAction : ActionBase<CreateSpreadsheetSettings, CreateSpreadsheetOutput>
 {
@@ -61,7 +63,7 @@ public sealed class CreateSpreadsheetAction : ActionBase<CreateSpreadsheetSettin
                 properties = new { title = settings.Title },
             };
 
-        var url = "https://sheets.googleapis.com/v4/spreadsheets";
+        var url = GoogleSheetsConfiguration.ApiBaseUrl;
 
         try
         {

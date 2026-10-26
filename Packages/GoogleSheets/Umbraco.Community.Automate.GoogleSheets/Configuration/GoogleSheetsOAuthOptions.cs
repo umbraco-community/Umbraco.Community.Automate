@@ -6,8 +6,6 @@ namespace Umbraco.Community.Automate.GoogleSheets.Configuration;
 /// </summary>
 public sealed class GoogleSheetsOAuthOptions
 {
-    internal const string SectionPath = "Umbraco:Automate:Providers:GoogleSheets";
-
     /// <summary>Gets or sets the OAuth 2.0 Client ID from Google Cloud Console.</summary>
     public string ClientId { get; set; } = string.Empty;
 

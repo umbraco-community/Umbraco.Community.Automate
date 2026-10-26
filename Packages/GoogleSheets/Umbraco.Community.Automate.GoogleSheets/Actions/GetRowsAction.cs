@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -10,7 +12,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.getRows", "Get Rows from Google Sheet",
     Description = "Reads rows from a sheet tab or a specific range.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class GetRowsAction : ActionBase<GetRowsSettings, GetRowsOutput>
 {
@@ -53,7 +55,7 @@ public sealed class GetRowsAction : ActionBase<GetRowsSettings, GetRowsOutput>
             ? settings.SheetName
             : $"{settings.SheetName}!{settings.Range.Trim()}";
 
-        var url = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(rangeSegment)}";
+        var url = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(rangeSegment)}";
 
         try
         {

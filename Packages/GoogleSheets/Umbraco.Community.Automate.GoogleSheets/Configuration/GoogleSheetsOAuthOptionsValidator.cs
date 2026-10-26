@@ -21,10 +21,10 @@ internal sealed class GoogleSheetsOAuthOptionsValidator : IValidateOptions<Googl
         var missing = new List<string>(2);
 
         if (string.IsNullOrEmpty(options.ClientId))
-            missing.Add($"{GoogleSheetsOAuthOptions.SectionPath}:ClientId");
+            missing.Add($"{GoogleSheetsConfiguration.ProviderPath}:ClientId");
 
         if (string.IsNullOrEmpty(options.ClientSecret))
-            missing.Add($"{GoogleSheetsOAuthOptions.SectionPath}:ClientSecret");
+            missing.Add($"{GoogleSheetsConfiguration.ProviderPath}:ClientSecret");
 
         if (missing.Count == 0)
             return ValidateOptionsResult.Success;

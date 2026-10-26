@@ -2,6 +2,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -12,7 +14,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.clearRange", "Clear Range in Google Sheet",
     Description = "Clears all values in a sheet tab or a specific A1 range. Formatting is preserved.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class ClearRangeAction : ActionBase<ClearRangeSettings, ClearRangeOutput>
 {
@@ -54,7 +56,7 @@ public sealed class ClearRangeAction : ActionBase<ClearRangeSettings, ClearRange
             ? settings.SheetName
             : $"{settings.SheetName}!{settings.Range.Trim()}";
 
-        var url = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(rangeSegment)}:clear";
+        var url = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(rangeSegment)}:clear";
 
         try
         {

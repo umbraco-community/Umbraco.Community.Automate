@@ -2,6 +2,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -11,7 +13,7 @@ namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 [Action("community.googleSheets.createSheet", "Create Sheet Tab in Google Spreadsheet",
     Description = "Adds a new sheet tab to an existing spreadsheet.",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     ConnectionTypeAlias = "community.googleSheets")]
 public sealed class CreateSheetAction : ActionBase<CreateSheetSettings, CreateSheetOutput>
 {
@@ -48,7 +50,7 @@ public sealed class CreateSheetAction : ActionBase<CreateSheetSettings, CreateSh
         using var httpClient = client!;
 
         var spreadsheetId = SpreadsheetIdParser.Parse(settings.SpreadsheetId);
-        var url = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}:batchUpdate";
+        var url = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}:batchUpdate";
 
         var payload = new
         {

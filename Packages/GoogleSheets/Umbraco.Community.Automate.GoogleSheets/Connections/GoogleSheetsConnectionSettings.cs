@@ -1,6 +1,6 @@
 using Umbraco.Automate.Core.Settings;
 
-namespace Umbraco.Community.Automate.GoogleSheets.Connection;
+namespace Umbraco.Community.Automate.GoogleSheets.Connections;
 
 /// <summary>
 /// Settings for the Google Sheets connection type.

@@ -1,9 +1,16 @@
 {
+    "$schema": "https://json.schemastore.org/umbraco-package.json",
     "id": "Umbraco.Community.Automate.GoogleSheets",
     "name": "Umbraco Community Automate Google Sheets",
     "version": "0.0.0",
     "allowTelemetry": true,
     "extensions": [
+        {
+            "type": "icons",
+            "alias": "UmbracoCommunityAutomateGoogleSheets.Icons",
+            "name": "Google Sheets Icons",
+            "js": "/App_Plugins/UmbracoCommunityAutomateGoogleSheets/icons/icons.js"
+        },
         {
             "name": "Umbraco Community Automate Google Sheets",
             "alias": "UmbracoCommunityAutomateGoogleSheets.Bundle",

@@ -2,14 +2,14 @@ using Umbraco.Automate.Core.Connections;
 using Umbraco.Automate.OpenIddict.ConnectionTypes;
 using Umbraco.Automate.OpenIddict.Credentials;
 
-namespace Umbraco.Community.Automate.GoogleSheets.Connection;
+namespace Umbraco.Community.Automate.GoogleSheets.Connections;
 
 /// <summary>
 /// Connection type for Google Sheets using OAuth via OpenIddict WebIntegration.
 /// </summary>
 [ConnectionType("community.googleSheets", "Google Sheets",
     Group = "Productivity",
-    Icon = "icon-google-sheets",
+    Icon = "icon-automate-googlesheets",
     Description = "Connect to Google Sheets")]
 public sealed class  GoogleSheetsConnectionType : OAuthConnectionTypeBase<GoogleSheetsConnectionSettings>
 {
