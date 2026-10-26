@@ -78,8 +78,8 @@ public class SendMastodonPostAction : ActionBase<MastodonPostSettings>
             {
                 var error = await response.Content.ReadAsStringAsync(cancellationToken);
                 return ActionResult.Failed(
-                    new InvalidOperationException($"Mastodon API returned {response.StatusCode}: {error}"),
-                    StepRunErrorCategory.InvalidResponse);
+                    new InvalidOperationException($"Mastodon API returned {(int)response.StatusCode}: {error}"),
+                    MastodonErrors.Classify(response.StatusCode));
             }
 
             return Success();
@@ -88,13 +88,13 @@ public class SendMastodonPostAction : ActionBase<MastodonPostSettings>
         {
             return ActionResult.Failed(
                 new InvalidOperationException($"Could not reach {connectionSettings.InstanceUrl}: {ex.Message}", ex),
-                StepRunErrorCategory.InvalidResponse);
+                StepRunErrorCategory.ServiceUnavailable);
         }
         catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             return ActionResult.Failed(
                 new InvalidOperationException($"The request to {connectionSettings.InstanceUrl} timed out."),
-                StepRunErrorCategory.InvalidResponse);
+                StepRunErrorCategory.Timeout);
         }
     }
 }
