@@ -1,4 +1,4 @@
-namespace Umbraco.Community.Automate.Mastodon.Settings;
+namespace Umbraco.Community.Automate.Mastodon.Configuration;
 
 /// <summary>
 /// Where this package's values live in configuration. They sit under Umbraco Automate's shared
@@ -10,4 +10,8 @@ public static class MastodonConfiguration
 {
     public const string VariablesPath = "Umbraco:Automate:Variables:Mastodon";
     public const string SecretsPath = "Umbraco:Automate:Secrets:Mastodon";
+
+    /// <summary>The references new connections start with, so values in configuration are used without any typing.</summary>
+    public const string InstanceUrlReference = "$" + VariablesPath + ":InstanceUrl";
+    public const string AccessTokenReference = "$" + SecretsPath + ":AccessToken";
 }

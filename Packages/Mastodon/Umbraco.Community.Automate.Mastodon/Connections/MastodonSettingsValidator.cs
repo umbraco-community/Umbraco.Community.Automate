@@ -1,4 +1,6 @@
-namespace Umbraco.Community.Automate.Mastodon.Settings;
+using Umbraco.Community.Automate.Mastodon.Configuration;
+
+namespace Umbraco.Community.Automate.Mastodon.Connections;
 
 /// <summary>
 /// Shared validation for <see cref="MastodonSettings"/>, used by both the
@@ -17,6 +19,14 @@ public static class MastodonSettingsValidator
         if (string.IsNullOrWhiteSpace(settings.AccessToken))
             return "Access token is required.";
 
+        // Automate resolves $-references before settings reach this code, and reports a missing
+        // key itself; this is a safety net for a reference that arrives unresolved anyway.
+        if (IsUnresolvedReference(settings.InstanceUrl))
+            return $"The instance URL reference '{settings.InstanceUrl}' could not be resolved. Add the URL to configuration at {MastodonConfiguration.VariablesPath}:InstanceUrl, or enter it on the connection.";
+
+        if (IsUnresolvedReference(settings.AccessToken))
+            return $"The access token reference '{settings.AccessToken}' could not be resolved. Add the token to configuration at {MastodonConfiguration.SecretsPath}:AccessToken, or enter it on the connection.";
+
         if (!Uri.TryCreate(settings.InstanceUrl, UriKind.Absolute, out var uri)
             || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
         {
@@ -25,4 +35,6 @@ public static class MastodonSettingsValidator
 
         return null;
     }
+
+    private static bool IsUnresolvedReference(string value) => value.TrimStart().StartsWith('$');
 }

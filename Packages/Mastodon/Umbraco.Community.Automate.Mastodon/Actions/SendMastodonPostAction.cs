@@ -1,8 +1,9 @@
 using Microsoft.Extensions.Logging;
-using Umbraco.Community.Automate.Mastodon.Factory;
-using Umbraco.Community.Automate.Mastodon.Settings;
 using System.Net.Http.Json;
 using Umbraco.Automate.Core.Actions;
+using Umbraco.Community.Automate.Mastodon.Api;
+using Umbraco.Community.Automate.Mastodon.Connections;
+using Umbraco.Community.Automate.Mastodon.Models;
 
 namespace Umbraco.Community.Automate.Mastodon.Actions;
 
@@ -77,8 +78,8 @@ public class SendMastodonPostAction : ActionBase<MastodonPostSettings>
             {
                 var error = await response.Content.ReadAsStringAsync(cancellationToken);
                 return ActionResult.Failed(
-                    new InvalidOperationException($"Mastodon API returned {response.StatusCode}: {error}"),
-                    StepRunErrorCategory.InvalidResponse);
+                    new InvalidOperationException($"Mastodon API returned {(int)response.StatusCode}: {error}"),
+                    MastodonErrors.Classify(response.StatusCode));
             }
 
             return Success();
@@ -87,13 +88,13 @@ public class SendMastodonPostAction : ActionBase<MastodonPostSettings>
         {
             return ActionResult.Failed(
                 new InvalidOperationException($"Could not reach {connectionSettings.InstanceUrl}: {ex.Message}", ex),
-                StepRunErrorCategory.InvalidResponse);
+                StepRunErrorCategory.ServiceUnavailable);
         }
         catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             return ActionResult.Failed(
                 new InvalidOperationException($"The request to {connectionSettings.InstanceUrl} timed out."),
-                StepRunErrorCategory.InvalidResponse);
+                StepRunErrorCategory.Timeout);
         }
     }
 }
