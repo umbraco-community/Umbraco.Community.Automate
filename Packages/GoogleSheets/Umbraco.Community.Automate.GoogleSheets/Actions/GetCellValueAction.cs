@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -51,7 +53,7 @@ public sealed class GetCellValueAction : ActionBase<GetCellValueSettings, GetCel
 
         var spreadsheetId = SpreadsheetIdParser.Parse(settings.SpreadsheetId);
         var rangeSegment = $"{settings.SheetName}!{settings.Cell.Trim()}";
-        var url = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(rangeSegment)}";
+        var url = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(rangeSegment)}";
 
         try
         {

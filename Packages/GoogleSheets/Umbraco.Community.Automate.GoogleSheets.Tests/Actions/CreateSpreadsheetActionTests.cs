@@ -8,7 +8,7 @@ using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
 using Umbraco.Automate.Testing;
 using Umbraco.Community.Automate.GoogleSheets.Actions;
-using Umbraco.Community.Automate.GoogleSheets.Connection;
+using Umbraco.Community.Automate.GoogleSheets.Connections;
 using Xunit;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Tests.Actions;

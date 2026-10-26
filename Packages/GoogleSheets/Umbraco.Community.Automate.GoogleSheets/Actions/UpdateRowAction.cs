@@ -2,6 +2,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -67,7 +69,7 @@ public sealed class UpdateRowAction : ActionBase<UpdateRowSettings, UpdateRowOut
         try
         {
             // Step 1: fetch all rows to locate the target row by column value.
-            var getUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
+            var getUrl = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
             using var getResponse = await httpClient.GetAsync(getUrl, cancellationToken);
             if (await GoogleApiErrorParser.TryHandleErrorAsync(getResponse, cancellationToken) is { } getError)
                 return getError;
@@ -86,7 +88,7 @@ public sealed class UpdateRowAction : ActionBase<UpdateRowSettings, UpdateRowOut
             // the API extends the range rightward to match the values array length.
             var rowNumber = matchedRow + 1;
             var updateRange = $"{settings.SheetName}!A{rowNumber}";
-            var putUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(updateRange)}?valueInputOption=USER_ENTERED";
+            var putUrl = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(updateRange)}?valueInputOption=USER_ENTERED";
             var payload = new { values = new[] { settings.Columns.ToArray() } };
 
             using var putResponse = await httpClient.PutAsJsonAsync(putUrl, payload, cancellationToken);

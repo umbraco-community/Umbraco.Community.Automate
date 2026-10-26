@@ -2,6 +2,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -64,7 +66,7 @@ public sealed class DeleteRowAction : ActionBase<DeleteRowSettings, DeleteRowOut
         try
         {
             // Step 1: GET all rows to find the target row number.
-            var getUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
+            var getUrl = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
             using var getResponse = await httpClient.GetAsync(getUrl, cancellationToken);
             if (await GoogleApiErrorParser.TryHandleErrorAsync(getResponse, cancellationToken) is { } getError)
                 return getError;
@@ -84,7 +86,7 @@ public sealed class DeleteRowAction : ActionBase<DeleteRowSettings, DeleteRowOut
             // look it up from the spreadsheet properties. However, for the batchUpdate
             // deleteDimension request, we need the numeric sheetId — not the tab name.
             // To avoid a third API call, we fetch spreadsheet metadata to get the sheetId.
-            var metaUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}?fields=sheets.properties";
+            var metaUrl = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}?fields=sheets.properties";
             using var metaResponse = await httpClient.GetAsync(metaUrl, cancellationToken);
             if (await GoogleApiErrorParser.TryHandleErrorAsync(metaResponse, cancellationToken) is { } metaError)
                 return metaError;
@@ -100,7 +102,7 @@ public sealed class DeleteRowAction : ActionBase<DeleteRowSettings, DeleteRowOut
                     StepRunErrorCategory.Validation);
 
             // batchUpdate uses 0-based row indices; matchedRow is already 0-based.
-            var batchUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}:batchUpdate";
+            var batchUrl = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}:batchUpdate";
             var batchPayload = new
             {
                 requests = new[]

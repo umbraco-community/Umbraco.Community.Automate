@@ -3,10 +3,10 @@ using Shouldly;
 using Umbraco.Automate.Core.Connections;
 using Umbraco.Automate.Core.Settings;
 using Umbraco.Automate.OpenIddict.Credentials;
-using Umbraco.Community.Automate.GoogleSheets.Connection;
+using Umbraco.Community.Automate.GoogleSheets.Connections;
 using Xunit;
 
-namespace Umbraco.Community.Automate.GoogleSheets.Tests.Connection;
+namespace Umbraco.Community.Automate.GoogleSheets.Tests.Connections;
 
 public class GoogleSheetsConnectionTypeTests
 {

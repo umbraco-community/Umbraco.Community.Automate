@@ -1,9 +1,9 @@
 using System.Net.Http.Headers;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
-using Umbraco.Community.Automate.GoogleSheets.Connection;
+using Umbraco.Community.Automate.GoogleSheets.Connections;
 
-namespace Umbraco.Community.Automate.GoogleSheets.Actions;
+namespace Umbraco.Community.Automate.GoogleSheets.Api;
 
 /// <summary>
 /// Resolves the connection's OAuth credential into a valid access token and hands back an

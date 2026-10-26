@@ -2,6 +2,8 @@ using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.OpenIddict.Credentials;
+using Umbraco.Community.Automate.GoogleSheets.Api;
+using Umbraco.Community.Automate.GoogleSheets.Configuration;
 
 namespace Umbraco.Community.Automate.GoogleSheets.Actions;
 
@@ -75,7 +77,7 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
         try
         {
             // Step 1: fetch all rows to check whether the key value already exists.
-            var getUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
+            var getUrl = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}";
             using var getResponse = await httpClient.GetAsync(getUrl, cancellationToken);
             if (await GoogleApiErrorParser.TryHandleErrorAsync(getResponse, cancellationToken) is { } getError)
                 return getError;
@@ -91,7 +93,7 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
                 // Step 2a: update the existing row in-place.
                 var rowNumber = matchedRow + 1;
                 var updateRange = $"{settings.SheetName}!A{rowNumber}";
-                var putUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(updateRange)}?valueInputOption=USER_ENTERED";
+                var putUrl = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(updateRange)}?valueInputOption=USER_ENTERED";
                 var putPayload = new { values = new[] { settings.Columns.ToArray() } };
 
                 using var putResponse = await httpClient.PutAsJsonAsync(putUrl, putPayload, cancellationToken);
@@ -110,7 +112,7 @@ public sealed class AppendOrUpdateRowAction : ActionBase<AppendOrUpdateRowSettin
             else
             {
                 // Step 2b: append a new row.
-                var appendUrl = $"https://sheets.googleapis.com/v4/spreadsheets/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}:append?valueInputOption=USER_ENTERED";
+                var appendUrl = $"{GoogleSheetsConfiguration.ApiBaseUrl}/{Uri.EscapeDataString(spreadsheetId)}/values/{Uri.EscapeDataString(settings.SheetName)}:append?valueInputOption=USER_ENTERED";
                 var appendPayload = new { values = new[] { settings.Columns.ToArray() } };
 
                 using var appendResponse = await httpClient.PostAsJsonAsync(appendUrl, appendPayload, cancellationToken);
