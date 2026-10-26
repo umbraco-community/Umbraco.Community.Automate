@@ -85,6 +85,41 @@ public class UpdateChargingProfileActionTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_keeps_current_values_for_blank_settings()
+    {
+        // "Keep current setting" in the dropdowns, and an empty name, arrive as empty strings.
+        var existingProfile = new ChargingProfile(
+            123456,
+            "Home",
+            new ChargingProfileSettings("REDUCED", new MinBatteryStateOfCharge(true, 20), 80, "OFF"),
+            [],
+            []);
+
+        var client = SetUpClientWithProfile(existingProfile);
+        ChargingProfile? sentProfile = null;
+        client.Setup(c => c.UpdateChargingProfileAsync(ApiKey, Vin, 123456, It.IsAny<ChargingProfile>(), It.IsAny<CancellationToken>()))
+              .Callback<string, string, long, ChargingProfile, CancellationToken>((_, _, _, profile, _) => sentProfile = profile)
+              .Returns(Task.CompletedTask);
+
+        var result = await ActionTestHarness.For<UpdateChargingProfileAction>()
+            .WithService(client.Object)
+            .WithSettings(new UpdateChargingProfileSettings
+            {
+                ProfileId = 123456,
+                Name = "",
+                MaxChargingCurrent = "",
+                AutoUnlockPlugWhenCharged = " ",
+            })
+            .WithConnection("community.skoda", new SkodaConnectionSettings { ApiKey = ApiKey, Vin = Vin })
+            .ExecuteAsync();
+
+        result.Status.ShouldBe(ActionResultStatus.Success);
+        sentProfile!.Name.ShouldBe("Home");
+        sentProfile.Settings.MaxChargingCurrent.ShouldBe("REDUCED");
+        sentProfile.Settings.AutoUnlockPlugWhenCharged.ShouldBe("OFF");
+    }
+
+    [Fact]
     public async Task ExecuteAsync_fails_validation_without_calling_update_when_profile_id_is_not_found()
     {
         var client = SetUpClientWithProfile(new ChargingProfile(

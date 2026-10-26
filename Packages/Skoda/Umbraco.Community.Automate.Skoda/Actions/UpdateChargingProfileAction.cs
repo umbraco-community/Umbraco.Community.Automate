@@ -35,12 +35,12 @@ public sealed class UpdateChargingProfileAction(ActionInfrastructure infrastruct
             // rather than defaulted, to avoid silently clearing them.
             var updatedProfile = profile with
             {
-                Name = settings.Name ?? profile.Name,
+                Name = KeepIfBlank(settings.Name, profile.Name),
                 Settings = profile.Settings with
                 {
                     TargetStateOfChargeInPercent = settings.TargetStateOfChargeInPercent ?? profile.Settings.TargetStateOfChargeInPercent,
-                    MaxChargingCurrent = settings.MaxChargingCurrent ?? profile.Settings.MaxChargingCurrent,
-                    AutoUnlockPlugWhenCharged = settings.AutoUnlockPlugWhenCharged ?? profile.Settings.AutoUnlockPlugWhenCharged,
+                    MaxChargingCurrent = KeepIfBlank(settings.MaxChargingCurrent, profile.Settings.MaxChargingCurrent),
+                    AutoUnlockPlugWhenCharged = KeepIfBlank(settings.AutoUnlockPlugWhenCharged, profile.Settings.AutoUnlockPlugWhenCharged),
                 },
             };
 
@@ -58,4 +58,6 @@ public sealed class UpdateChargingProfileAction(ActionInfrastructure infrastruct
             return failure;
         }
     }
+
+    private static string KeepIfBlank(string? value, string current) => string.IsNullOrWhiteSpace(value) ? current : value;
 }
