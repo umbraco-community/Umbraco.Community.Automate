@@ -19,5 +19,13 @@
   <Folder Name="/Skoda/tests/">
     <Project Path="Skoda/tests/Umbraco.Community.Automate.Skoda.Tests/Umbraco.Community.Automate.Skoda.Tests.csproj" />
   </Folder>
+  <Folder Name="/Packages/WeatherApi/">
+    <Project Path="Packages/WeatherApi/Umbraco.Community.Automate.WeatherApi.Tests/Umbraco.Community.Automate.WeatherApi.Tests.csproj" />
+    <Project Path="Packages/WeatherApi/Umbraco.Community.Automate.WeatherApi/Umbraco.Community.Automate.WeatherApi.csproj" />
+  </Folder>
+  <Folder Name="/Packages/Pushover/">
+    <Project Path="Packages/Pushover/Umbraco.Community.Automate.Pushover.Tests/Umbraco.Community.Automate.Pushover.Tests.csproj" />
+    <Project Path="Packages/Pushover/Umbraco.Community.Automate.Pushover/Umbraco.Community.Automate.Pushover.csproj" />
+  </Folder>
   <Project Path="Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj" />
 </Solution>

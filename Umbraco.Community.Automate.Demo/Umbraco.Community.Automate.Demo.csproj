@@ -18,6 +18,8 @@
     <ProjectReference Include="..\Packages\GoogleSheets\Umbraco.Community.Automate.GoogleSheets\Umbraco.Community.Automate.GoogleSheets.csproj" />
     <ProjectReference Include="..\Packages\Mastodon\Umbraco.Community.Automate.Mastodon\Umbraco.Community.Automate.Mastodon.csproj" />
     <ProjectReference Include="..\Skoda\src\Umbraco.Community.Automate.Skoda\Umbraco.Community.Automate.Skoda.csproj" />
+    <ProjectReference Include="..\Packages\WeatherApi\Umbraco.Community.Automate.WeatherApi\Umbraco.Community.Automate.WeatherApi.csproj" />
+    <ProjectReference Include="..\Packages\Pushover\Umbraco.Community.Automate.Pushover\Umbraco.Community.Automate.Pushover.csproj" />
   </ItemGroup>
 
   <ItemGroup>

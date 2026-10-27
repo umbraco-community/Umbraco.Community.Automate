@@ -24,7 +24,7 @@ In your Mastodon account go to **Preferences → Development → New application
 
 ### 2. Add your settings to configuration (recommended)
 
-The instance URL and access token are entered on the connection in the backoffice, but instead of typing the values directly you can store them in configuration and reference them. Values go under a `Mastodon` key in Umbraco Automate's shared **Variables** (non-sensitive) and **Secrets** (sensitive) sections. Automate resolves `$` references from its shared `Umbraco:Automate:Variables` and `Umbraco:Automate:Secrets` sections out of the box, so there's nothing to register; `Secrets` can only be referenced from sensitive fields such as **Access Token**.
+New connections are pre-filled with references to configuration, so if you store the instance URL and access token there, you don't need to type anything into the backoffice. Values go under a `Mastodon` key in Umbraco Automate's shared **Variables** (non-sensitive) and **Secrets** (sensitive) sections. Automate resolves `$` references from its shared `Umbraco:Automate:Variables` and `Umbraco:Automate:Secrets` sections out of the box, so there's nothing to register; `Secrets` can only be referenced from sensitive fields such as **Access Token**.
 
 Add the following to your `appsettings.json`:
 
@@ -59,9 +59,8 @@ The key names (`InstanceUrl`, `AccessToken`) are your choice — add more (e.g. 
 ### 3. Create the connection in the backoffice
 
 1. Go to **Automate → Connections** and create a new **Mastodon** connection (in the **Social Networks** group).
-2. **Instance URL** — enter the URL directly (e.g. `https://mastodon.social`), or reference your configuration value: `$Umbraco:Automate:Variables:Mastodon:InstanceUrl`
-3. **Access Token** — enter the token directly, or (recommended) reference your configuration value: `$Umbraco:Automate:Secrets:Mastodon:AccessToken`
-4. Click **Test connection** to verify.
+2. **Instance URL** and **Access Token** are already filled in with `$Umbraco:Automate:Variables:Mastodon:InstanceUrl` and `$Umbraco:Automate:Secrets:Mastodon:AccessToken`, references to the values you stored in step 2. Leave them as they are, or replace either with the value itself (e.g. `https://umbracocommunity.social`) to store it on the connection.
+3. Click **Test connection** to verify.
 
 ## Usage
 
@@ -111,7 +110,7 @@ steps created before this change reference the old aliases and must be recreated
 ### Steps to migrate:
 1. Move your access token to `Umbraco:Automate:Secrets:Mastodon:AccessToken` (and optionally the instance URL to `Umbraco:Automate:Variables:Mastodon:InstanceUrl`) in `appsettings.json` or environment variables
 2. Recreate your Mastodon connections in the backoffice (select the new **Mastodon** connection type in the **Social Networks** group)
-3. Fill in both fields, using `$Umbraco:Automate:...:Mastodon:...` references for any values stored in configuration
+3. Both fields come pre-filled with the references above; leave them, or enter the values directly
 
 ## Troubleshooting
 
