@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Umbraco Community Automate Kitchen Sink Example</Title>
+    <Description>A reference connection for Umbraco Automate showing conventions this repo's other packages don't: outcomes and a trigger. Talks to httpbin.org.</Description>
+    <!-- Serves wwwroot/ (umbraco-package.json and the icon) as static web assets under this path. -->
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <StaticWebAssetBasePath>App_Plugins/UmbracoCommunityAutomateExamplesKitchenSink</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Automate.Core" />
+    <PackageReference Include="Umbraco.Cms.Core" />
+  </ItemGroup>
+
+</Project>
