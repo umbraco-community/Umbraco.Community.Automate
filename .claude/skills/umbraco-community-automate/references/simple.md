@@ -1,10 +1,21 @@
 # Simple connection: an API key and an action
 
-Every file for the most common package: one connection with an API key, and one action that calls the service. It's `Packages/_Development/Simple/` set up as a real, releasable package. Most new connections start here, and you add more actions to it the same way.
+Every file for the most common package: one connection with an API key, and one action that
+calls the service. This is generated from **WeatherApi** (`Packages/WeatherApi/`) — a real,
+shipped package, and the simplest one here — showing only its connection and its first action,
+**Get Current Weather**; its README names a second, **Get Today's Weather**, which is identical
+in shape (see [Adding a second action](#adding-a-second-action)).
 
-Replace `Example` / `example` with the area name (PascalCase / camelCase / lowercase as shown) and adjust the calls to the service. If the real code in `Packages/_Development/Simple/` disagrees with this file, the real code wins.
+Replace `WeatherApi` / `weatherApi` (as shown) with your own area name, and adjust to your
+service. Because this is real code rather than a stripped-down template, it also validates one
+thing a minimal example wouldn't: a culture argument, with its own error handling. Copy the
+*structure* (one settings class, one output class, one action class, a connection, a
+configuration class, a composer), not that specific validation — write whatever your own service
+actually needs instead. If the real code in `Packages/WeatherApi/` disagrees with this file, the
+real code wins, since this file is generated from it.
 
-Outgrow it when the package needs a trigger, outcomes, several actions sharing request and error handling, or a backoffice editor: then follow [full.md](full.md), which builds on the same files.
+Outgrow it when the package needs a trigger, outcomes, several actions sharing request and error
+handling, or a backoffice editor: then follow [full.md](full.md), which builds on the same files.
 
 ## Contents
 
@@ -23,36 +34,41 @@ Outgrow it when the package needs a trigger, outcomes, several actions sharing r
 ## Files
 
 ```
-Packages/Example/
-  Umbraco.Community.Automate.Example/
+Packages/<Area>/
+  Umbraco.Community.Automate.<Area>/
     Actions/
-      SendMessageAction.cs
-      SendMessageOutput.cs
-      SendMessageSettings.cs
+      GetCurrentWeatherAction.cs
+      GetCurrentWeatherOutput.cs
+      GetCurrentWeatherSettings.cs
     Composers/
-      ExampleComposer.cs
+      WeatherApiComposer.cs
     Configuration/
-      ExampleConfiguration.cs
+      WeatherApiConfiguration.cs
     Connections/
-      ExampleConnectionSettings.cs
-      ExampleConnectionType.cs
+      WeatherApiConnectionSettings.cs, WeatherApiConnectionSettingsValidator.cs, WeatherApiConnectionType.cs
     Directory.Build.props
     README.md
     community-automate-128.png          copy from another package
-    Umbraco.Community.Automate.Example.csproj
-  Umbraco.Community.Automate.Example.Tests/
-    Actions/SendMessageActionTests.cs
-    Connections/ExampleConnectionTypeTests.cs
+    Umbraco.Community.Automate.<Area>.csproj
+  Umbraco.Community.Automate.<Area>.Tests/
+    Actions/GetCurrentWeatherActionTests.cs
+    Connections/WeatherApiConnectionTypeTests.cs, WeatherApiConnectionSettingsValidatorTests.cs
     Fakes/StubHttp.cs
-    Umbraco.Community.Automate.Example.Tests.csproj
+    Umbraco.Community.Automate.<Area>.Tests.csproj
 ```
 
-No `Api/`, `Models/`, `Client/` or `wwwroot/`: the connection type and the action each make their one HTTP call directly, and the icon is a built-in Umbraco one, because httpbin is a utility rather than a vendor. A package for a commercial service adds the vendor's logo (see Icons in SKILL.md).
+No `Client/` or `wwwroot/`: the icon is a built-in Umbraco one (`icon-partly-cloudy`), because
+WeatherAPI.com isn't the kind of commercial brand this repo puts a logo on. A package for a
+vendor whose logo you want to show adds that instead (see Icons in SKILL.md). WeatherApi has
+grown an `Api/` and `Models/` folder for its shared request logic — see [Adding a second
+action](#adding-a-second-action) — which a package with genuinely one action and nothing to
+share yet can skip, calling the connection's `HttpClient` directly instead.
 
 ## Package project
 
-`Packages/Example/Umbraco.Community.Automate.Example/Umbraco.Community.Automate.Example.csproj`. Plain `Microsoft.NET.Sdk`: there are no static files to serve.
+`Packages/<Area>/Umbraco.Community.Automate.<Area>/Umbraco.Community.Automate.<Area>.csproj`. Plain `Microsoft.NET.Sdk`: there are no static files to serve.
 
+`Umbraco.Community.Automate.WeatherApi/Umbraco.Community.Automate.WeatherApi.csproj`
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -60,26 +76,23 @@ No `Api/`, `Models/`, `Client/` or `wwwroot/`: the connection type and the actio
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Title>Umbraco Community Automate Example</Title>
-    <Description>Example connection and actions for Umbraco Automate. One or two sentences on what it lets automations do.</Description>
-    <PackageTags>umbraco automate automation example umbraco-marketplace</PackageTags>
+    <Title>Umbraco Community Automate WeatherAPI</Title>
+    <Description>WeatherAPI.com connection type and actions for Umbraco Automate. Get the current weather or today's forecast for a location as part of an automation workflow.</Description>
+    <PackageTags>umbraco automate automation weatherapi weather umbraco-marketplace</PackageTags>
     <PackageIcon>community-automate-128.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Umbraco.Automate.Core" />
-    <PackageReference Include="Umbraco.Cms.Core" />
-    <!-- Versions the package from its git tag (see Directory.Build.props). Without it every
-         release packs as 1.0.0 and NuGet skips it as a duplicate. -->
+    <!-- Versions the package from its weatherapi-v* tag (see Directory.Build.props). -->
     <PackageReference Include="MinVer" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Umbraco.Community.Automate.Example.Tests" />
+    <InternalsVisibleTo Include="Umbraco.Community.Automate.WeatherApi.Tests" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- README.md is the NuGet / Umbraco Marketplace description. -->
     <None Include="README.md" Pack="true" PackagePath="" />
     <None Include="community-automate-128.png" Pack="true" PackagePath="" />
   </ItemGroup>
@@ -91,13 +104,14 @@ No `Version` attributes: versions live in the root `Directory.Packages.props`.
 
 ## Directory.Build.props
 
-`Packages/Example/Umbraco.Community.Automate.Example/Directory.Build.props`. Besides the package metadata, this file is what makes CI find the package.
+`Packages/<Area>/Umbraco.Community.Automate.<Area>/Directory.Build.props`. Besides the package metadata, this file is what makes CI find the package.
 
+`Umbraco.Community.Automate.WeatherApi/Directory.Build.props`
 ```xml
 <Project>
   <PropertyGroup>
-    <Authors>Your Name, Umbraco Community</Authors>
-    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Packages/Example/Umbraco.Community.Automate.Example</PackageProjectUrl>
+    <Authors>Paul Wright, Umbraco Community</Authors>
+    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Packages/WeatherApi/Umbraco.Community.Automate.WeatherApi</PackageProjectUrl>
     <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -105,9 +119,9 @@ No `Version` attributes: versions live in the root `Directory.Packages.props`.
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Releases come from example-v* tags only; height-based pre-release
+    <!-- Releases come from weatherapi-v* tags only; height-based pre-release
          versions would react to other packages' commits in this monorepo. -->
-    <MinVerTagPrefix>example-v</MinVerTagPrefix>
+    <MinVerTagPrefix>weatherapi-v</MinVerTagPrefix>
     <MinVerIgnoreHeight>true</MinVerIgnoreHeight>
   </PropertyGroup>
 
@@ -120,88 +134,117 @@ No `Version` attributes: versions live in the root `Directory.Packages.props`.
 
 ## Configuration
 
-`Configuration/ExampleConfiguration.cs`. The one place the configuration path, the default reference and the service's fixed values are defined.
+`Configuration/WeatherApiConfiguration.cs`. The one place the configuration path, the default reference and the service's fixed values are defined.
 
+`Umbraco.Community.Automate.WeatherApi/Configuration/WeatherApiConfiguration.cs`
 ```csharp
-namespace Umbraco.Community.Automate.Example.Configuration;
+namespace Umbraco.Community.Automate.WeatherApi.Configuration;
 
 /// <summary>
-/// Where this package's values live in configuration. The API key sits under Umbraco Automate's
-/// shared <c>Umbraco:Automate:Secrets</c> section, which Automate resolves <c>$</c> references
-/// from by default, so nothing needs registering.
+/// Where this package's values live in configuration. They sit under Umbraco Automate's shared
+/// <c>Umbraco:Automate:Secrets</c> and <c>Umbraco:Automate:Variables</c> sections, which Automate
+/// resolves <c>$</c> references from by default, so nothing needs registering. Nesting under
+/// <c>WeatherApi</c> keeps this package's keys together and avoids clashes with other packages.
 /// </summary>
-public static class ExampleConfiguration
+public static class WeatherApiConfiguration
 {
-    public const string SecretsPath = "Umbraco:Automate:Secrets:Example";
+    public const string VariablesPath = "Umbraco:Automate:Variables:WeatherApi";
+    public const string SecretsPath = "Umbraco:Automate:Secrets:WeatherApi";
 
     /// <summary>The reference new connections start with, so a key in configuration is used without any typing.</summary>
     public const string ApiKeyReference = "$" + SecretsPath + ":ApiKey";
 
-    // Fixed values: they're the same for every site, so they're constants here, not configuration.
-
-    /// <summary>The service's API.</summary>
-    public const string BaseUrl = "https://api.example.com/";
+    // Fixed value: it's the same for every site, so it's a constant here, not configuration.
+    /// <summary>The WeatherAPI.com REST API.</summary>
+    public const string BaseUrl = "https://api.weatherapi.com/v1";
 }
 ```
 
 ## Connection settings and type
 
-`Connections/ExampleConnectionSettings.cs`. The credential defaults to its configuration reference, so a new connection opens pre-filled. The description says what the value is and where to get it, not the path: the field already shows that.
+`Connections/WeatherApiConnectionSettings.cs`. The credential defaults to its configuration reference, so a new connection opens pre-filled.
 
+`Umbraco.Community.Automate.WeatherApi/Connections/WeatherApiConnectionSettings.cs`
 ```csharp
 using Umbraco.Automate.Core.Settings;
-using Umbraco.Community.Automate.Example.Configuration;
+using Umbraco.Community.Automate.WeatherApi.Configuration;
 
-namespace Umbraco.Community.Automate.Example.Connections;
+namespace Umbraco.Community.Automate.WeatherApi.Connections;
 
-public sealed class ExampleConnectionSettings
+public sealed class WeatherApiConnectionSettings
 {
     [Field(
-        Label = "API key",
-        Description = "Generate a key under Settings → API in Example.",
+        Label = "API Key",
+        Description = "The WeatherAPI.com API key.",
         IsSensitive = true,
-        SortOrder = 0)]
-    public string ApiKey { get; set; } = ExampleConfiguration.ApiKeyReference;
+        SortOrder = 1)]
+    public string ApiKey { get; set; } = WeatherApiConfiguration.ApiKeyReference;
 }
 ```
 
-`Connections/ExampleConnectionType.cs`. `ValidateAsync` runs when the user clicks **Test connection**: check the fields, then make one cheap authenticated call. The alias is stored in saved connections and automations, so it can never change once released.
+`Connections/WeatherApiConnectionSettingsValidator.cs`. Worth having as soon as more than one
+place checks the connection: here, the connection type and the action already share it.
 
+`Umbraco.Community.Automate.WeatherApi/Connections/WeatherApiConnectionSettingsValidator.cs`
 ```csharp
-using System.Net.Http.Headers;
-using Umbraco.Automate.Core.Connections;
-using Umbraco.Community.Automate.Example.Configuration;
+using Umbraco.Community.Automate.WeatherApi.Configuration;
 
-namespace Umbraco.Community.Automate.Example.Connections;
+namespace Umbraco.Community.Automate.WeatherApi.Connections;
 
-[ConnectionType("community.example", "Example",
-    Description = "Connects Umbraco Automate to Example.",
-    Group = "Productivity",
-    Icon = "icon-paper-plane")]
-public sealed class ExampleConnectionType(ConnectionTypeInfrastructure infrastructure, IHttpClientFactory httpClientFactory)
-    : ConnectionTypeBase<ExampleConnectionSettings>(infrastructure)
+/// <summary>
+/// Shared validation for <see cref="WeatherApiConnectionSettings"/>, used by the connection
+/// type (Test connection) and both actions, so they report the same message.
+/// </summary>
+public static class WeatherApiConnectionSettingsValidator
 {
-    public override async Task<ConnectionValidationResult> ValidateAsync(object? settings, CancellationToken cancellationToken)
+    /// <summary>Returns the first problem found, or <c>null</c> when the settings are valid.</summary>
+    public static string? Validate(WeatherApiConnectionSettings? settings)
     {
-        var apiKey = (settings as ExampleConnectionSettings)?.ApiKey;
-        if (string.IsNullOrWhiteSpace(apiKey))
-            return ConnectionValidationResult.Failure("An API key is required.");
+        if (string.IsNullOrWhiteSpace(settings?.ApiKey))
+            return "A WeatherAPI.com API key is required.";
+
+        // Automate resolves $-references before settings reach this code, and reports a missing
+        // key itself; this is a safety net for a reference that arrives unresolved anyway.
+        if (settings.ApiKey.TrimStart().StartsWith('$'))
+            return $"The API key reference '{settings.ApiKey}' could not be resolved. Add the key to configuration at {WeatherApiConfiguration.SecretsPath}:ApiKey, or enter the key itself on the connection.";
+
+        return null;
+    }
+}
+```
+
+`Connections/WeatherApiConnectionType.cs`. `ValidateAsync` runs when the user clicks **Test
+connection**: check the fields, then make one cheap authenticated call — here, through the
+shared `Api/WeatherApiRequestHelper.cs` (see [Adding a second action](#adding-a-second-action));
+with one action and no shared helper yet, call the service directly instead. The alias is stored
+in saved connections and automations, so it can never change once released.
+
+`Umbraco.Community.Automate.WeatherApi/Connections/WeatherApiConnectionType.cs`
+```csharp
+using Umbraco.Automate.Core.Connections;
+using Umbraco.Community.Automate.WeatherApi.Api;
+
+namespace Umbraco.Community.Automate.WeatherApi.Connections;
+
+[ConnectionType("community.weatherApi", "WeatherAPI.com",
+    Description = "Connect to WeatherAPI.com using an API key",
+    Group = "Weather",
+    Icon = "icon-partly-cloudy")]
+public sealed class WeatherApiConnectionType(ConnectionTypeInfrastructure infrastructure, IHttpClientFactory httpClientFactory)
+    : ConnectionTypeBase<WeatherApiConnectionSettings>(infrastructure)
+{
+    public override async Task<ConnectionValidationResult> ValidateAsync(
+        object? settings,
+        CancellationToken cancellationToken)
+    {
+        var typed = settings as WeatherApiConnectionSettings;
+
+        if (WeatherApiConnectionSettingsValidator.Validate(typed) is { } error)
+            return ConnectionValidationResult.Failure(error);
 
         using var client = httpClientFactory.CreateClient();
-        using var request = new HttpRequestMessage(HttpMethod.Get, new Uri(new Uri(ExampleConfiguration.BaseUrl), "v1/me"));
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
-        try
-        {
-            using var response = await client.SendAsync(request, cancellationToken);
-            return response.IsSuccessStatusCode
-                ? ConnectionValidationResult.Success("Connected to Example.")
-                : ConnectionValidationResult.Failure($"Example rejected the API key ({(int)response.StatusCode}).");
-        }
-        catch (HttpRequestException ex)
-        {
-            return ConnectionValidationResult.Failure($"Could not reach Example: {ex.Message}");
-        }
+        return await WeatherApiRequestHelper.ValidateApiKeyAsync(client, typed!.ApiKey, cancellationToken);
     }
 }
 ```
@@ -210,106 +253,188 @@ For a utility with no vendor, pick the icon from Umbraco's built-in set (`icon-p
 
 ## Action, settings and output
 
-`Actions/SendMessageSettings.cs`. The fields shown in the automation editor. `SupportsBindings` lets a value come from the trigger or an earlier step, and a text area suits a message better than the default one-line box. See [fields.md](fields.md) for choosing the editor for each setting.
+`Actions/GetCurrentWeatherSettings.cs`. The fields shown in the automation editor.
+`SupportsBindings` lets a value come from the trigger or an earlier step. See
+[fields.md](fields.md) for choosing the editor for each setting.
 
+`Umbraco.Community.Automate.WeatherApi/Actions/GetCurrentWeatherSettings.cs`
 ```csharp
 using Umbraco.Automate.Core.Settings;
 
-namespace Umbraco.Community.Automate.Example.Actions;
+namespace Umbraco.Community.Automate.WeatherApi.Actions;
 
-public sealed class SendMessageSettings
+public class GetCurrentWeatherSettings
 {
     [Field(
-        Label = "Message",
-        Description = "The message to send. Supports ${ binding } expressions.",
+        Label = "Location",
+        Description = "The location to get current weather for. Accepts a city name, US zip, UK postcode, IP address, or \"lat,lon\". Supports bindings.",
         SupportsBindings = true,
-        EditorUiAlias = "Umb.PropertyEditorUi.TextArea",
-        EditorConfig = """[{ "alias": "rows", "value": 4 }]""",
-        SortOrder = 0)]
-    public string Message { get; set; } = string.Empty;
+        SortOrder = 1)]
+    public string Location { get; set; } = string.Empty;
+
+    [Field(
+        Label = "Culture",
+        Description = "Optional. The culture to localize the weather condition text into, e.g. \"en-GB\", \"fr-FR\", \"es-ES\". Falls back to English if not set. Supports bindings.",
+        SupportsBindings = true,
+        SortOrder = 2)]
+    public string? Culture { get; set; }
 }
 ```
 
-`Actions/SendMessageOutput.cs`. What later steps can use, in camelCase: `${ steps.<alias>.statusCode }`. Drop it (and use `ActionBase<TSettings>`) if the action returns nothing useful.
+`Actions/GetCurrentWeatherOutput.cs`. What later steps can use, in camelCase: `${
+steps.<alias>.temperatureC }`. Drop it (and use `ActionBase<TSettings>`) if the action returns
+nothing useful.
 
+`Umbraco.Community.Automate.WeatherApi/Actions/GetCurrentWeatherOutput.cs`
 ```csharp
-namespace Umbraco.Community.Automate.Example.Actions;
+namespace Umbraco.Community.Automate.WeatherApi.Actions;
 
-public sealed class SendMessageOutput
+public sealed class GetCurrentWeatherOutput
 {
-    public int StatusCode { get; init; }
+    public string? LocationName { get; init; }
+    public string? Region { get; init; }
+    public string? Country { get; init; }
+    public string? LocalTime { get; init; }
+    public double TemperatureC { get; init; }
+    public double TemperatureF { get; init; }
+    public string? Condition { get; init; }
+    public string? ConditionIconUrl { get; init; }
+    public int ConditionCode { get; init; }
+    public int Humidity { get; init; }
+    public int Cloud { get; init; }
+    public double WindKph { get; init; }
+    public double WindMph { get; init; }
+    public string? WindDirection { get; init; }
+    public string? LastUpdated { get; init; }
+    public bool WillItRain { get; init; }
+    public int ChanceOfRain { get; init; }
+    public bool WillItSnow { get; init; }
+    public int ChanceOfSnow { get; init; }
+    public double Uv { get; init; }
+
+    /// <summary>The full, unprocessed JSON response returned by WeatherAPI.com.</summary>
+    public string? RawResponse { get; init; }
 }
 ```
 
-`Actions/SendMessageAction.cs`. Check the inputs, call the service, and report the result. The failure category decides whether Automate retries the step: rate limits and outages are worth retrying, a rejected key isn't.
+`Actions/GetCurrentWeatherAction.cs`. Check the inputs, call the service, and report the result.
+The failure category decides whether Automate retries the step: rate limits and outages are
+worth retrying, a rejected key isn't. The culture handling is specific to this action — a package
+with one simple input and output doesn't need anything like it.
 
+`Umbraco.Community.Automate.WeatherApi/Actions/GetCurrentWeatherAction.cs`
 ```csharp
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
+using System.Globalization;
 using Umbraco.Automate.Core.Actions;
-using Umbraco.Community.Automate.Example.Configuration;
-using Umbraco.Community.Automate.Example.Connections;
+using Umbraco.Community.Automate.WeatherApi.Api;
+using Umbraco.Community.Automate.WeatherApi.Connections;
 
-namespace Umbraco.Community.Automate.Example.Actions;
+namespace Umbraco.Community.Automate.WeatherApi.Actions;
 
-[Action("community.example.sendMessage", "Send Example Message",
-    Description = "Posts a message to Example.",
-    ConnectionTypeAlias = "community.example",
-    Group = "Productivity",
-    Icon = "icon-paper-plane")]
-public sealed class SendMessageAction(ActionInfrastructure infrastructure, IHttpClientFactory httpClientFactory)
-    : ActionBase<SendMessageSettings, SendMessageOutput>(infrastructure)
+[Action("community.weatherApi.getCurrentWeather", "Get Current Weather",
+    Description = "Gets the current weather conditions for a location",
+    Group = "Weather",
+    Icon = "icon-partly-cloudy",
+    ConnectionTypeAlias = "community.weatherApi")]
+public class GetCurrentWeatherAction(ActionInfrastructure infrastructure, IHttpClientFactory httpClientFactory)
+    : ActionBase<GetCurrentWeatherSettings, GetCurrentWeatherOutput>(infrastructure)
 {
     public override async Task<ActionResult> ExecuteAsync(ActionContext context, CancellationToken cancellationToken)
     {
-        // 1. Check the inputs first and fail fast with a message the user can act on.
-        var apiKey = context.Connection?.GetSettings<ExampleConnectionSettings>().ApiKey;
-        if (string.IsNullOrWhiteSpace(apiKey))
-            return ActionResult.Failed(new InvalidOperationException("The connection has no API key."), StepRunErrorCategory.ConfigurationError);
+        var settings = context.GetSettings<GetCurrentWeatherSettings>();
 
-        var settings = context.GetSettings<SendMessageSettings>();
-        if (string.IsNullOrWhiteSpace(settings.Message))
-            return ActionResult.Failed(new InvalidOperationException("A message is required."), StepRunErrorCategory.Validation);
-
-        // 2. Call the service. The idempotency key is the same on a retry of this step, so a
-        //    service that supports it ignores the duplicate instead of posting twice.
-        using var client = httpClientFactory.CreateClient();
-        using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(new Uri(ExampleConfiguration.BaseUrl), "v1/messages"))
+        if (string.IsNullOrWhiteSpace(settings.Location))
         {
-            Content = JsonContent.Create(new { message = settings.Message }),
-        };
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-        request.Headers.Add("Idempotency-Key", $"{context.RunId}:{context.StepId}");
+            return ActionResult.Failed(
+                new ArgumentException("Location is required."),
+                StepRunErrorCategory.Validation);
+        }
 
-        HttpResponseMessage response;
+        var connectionSettings = context.Connection?.GetSettings<WeatherApiConnectionSettings>();
+
+        if (WeatherApiConnectionSettingsValidator.Validate(connectionSettings) is { } connectionError)
+        {
+            return ActionResult.Failed(
+                new InvalidOperationException(connectionError),
+                StepRunErrorCategory.ConfigurationError);
+        }
+
+        string? languageCode = null;
+        if (!string.IsNullOrWhiteSpace(settings.Culture))
+        {
+            try
+            {
+                languageCode = WeatherApiRequestHelper.ResolveLanguageCode(CultureInfo.GetCultureInfo(settings.Culture));
+            }
+            catch (CultureNotFoundException ex)
+            {
+                return ActionResult.Failed(
+                    new ArgumentException($"\"{settings.Culture}\" is not a recognized culture.", ex),
+                    StepRunErrorCategory.Validation);
+            }
+        }
+
         try
         {
-            response = await client.SendAsync(request, cancellationToken);
+            var client = httpClientFactory.CreateClient();
+
+            var result = await WeatherApiRequestHelper.GetCurrentWeatherAsync(
+                client, connectionSettings!.ApiKey, settings.Location, languageCode, cancellationToken);
+
+            if (!result.IsSuccess)
+            {
+                return ActionResult.Failed(
+                    new InvalidOperationException(result.ErrorMessage ?? $"WeatherAPI.com returned status {result.StatusCode}"),
+                    WeatherApiRequestHelper.Classify(result.StatusCode));
+            }
+
+            var location = result.Response?.Location;
+            var current = result.Response?.Current;
+            var condition = current?.Condition;
+            var iconUrl = condition?.Icon;
+            if (!string.IsNullOrWhiteSpace(iconUrl) && iconUrl.StartsWith("//"))
+                iconUrl = $"https:{iconUrl}";
+
+            return Success(new GetCurrentWeatherOutput
+            {
+                LocationName = location?.Name,
+                Region = location?.Region,
+                Country = location?.Country,
+                LocalTime = location?.Localtime,
+                TemperatureC = current?.TempC ?? 0,
+                TemperatureF = current?.TempF ?? 0,
+                Condition = condition?.Text,
+                ConditionIconUrl = iconUrl,
+                ConditionCode = condition?.Code ?? 0,
+                Humidity = current?.Humidity ?? 0,
+                Cloud = current?.Cloud ?? 0,
+                WindKph = current?.WindKph ?? 0,
+                WindMph = current?.WindMph ?? 0,
+                WindDirection = current?.WindDir,
+                LastUpdated = current?.LastUpdated,
+                WillItRain = current?.WillItRain == 1,
+                ChanceOfRain = current?.ChanceOfRain ?? 0,
+                WillItSnow = current?.WillItSnow == 1,
+                ChanceOfSnow = current?.ChanceOfSnow ?? 0,
+                Uv = current?.Uv ?? 0,
+                RawResponse = result.RawBody,
+            });
         }
         catch (HttpRequestException ex)
         {
-            return ActionResult.Failed(ex, StepRunErrorCategory.ServiceUnavailable);
+            return ActionResult.Failed(
+                new InvalidOperationException($"Could not reach WeatherAPI.com: {ex.Message}", ex),
+                StepRunErrorCategory.ServiceUnavailable);
         }
         catch (TaskCanceledException ex) when (!cancellationToken.IsCancellationRequested)
         {
-            return ActionResult.Failed(ex, StepRunErrorCategory.Timeout);
+            return ActionResult.Failed(
+                new InvalidOperationException("The request to WeatherAPI.com timed out.", ex),
+                StepRunErrorCategory.Timeout);
         }
-
-        // 3. Report the result.
-        using (response)
+        catch (Exception ex)
         {
-            if (response.IsSuccessStatusCode)
-                return Success(new SendMessageOutput { StatusCode = (int)response.StatusCode });
-
-            var category = (int)response.StatusCode switch
-            {
-                401 or 403 => StepRunErrorCategory.Authentication,
-                400 or 404 or 422 => StepRunErrorCategory.Validation,
-                429 => StepRunErrorCategory.RateLimiting,
-                >= 500 => StepRunErrorCategory.ServiceUnavailable,
-                _ => StepRunErrorCategory.InvalidResponse,
-            };
-            return ActionResult.Failed(new HttpRequestException($"Example returned {(int)response.StatusCode}."), category);
+            return ActionResult.Failed(ex, StepRunErrorCategory.InvalidResponse);
         }
     }
 }
@@ -317,33 +442,32 @@ public sealed class SendMessageAction(ActionInfrastructure infrastructure, IHttp
 
 ## Composer
 
-`Composers/ExampleComposer.cs`. Registers the package's services. Umbraco finds composers on its own, and Automate finds the connection type and actions from their attributes, so a site only installs the package.
+`Composers/WeatherApiComposer.cs`. Registers the package's services. Umbraco finds composers on
+its own, and Automate finds the connection type and actions from their attributes, so a site only
+installs the package.
 
+`Umbraco.Community.Automate.WeatherApi/Composers/WeatherApiComposer.cs`
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 
-namespace Umbraco.Community.Automate.Example.Composers;
+namespace Umbraco.Community.Automate.WeatherApi.Composers;
 
-public class ExampleComposer : IComposer
+public class WeatherApiComposer : IComposer
 {
     public void Compose(IUmbracoBuilder builder)
     {
         builder.Services.AddHttpClient();
-
-        // No connection type, action or trigger registration: Automate discovers classes with
-        // [ConnectionType], [Action] and [Trigger] attributes on its own. Only services go here.
-        // No configuration registration: the API key reference lives under Automate's shared
-        // Umbraco:Automate:Secrets section, which it resolves out of the box.
     }
 }
 ```
 
 ## Test project
 
-`Packages/Example/Umbraco.Community.Automate.Example.Tests/Umbraco.Community.Automate.Example.Tests.csproj`
+`Packages/<Area>/Umbraco.Community.Automate.<Area>.Tests/Umbraco.Community.Automate.<Area>.Tests.csproj`.
 
+`Umbraco.Community.Automate.WeatherApi.Tests/Umbraco.Community.Automate.WeatherApi.Tests.csproj`
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
@@ -366,7 +490,7 @@ public class ExampleComposer : IComposer
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.Community.Automate.Example\Umbraco.Community.Automate.Example.csproj" />
+    <ProjectReference Include="..\Umbraco.Community.Automate.WeatherApi\Umbraco.Community.Automate.WeatherApi.csproj" />
   </ItemGroup>
 
 </Project>
@@ -376,31 +500,29 @@ public class ExampleComposer : IComposer
 
 xUnit only, with a hand-written HTTP stub instead of a mocking library. Never call the real service.
 
-`Fakes/StubHttp.cs`. Returns canned responses in order and records each request. It reads each body as the request goes out, because the code under test disposes its requests straight after sending.
+`Fakes/StubHttp.cs`. Returns canned responses in order and records each request.
 
+`Umbraco.Community.Automate.WeatherApi.Tests/Fakes/StubHttp.cs`
 ```csharp
 using System.Net;
 using System.Text;
 
-namespace Umbraco.Community.Automate.Example.Tests.Fakes;
+namespace Umbraco.Community.Automate.WeatherApi.Tests.Fakes;
 
+/// <summary>Returns canned responses in order and records every request sent.</summary>
 public sealed class StubHttpMessageHandler(params HttpResponseMessage[] responses) : HttpMessageHandler
 {
     private readonly Queue<HttpResponseMessage> _responses = new(responses);
 
     public List<HttpRequestMessage> Requests { get; } = [];
 
-    /// <summary>Each request's body, read as it's sent: callers dispose requests straight after.</summary>
-    public List<string?> Bodies { get; } = [];
-
     public static HttpResponseMessage Json(HttpStatusCode status, string json)
         => new(status) { Content = new StringContent(json, Encoding.UTF8, "application/json") };
 
-    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         Requests.Add(request);
-        Bodies.Add(request.Content is null ? null : await request.Content.ReadAsStringAsync(cancellationToken));
-        return _responses.Dequeue();
+        return Task.FromResult(_responses.Dequeue());
     }
 }
 
@@ -410,125 +532,104 @@ public sealed class StubHttpClientFactory(HttpMessageHandler handler) : IHttpCli
 }
 ```
 
-`Actions/SendMessageActionTests.cs`. `ActionTestHarness` runs the action end to end; give it every service its constructor asks for.
+`Connections/WeatherApiConnectionSettingsValidatorTests.cs`.
 
+`Umbraco.Community.Automate.WeatherApi.Tests/Connections/WeatherApiConnectionSettingsValidatorTests.cs`
 ```csharp
-using System.Net;
-using Umbraco.Automate.Core.Actions;
-using Umbraco.Automate.Testing;
-using Umbraco.Community.Automate.Example.Actions;
-using Umbraco.Community.Automate.Example.Connections;
-using Umbraco.Community.Automate.Example.Tests.Fakes;
+using Umbraco.Community.Automate.WeatherApi.Connections;
 using Xunit;
 
-namespace Umbraco.Community.Automate.Example.Tests.Actions;
+namespace Umbraco.Community.Automate.WeatherApi.Tests.Connections;
 
-public class SendMessageActionTests
+public class WeatherApiConnectionSettingsValidatorTests
 {
     [Fact]
-    public async Task Posts_the_message_with_the_api_key()
+    public void New_connections_default_to_the_configuration_reference()
+        => Assert.Equal("$Umbraco:Automate:Secrets:WeatherApi:ApiKey", new WeatherApiConnectionSettings().ApiKey);
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Blank_api_key_fails(string apiKey)
+        => Assert.Equal("A WeatherAPI.com API key is required.",
+            WeatherApiConnectionSettingsValidator.Validate(new WeatherApiConnectionSettings { ApiKey = apiKey }));
+
+    [Fact]
+    public void Missing_settings_fail()
+        => Assert.Equal("A WeatherAPI.com API key is required.", WeatherApiConnectionSettingsValidator.Validate(null));
+
+    [Fact]
+    public void Unresolved_default_reference_explains_where_to_put_the_key()
     {
-        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(HttpStatusCode.OK, "{}"));
+        // A reference arriving unresolved (Automate normally resolves it, or reports the missing key, first).
+        var error = WeatherApiConnectionSettingsValidator.Validate(new WeatherApiConnectionSettings());
 
-        var result = await Run(handler, "Hello");
-
-        Assert.Equal(ActionResultStatus.Success, result.Status);
-        Assert.Equal(200, Assert.IsType<SendMessageOutput>(result.OutputData).StatusCode);
-
-        var request = handler.Requests.Single();
-        Assert.Equal(HttpMethod.Post, request.Method);
-        Assert.Equal("Bearer token", request.Headers.Authorization!.ToString());
-        Assert.True(request.Headers.Contains("Idempotency-Key"));
-        Assert.Contains("Hello", handler.Bodies.Single());
+        Assert.NotNull(error);
+        Assert.Contains("could not be resolved", error);
+        Assert.Contains("Umbraco:Automate:Secrets:WeatherApi:ApiKey", error);
     }
 
     [Fact]
-    public async Task Blank_message_is_a_validation_error_and_calls_nothing()
-    {
-        var handler = new StubHttpMessageHandler();
-
-        var result = await Run(handler, " ");
-
-        Assert.Equal(StepRunErrorCategory.Validation, result.ErrorCategory);
-        Assert.Empty(handler.Requests);
-    }
-
-    [Theory]
-    [InlineData(HttpStatusCode.Unauthorized, StepRunErrorCategory.Authentication)]
-    [InlineData(HttpStatusCode.TooManyRequests, StepRunErrorCategory.RateLimiting)]
-    [InlineData(HttpStatusCode.BadGateway, StepRunErrorCategory.ServiceUnavailable)]
-    public async Task Failed_responses_are_categorised_so_Automate_knows_whether_to_retry(HttpStatusCode status, StepRunErrorCategory expected)
-    {
-        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(status, "{}"));
-
-        var result = await Run(handler, "Hello");
-
-        Assert.Equal(expected, result.ErrorCategory);
-    }
-
-    private static Task<ActionResult> Run(StubHttpMessageHandler handler, string message)
-        => ActionTestHarness.For<SendMessageAction>()
-            .WithService<IHttpClientFactory>(new StubHttpClientFactory(handler))
-            .WithSettings(new SendMessageSettings { Message = message })
-            .WithConnection("community.example", new ExampleConnectionSettings { ApiKey = "token" })
-            .ExecuteAsync();
+    public void Real_key_passes()
+        => Assert.Null(WeatherApiConnectionSettingsValidator.Validate(new WeatherApiConnectionSettings { ApiKey = "abc123" }));
 }
 ```
 
-`Connections/ExampleConnectionTypeTests.cs`. Construct the connection type with a fake model resolver: validation never uses it, so its members just throw. Implementing them explicitly avoids repeating the interface's generic constraint.
+`Connections/WeatherApiConnectionTypeTests.cs`. Construct the connection type with a fake model
+resolver: validation never uses it, so its members just throw. Implementing them explicitly
+avoids repeating the interface's generic constraint. `WeatherApiResponses` (in the same `Fakes/`
+folder) holds the trimmed, canned API response bodies these tests and the action tests share.
 
+`Umbraco.Community.Automate.WeatherApi.Tests/Connections/WeatherApiConnectionTypeTests.cs`
 ```csharp
 using System.Net;
 using Umbraco.Automate.Core.Connections;
 using Umbraco.Automate.Core.Settings;
-using Umbraco.Community.Automate.Example.Connections;
-using Umbraco.Community.Automate.Example.Tests.Fakes;
+using Umbraco.Community.Automate.WeatherApi.Connections;
+using Umbraco.Community.Automate.WeatherApi.Tests.Fakes;
 using Xunit;
 
-namespace Umbraco.Community.Automate.Example.Tests.Connections;
+namespace Umbraco.Community.Automate.WeatherApi.Tests.Connections;
 
-public class ExampleConnectionTypeTests
+public class WeatherApiConnectionTypeTests
 {
     [Fact]
-    public void New_connections_start_with_the_configuration_reference()
-        => Assert.Equal("$Umbraco:Automate:Secrets:Example:ApiKey", new ExampleConnectionSettings().ApiKey);
-
-    [Fact]
-    public async Task Accepted_key_connects()
-    {
-        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(HttpStatusCode.OK, "{}"));
-
-        var result = await CreateSut(handler).ValidateAsync(new ExampleConnectionSettings { ApiKey = "token" }, CancellationToken.None);
-
-        Assert.Equal(ConnectionValidationStatus.Success, result.Status);
-        Assert.Equal("Bearer token", handler.Requests.Single().Headers.Authorization!.ToString());
-    }
-
-    [Fact]
-    public async Task Missing_key_fails_without_calling_the_service()
+    public async Task Unresolved_reference_fails_without_calling_the_api()
     {
         var handler = new StubHttpMessageHandler();
 
-        var result = await CreateSut(handler).ValidateAsync(new ExampleConnectionSettings { ApiKey = "" }, CancellationToken.None);
+        var result = await CreateSut(handler).ValidateAsync(new WeatherApiConnectionSettings(), CancellationToken.None);
 
         Assert.Equal(ConnectionValidationStatus.Failure, result.Status);
         Assert.Empty(handler.Requests);
     }
 
     [Fact]
-    public async Task Rejected_key_fails_with_the_status_code()
+    public async Task Valid_key_succeeds()
     {
-        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(HttpStatusCode.Unauthorized, "{}"));
+        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(HttpStatusCode.OK, WeatherApiResponses.Current));
 
-        var result = await CreateSut(handler).ValidateAsync(new ExampleConnectionSettings { ApiKey = "token" }, CancellationToken.None);
+        var result = await CreateSut(handler).ValidateAsync(new WeatherApiConnectionSettings { ApiKey = "abc123" }, CancellationToken.None);
 
-        Assert.Equal(ConnectionValidationStatus.Failure, result.Status);
-        Assert.Contains("401", result.Message);
+        Assert.Equal(ConnectionValidationStatus.Success, result.Status);
+        Assert.Contains("key=abc123", handler.Requests.Single().RequestUri!.Query);
     }
 
-    private static ExampleConnectionType CreateSut(HttpMessageHandler handler)
+    [Fact]
+    public async Task Rejected_key_reports_the_api_message()
+    {
+        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(HttpStatusCode.Unauthorized, WeatherApiResponses.InvalidKey));
+
+        var result = await CreateSut(handler).ValidateAsync(new WeatherApiConnectionSettings { ApiKey = "wrong" }, CancellationToken.None);
+
+        Assert.Equal(ConnectionValidationStatus.Failure, result.Status);
+        Assert.Equal("API key is invalid.", result.Message);
+    }
+
+    private static WeatherApiConnectionType CreateSut(HttpMessageHandler handler)
         => new(new ConnectionTypeInfrastructure(new UnusedModelResolver()), new StubHttpClientFactory(handler));
 
+    /// <summary>ValidateAsync never resolves models; this only satisfies the constructor.</summary>
     private sealed class UnusedModelResolver : IEditableModelResolver
     {
         object IEditableModelResolver.ResolveModel(string alias, Type modelType, object? source, EditableModelSchema? schema) => throw new NotSupportedException();
@@ -537,26 +638,127 @@ public class ExampleConnectionTypeTests
 }
 ```
 
-`ExampleFieldTests.cs`. Every package has this test: a setting without a `Label` or `Description` doesn't fail anywhere, it just shows a raw `#uaFields_...` localization key in the backoffice.
+`Actions/GetCurrentWeatherActionTests.cs`. `ActionTestHarness` runs the action end to end; give
+it every service its constructor asks for.
 
+`Umbraco.Community.Automate.WeatherApi.Tests/Actions/GetCurrentWeatherActionTests.cs`
+```csharp
+using System.Net;
+using Umbraco.Automate.Core.Actions;
+using Umbraco.Automate.Testing;
+using Umbraco.Community.Automate.WeatherApi.Actions;
+using Umbraco.Community.Automate.WeatherApi.Connections;
+using Umbraco.Community.Automate.WeatherApi.Tests.Fakes;
+using Xunit;
+
+namespace Umbraco.Community.Automate.WeatherApi.Tests.Actions;
+
+public class GetCurrentWeatherActionTests
+{
+    [Fact]
+    public async Task Returns_the_current_weather()
+    {
+        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(HttpStatusCode.OK, WeatherApiResponses.Current));
+
+        var result = await Run(handler, new GetCurrentWeatherSettings { Location = "London", Culture = "fr-FR" });
+
+        Assert.Equal(ActionResultStatus.Success, result.Status);
+        var output = Assert.IsType<GetCurrentWeatherOutput>(result.OutputData);
+        Assert.Equal("London", output.LocationName);
+        Assert.Equal(14.0, output.TemperatureC);
+        Assert.Equal("Partly cloudy", output.Condition);
+        // WeatherAPI.com returns protocol-relative icon URLs; the action makes them absolute.
+        Assert.Equal("https://cdn.weatherapi.com/weather/64x64/day/116.png", output.ConditionIconUrl);
+
+        var query = handler.Requests.Single().RequestUri!.Query;
+        Assert.Contains("q=London", query);
+        Assert.Contains("lang=fr", query);
+    }
+
+    [Fact]
+    public async Task Missing_location_is_a_validation_error()
+    {
+        var result = await Run(new StubHttpMessageHandler(), new GetCurrentWeatherSettings { Location = "" });
+
+        Assert.Equal(ActionResultStatus.Failed, result.Status);
+        Assert.Equal(StepRunErrorCategory.Validation, result.ErrorCategory);
+    }
+
+    [Fact]
+    public async Task Malformed_culture_is_a_validation_error()
+    {
+        // .NET accepts any well-formed name (e.g. "xx-YY") as a culture, so only malformed
+        // names are rejected; a well-formed unknown one is passed through to WeatherAPI.com.
+        var result = await Run(new StubHttpMessageHandler(), new GetCurrentWeatherSettings { Location = "London", Culture = "!!" });
+
+        Assert.Equal(StepRunErrorCategory.Validation, result.ErrorCategory);
+    }
+
+    [Fact]
+    public async Task Unresolved_api_key_reference_is_a_configuration_error()
+    {
+        var handler = new StubHttpMessageHandler();
+
+        var result = await Run(handler, new GetCurrentWeatherSettings { Location = "London" }, new WeatherApiConnectionSettings());
+
+        Assert.Equal(StepRunErrorCategory.ConfigurationError, result.ErrorCategory);
+        Assert.Empty(handler.Requests);
+    }
+
+    [Fact]
+    public async Task Invalid_key_is_an_authentication_error()
+    {
+        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(HttpStatusCode.Unauthorized, WeatherApiResponses.InvalidKey));
+
+        var result = await Run(handler, new GetCurrentWeatherSettings { Location = "London" });
+
+        Assert.Equal(StepRunErrorCategory.Authentication, result.ErrorCategory);
+        Assert.Equal("API key is invalid.", result.Exception?.Message);
+    }
+
+    [Fact]
+    public async Task Unknown_location_is_a_validation_error()
+    {
+        var handler = new StubHttpMessageHandler(StubHttpMessageHandler.Json(HttpStatusCode.BadRequest, WeatherApiResponses.NoLocation));
+
+        var result = await Run(handler, new GetCurrentWeatherSettings { Location = "Nowhereville" });
+
+        Assert.Equal(StepRunErrorCategory.Validation, result.ErrorCategory);
+    }
+
+    private static Task<ActionResult> Run(
+        StubHttpMessageHandler handler,
+        GetCurrentWeatherSettings settings,
+        WeatherApiConnectionSettings? connection = null)
+        => ActionTestHarness.For<GetCurrentWeatherAction>()
+            .WithService<IHttpClientFactory>(new StubHttpClientFactory(handler))
+            .WithSettings(settings)
+            .WithConnection("community.weatherApi", connection ?? new WeatherApiConnectionSettings { ApiKey = "abc123" })
+            .ExecuteAsync();
+}
+```
+
+`<Area>FieldTests.cs`. Every package has this test: a setting without a `Label` or `Description` doesn't fail anywhere, it just shows a raw `#uaFields_...` localization key in the backoffice.
+
+`Umbraco.Community.Automate.WeatherApi.Tests/WeatherApiFieldTests.cs`
 ```csharp
 using System.Reflection;
 using Umbraco.Automate.Core.Settings;
-using Umbraco.Community.Automate.Example.Connections;
+using Umbraco.Community.Automate.WeatherApi.Connections;
 using Xunit;
 
-namespace Umbraco.Community.Automate.Example.Tests;
+namespace Umbraco.Community.Automate.WeatherApi.Tests;
 
 /// <summary>
 /// A setting without a Label or Description shows a raw localization key in the backoffice
 /// (e.g. #uaFields_...Description) instead of failing anywhere, so this test catches it.
 /// </summary>
-public class ExampleFieldTests
+public class WeatherApiFieldTests
 {
     [Fact]
     public void Every_setting_has_a_label_and_description()
     {
-        var fields = typeof(ExampleConnectionType).Assembly.GetTypes()
+        var fields = typeof(WeatherApiConnectionType).Assembly.GetTypes()
             .SelectMany(t => t.GetProperties())
             .Select(p => (Name: $"{p.DeclaringType!.Name}.{p.Name}", Field: p.GetCustomAttribute<EditableModelFieldAttribute>()))
             .Where(x => x.Field is not null)
@@ -574,8 +776,20 @@ public class ExampleFieldTests
 
 ## Wiring into the repo
 
-The same for every package; see [full.md](full.md#wiring-into-the-repo) for the solution, Demo site and root README snippets, and the [README skeleton](full.md#readme-skeleton). That includes adding the package's configuration to the Demo site: `Umbraco:Automate:Secrets:Example:ApiKey` with a fake placeholder (`"e2e-test"`) in `Umbraco.Community.Automate.Demo/appsettings.Development.json`, and with a `your-...` value in `appsettings.Local.example.json`, the template for real credentials.
+The same for every package; see [full.md](full.md#wiring-into-the-repo) for the solution, Demo
+site and root README snippets, and the [README skeleton](full.md#readme-skeleton). That includes
+adding the package's configuration to the Demo site: `Umbraco:Automate:Secrets:<Area>:ApiKey`
+with a fake placeholder (`"e2e-test"`) in `Umbraco.Community.Automate.Demo/appsettings.Development.json`,
+and with a `your-...` value in `appsettings.Local.example.json`, the template for real credentials.
 
 ## Adding a second action
 
-Copy the action's three files under a new name, give it its own alias (`community.example.<name>`), add it to the composer, and test it the same way. When two or more actions repeat the same request and error-handling code, move that into an `Api/ExampleClient.cs` with a shared error mapping: that's the first step towards [full.md](full.md#api-client-and-models).
+WeatherApi's own README names its second action, **Get Today's Weather** (`Actions/GetTodaysWeatherAction.cs`):
+copy the first action's three files under a new name, give it its own alias
+(`community.<area>.<name>`), add tests, and document it in the README. Once two actions call the
+service the same way, as WeatherApi's do, move the shared request-building, JSON parsing and
+error-classification logic into an `Api/<Area>RequestHelper.cs` (or `<Area>Client.cs` — see
+[full.md](full.md#api-client-and-models)) used by both actions and the connection type's
+`ValidateAsync`, with response shapes in `Models/`. Read `Packages/WeatherApi/Umbraco.Community.Automate.WeatherApi/Api/WeatherApiRequestHelper.cs`
+directly for a real, maintained example of exactly that — it's not duplicated here to avoid a
+second place for it to drift from.
