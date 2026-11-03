@@ -20,6 +20,7 @@
     <ProjectReference Include="..\Skoda\src\Umbraco.Community.Automate.Skoda\Umbraco.Community.Automate.Skoda.csproj" />
     <ProjectReference Include="..\Packages\WeatherApi\Umbraco.Community.Automate.WeatherApi\Umbraco.Community.Automate.WeatherApi.csproj" />
     <ProjectReference Include="..\Packages\Pushover\Umbraco.Community.Automate.Pushover\Umbraco.Community.Automate.Pushover.csproj" />
+    <ProjectReference Include="..\Packages\_Development\KitchenSink\Umbraco.Community.Automate.Examples.KitchenSink\Umbraco.Community.Automate.Examples.KitchenSink.csproj" />
   </ItemGroup>
 
   <ItemGroup>
