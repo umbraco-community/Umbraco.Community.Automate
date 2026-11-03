@@ -131,7 +131,7 @@ Before opening (or writing the description of) a pull request that adds a packag
 ## Conventions
 
 ### Aliases, names and groups
-- **Aliases are permanent once released.** Saved connections and automations store the connection type, action and trigger aliases, so renaming one breaks them. Pick them carefully up front.
+- **Aliases are permanent once released** — see [.claude/rules/umbraco-community-automate-conventions.md](../../rules/umbraco-community-automate-conventions.md).
 - Prefix every alias with `community.`: `community.<area>` for the connection type and `community.<area>.<name>` (camelCase) for actions and triggers, e.g. `community.bluesky` and `community.bluesky.createPost`. The prefix keeps community packages apart from Umbraco's own step types. Every new package uses it, with the `Umbraco.Community.Automate.<Area>` package ID and namespaces. The only exception is a migrated package whose author chooses to keep their own package ID, namespaces and aliases (see [references/migrating.md](references/migrating.md)); the rest of the conventions still apply to it.
 - Set `ConnectionTypeAlias` on every action to the connection type alias, so the action only offers matching connections.
 - Write the alias, name, group and icon directly on each `[ConnectionType]`, `[Action]` and `[Trigger]` attribute, as Umbraco Automate's own step types do. Don't gather them into an `<Area>Constants` class: the attribute is where a reader looks for them.
@@ -189,7 +189,7 @@ Pick the right editor for every setting rather than leaving everything a text bo
 - Build a custom editor in `Client/` only when no built-in editor can express the value (Google Sheets' column list is the model).
 
 ### Configuration and secrets
-- Never commit real credentials, not even temporarily. The repo's gitleaks hooks (`.githooks/`) block commits and pushes that contain them.
+- **Never commit real credentials, not even temporarily** — see [.claude/rules/umbraco-community-automate-conventions.md](../../rules/umbraco-community-automate-conventions.md).
 - Credentials live in configuration, not the database, under Umbraco Automate's **shared** sections, nested under the area name: `Umbraco:Automate:Secrets:<Area>:<Key>` for sensitive values and `Umbraco:Automate:Variables:<Area>:<Key>` for the rest, referenced from fields as `$Umbraco:Automate:Secrets:<Area>:ApiKey`. Automate resolves references from these two sections by default (its allow-list is default-deny for everything else), so **don't register anything** in the composer. Nesting under `<Area>` keeps a package's keys together and avoids clashes. Secrets can only be referenced from `IsSensitive` fields. Keep the paths, and each default reference, as constants in `Configuration/<Area>Configuration.cs`, and use them everywhere the path appears (settings defaults, validator messages), so there's a single place to change them.
 - **Pre-fill each credential field with its reference as the default value** (`public string ApiKey { get; set; } = <Area>Configuration.ApiKeyReference;`). A new connection then opens with the reference already filled in, so users who store the key in configuration don't type anything, and anyone who prefers can overwrite it with the value. Don't ask users to copy and paste references from help text, and don't repeat the reference path in the field's description either: the pre-filled value already shows it, so the description only needs to say what the value is and where to get it. Leave per-connection values (like a vehicle VIN) blank.
 - Automate resolves references before settings reach your code. If the key is missing it fails the step or the **Test connection** itself, with *Configuration key '...' not found*, so you don't need to handle that. As a cheap safety net, the shared validator can still reject a value that starts with `$` (one that arrived unresolved) with a message naming the key, before any API call.
@@ -218,7 +218,7 @@ Pick the right editor for every setting rather than leaving everything a text bo
 
 ## Testing
 
-- **xUnit only**: use xUnit's `Assert`, and don't add assertion or mocking libraries (no Shouldly, FluentAssertions, Moq or NSubstitute). One framework keeps tests readable for every contributor and the dependency list short. Some older packages still use Shouldly or Moq; don't copy that into new code.
+- **xUnit only, no mocking libraries** — see [.claude/rules/umbraco-community-automate-testing.md](../../rules/umbraco-community-automate-testing.md).
 - Umbraco's own `Umbraco.Automate.Testing` package is fine (it's the official harness, not a mocking library): `ActionTestHarness.For<TAction>().WithService(...).WithSettings(...).WithConnection(alias, settings).ExecuteAsync()` runs an action end to end and returns its `ActionResult`.
 - Instead of a mocking library, write small hand-written fakes: a stub `HttpMessageHandler` that returns canned responses and records requests, behind a tiny `IHttpClientFactory` implementation (see `Fakes/StubHttp.cs` in either reference).
 - To unit test a connection type's `ValidateAsync`, construct it with `new ConnectionTypeInfrastructure(fakeResolver)`, where the fake implements `IEditableModelResolver` with explicit interface members that throw (validation never uses it). Explicit implementation avoids having to repeat the interface's generic constraint.
