@@ -1,0 +1,22 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Paul Wright, Umbraco Community</Authors>
+    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Packages/Pushover/Umbraco.Community.Automate.Pushover</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Releases come from pushover-v* tags only; height-based pre-release
+         versions would react to other packages' commits in this monorepo. -->
+    <MinVerTagPrefix>pushover-v</MinVerTagPrefix>
+    <MinVerIgnoreHeight>true</MinVerIgnoreHeight>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+</Project>

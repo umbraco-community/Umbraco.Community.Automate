@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Packages/_Development/TestConnection/">
+    <Project Path="Packages/_Development/TestConnection/Umbraco.Community.Automate.TestConnection.Tests/Umbraco.Community.Automate.TestConnection.Tests.csproj" />
+    <Project Path="Packages/_Development/TestConnection/Umbraco.Community.Automate.TestConnection/Umbraco.Community.Automate.TestConnection.csproj" />
+  </Folder>
   <Folder Name="/Packages/DevTo/">
     <Project Path="Packages/DevTo/Umbraco.Community.Automate.DevTo.Tests/Umbraco.Community.Automate.DevTo.Tests.csproj" />
     <Project Path="Packages/DevTo/Umbraco.Community.Automate.DevTo/Umbraco.Community.Automate.DevTo.csproj" />
@@ -14,6 +18,18 @@
   <Folder Name="/Packages/Skoda/">
     <Project Path="Packages/Skoda/Umbraco.Community.Automate.Skoda.Tests/Umbraco.Community.Automate.Skoda.Tests.csproj" />
     <Project Path="Packages/Skoda/Umbraco.Community.Automate.Skoda/Umbraco.Community.Automate.Skoda.csproj" Id="fcdaea52-2888-4bd9-94a0-96b8590dbe4b" />
+  </Folder>
+  <Folder Name="/Packages/WeatherApi/">
+    <Project Path="Packages/WeatherApi/Umbraco.Community.Automate.WeatherApi.Tests/Umbraco.Community.Automate.WeatherApi.Tests.csproj" />
+    <Project Path="Packages/WeatherApi/Umbraco.Community.Automate.WeatherApi/Umbraco.Community.Automate.WeatherApi.csproj" />
+  </Folder>
+  <Folder Name="/Packages/Pushover/">
+    <Project Path="Packages/Pushover/Umbraco.Community.Automate.Pushover.Tests/Umbraco.Community.Automate.Pushover.Tests.csproj" />
+    <Project Path="Packages/Pushover/Umbraco.Community.Automate.Pushover/Umbraco.Community.Automate.Pushover.csproj" />
+  </Folder>
+  <Folder Name="/Packages/_Development/KitchenSink/">
+    <Project Path="Packages/_Development/KitchenSink/Umbraco.Community.Automate.Examples.KitchenSink.Tests/Umbraco.Community.Automate.Examples.KitchenSink.Tests.csproj" />
+    <Project Path="Packages/_Development/KitchenSink/Umbraco.Community.Automate.Examples.KitchenSink/Umbraco.Community.Automate.Examples.KitchenSink.csproj" />
   </Folder>
   <Project Path="Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj" />
 </Solution>
