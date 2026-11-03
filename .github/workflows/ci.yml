@@ -172,23 +172,51 @@ jobs:
       client-dir: ${{ matrix.package.client }}
       run-e2e: ${{ matrix.package.e2e }}
 
+  # Builds and tests the skill's fixtures separately from package discovery above: they live
+  # under .claude/skills/*/fixtures/, deliberately too deep for that find to ever match (and
+  # have no Directory.Build.props either), since they're reference material for the skill,
+  # never a package in Packages/. Also checks that full.md and simple.md still match the real
+  # code they're generated from (tools/generate-skill-reference.sh) — WeatherApi (simple.md's
+  # source) is already built and tested above, so only its diff-check is needed here.
+  skill-reference-docs:
+    name: skill-reference-docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - run: dotnet test .claude/skills/umbraco-community-automate/fixtures/kitchen-sink/Umbraco.Community.Automate.Examples.KitchenSink.Tests --configuration Release
+
+      - run: tools/generate-skill-reference.sh .claude/skills/umbraco-community-automate/fixtures/kitchen-sink .claude/skills/umbraco-community-automate/references/full.md --check
+
+      - run: tools/generate-skill-reference.sh Packages/WeatherApi .claude/skills/umbraco-community-automate/references/simple.md --check
+
   # Single stable name to require in branch protection: it succeeds when every matrix leg
   # succeeded, and — unlike listing each leg — does not need updating as packages come and go.
   # Also covers the legitimately-nothing-to-do case, where `package` is skipped.
   ci:
     name: CI
-    needs: [discover, package]
+    needs: [discover, package, skill-reference-docs]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Check results
         run: |
           set -euo pipefail
-          echo "discover: ${{ needs.discover.result }}"
-          echo "package:  ${{ needs.package.result }}"
+          echo "discover:            ${{ needs.discover.result }}"
+          echo "package:             ${{ needs.package.result }}"
+          echo "skill-reference-docs: ${{ needs.skill-reference-docs.result }}"
 
           if [ "${{ needs.discover.result }}" != "success" ]; then
             echo "Package discovery failed." >&2
+            exit 1
+          fi
+
+          if [ "${{ needs.skill-reference-docs.result }}" != "success" ]; then
+            echo "Skill reference docs failed." >&2
             exit 1
           fi
 
