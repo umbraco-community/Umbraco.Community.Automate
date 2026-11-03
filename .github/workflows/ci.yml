@@ -172,23 +172,45 @@ jobs:
       client-dir: ${{ matrix.package.client }}
       run-e2e: ${{ matrix.package.e2e }}
 
+  # Builds and tests the skill's fixtures separately from package discovery above: they live
+  # under .claude/skills/*/fixtures/, deliberately too deep for that find to ever match (and
+  # have no Directory.Build.props either), since they're reference material for the skill,
+  # never a package in Packages/.
+  skill-fixtures:
+    name: skill-fixtures
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - run: dotnet test .claude/skills/umbraco-community-automate/fixtures/kitchen-sink/Umbraco.Community.Automate.Examples.KitchenSink.Tests --configuration Release
+
   # Single stable name to require in branch protection: it succeeds when every matrix leg
   # succeeded, and — unlike listing each leg — does not need updating as packages come and go.
   # Also covers the legitimately-nothing-to-do case, where `package` is skipped.
   ci:
     name: CI
-    needs: [discover, package]
+    needs: [discover, package, skill-fixtures]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Check results
         run: |
           set -euo pipefail
-          echo "discover: ${{ needs.discover.result }}"
-          echo "package:  ${{ needs.package.result }}"
+          echo "discover:       ${{ needs.discover.result }}"
+          echo "package:        ${{ needs.package.result }}"
+          echo "skill-fixtures: ${{ needs.skill-fixtures.result }}"
 
           if [ "${{ needs.discover.result }}" != "success" ]; then
             echo "Package discovery failed." >&2
+            exit 1
+          fi
+
+          if [ "${{ needs.skill-fixtures.result }}" != "success" ]; then
+            echo "Skill fixtures failed." >&2
             exit 1
           fi
 
