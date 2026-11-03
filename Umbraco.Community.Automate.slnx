@@ -27,5 +27,9 @@
     <Project Path="Packages/Pushover/Umbraco.Community.Automate.Pushover.Tests/Umbraco.Community.Automate.Pushover.Tests.csproj" />
     <Project Path="Packages/Pushover/Umbraco.Community.Automate.Pushover/Umbraco.Community.Automate.Pushover.csproj" />
   </Folder>
+  <Folder Name="/Packages/_Development/KitchenSink/">
+    <Project Path="Packages/_Development/KitchenSink/Umbraco.Community.Automate.Examples.KitchenSink.Tests/Umbraco.Community.Automate.Examples.KitchenSink.Tests.csproj" />
+    <Project Path="Packages/_Development/KitchenSink/Umbraco.Community.Automate.Examples.KitchenSink/Umbraco.Community.Automate.Examples.KitchenSink.csproj" />
+  </Folder>
   <Project Path="Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj" />
 </Solution>
