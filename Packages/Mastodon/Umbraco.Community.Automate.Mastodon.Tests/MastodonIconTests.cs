@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Umbraco.Automate.Core.Actions;
 using Umbraco.Automate.Core.Connections;
 using Umbraco.Community.Automate.Mastodon.Actions;
-using Umbraco.Community.Automate.Mastodon.ConnectionTypes;
+using Umbraco.Community.Automate.Mastodon.Connections;
 using Xunit;
 
 namespace Umbraco.Community.Automate.Mastodon.Tests;
@@ -17,7 +17,7 @@ public class MastodonIconTests
 {
     private static string[] RegisteredIconNames()
     {
-        var icons = File.ReadAllText(Path.Combine(MastodonPackagePaths.Wwwroot, "icons.js"));
+        var icons = File.ReadAllText(Path.Combine(MastodonPackagePaths.Wwwroot, "icons", "icons.js"));
 
         return Regex.Matches(icons, @"name:\s*""([^""]+)""")
             .Select(m => m.Groups[1].Value)

@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Umbraco.Community.Automate.Mastodon.Actions;
-using Umbraco.Community.Automate.Mastodon.Settings;
+using Umbraco.Community.Automate.Mastodon.Models;
 using Xunit;
 
 namespace Umbraco.Community.Automate.Mastodon.Tests;

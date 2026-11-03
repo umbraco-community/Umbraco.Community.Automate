@@ -36,21 +36,20 @@ public class MastodonPackageManifestReaderTests
 
         // Must match StaticWebAssetBasePath in the csproj, or the backoffice 404s on the module.
         Assert.Equal(
-            "/App_Plugins/UmbracoCommunityAutomateMastodon/icons.js",
+            "/App_Plugins/UmbracoCommunityAutomateMastodon/icons/icons.js",
             icons.GetProperty("js").GetString());
     }
 
     [Fact]
     public async Task Icons_module_and_the_svg_it_imports_exist_on_disk()
     {
-        var icons = await GetIconsExtensionAsync();
-        var fileName = Path.GetFileName(icons.GetProperty("js").GetString()!);
+        await GetIconsExtensionAsync();
 
         var wwwroot = MastodonPackagePaths.Wwwroot;
 
         // Nothing builds these — they are hand-written static web assets, so a rename or a
         // stray delete would otherwise only surface as a broken icon in the backoffice.
-        Assert.True(File.Exists(Path.Combine(wwwroot, fileName)), $"Missing wwwroot/{fileName}");
-        Assert.True(File.Exists(Path.Combine(wwwroot, "mastodon.icon.js")), "Missing wwwroot/mastodon.icon.js");
+        Assert.True(File.Exists(Path.Combine(wwwroot, "icons", "icons.js")), "Missing wwwroot/icons/icons.js");
+        Assert.True(File.Exists(Path.Combine(wwwroot, "icons", "mastodon.icon.js")), "Missing wwwroot/icons/mastodon.icon.js");
     }
 }

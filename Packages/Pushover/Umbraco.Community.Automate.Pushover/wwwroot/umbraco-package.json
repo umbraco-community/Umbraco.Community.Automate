@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/umbraco-package.json",
+  "id": "Umbraco.Community.Automate.Pushover",
+  "name": "Umbraco Community Automate Pushover",
+  "allowTelemetry": true,
+  "extensions": [
+    {
+      "type": "icons",
+      "alias": "UmbracoCommunityAutomatePushover.Icons",
+      "name": "Pushover Icons",
+      "js": "/App_Plugins/UmbracoCommunityAutomatePushover/icons/icons.js"
+    }
+  ]
+}
