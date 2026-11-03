@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Umbraco Community Automate Skoda</Title>
+    <Description>Škoda connection type and actions for Umbraco Automate. Read vehicle status and control charging, air conditioning, auxiliary heating and ventilation through the MyŠkoda Public API.</Description>
+    <PackageTags>umbraco automate automation skoda myskoda ev charging umbraco-marketplace</PackageTags>
+    <!-- Serves wwwroot/ (umbraco-package.json and the icons) as static web assets under this path. -->
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <StaticWebAssetBasePath>App_Plugins/UmbracoCommunityAutomateSkoda</StaticWebAssetBasePath>
+    <PackageIcon>community-automate-128.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Umbraco.Automate.Core" />
+    <!-- Versions the package from skoda-v* tags (see Directory.Build.props). -->
+    <PackageReference Include="MinVer" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Umbraco.Community.Automate.Skoda.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="community-automate-128.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>
