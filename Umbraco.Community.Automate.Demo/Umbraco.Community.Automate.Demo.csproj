@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Packages\_Development\TestConnection\Umbraco.Community.Automate.TestConnection\Umbraco.Community.Automate.TestConnection.csproj" />
     <ProjectReference Include="..\Packages\DevTo\Umbraco.Community.Automate.DevTo\Umbraco.Community.Automate.DevTo.csproj" />
     <ProjectReference Include="..\Packages\GoogleSheets\Umbraco.Community.Automate.GoogleSheets\Umbraco.Community.Automate.GoogleSheets.csproj" />
     <ProjectReference Include="..\Packages\Mastodon\Umbraco.Community.Automate.Mastodon\Umbraco.Community.Automate.Mastodon.csproj" />

@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Packages/_Development/TestConnection/">
+    <Project Path="Packages/_Development/TestConnection/Umbraco.Community.Automate.TestConnection.Tests/Umbraco.Community.Automate.TestConnection.Tests.csproj" />
+    <Project Path="Packages/_Development/TestConnection/Umbraco.Community.Automate.TestConnection/Umbraco.Community.Automate.TestConnection.csproj" />
+  </Folder>
   <Folder Name="/Packages/DevTo/">
     <Project Path="Packages/DevTo/Umbraco.Community.Automate.DevTo.Tests/Umbraco.Community.Automate.DevTo.Tests.csproj" />
     <Project Path="Packages/DevTo/Umbraco.Community.Automate.DevTo/Umbraco.Community.Automate.DevTo.csproj" />
