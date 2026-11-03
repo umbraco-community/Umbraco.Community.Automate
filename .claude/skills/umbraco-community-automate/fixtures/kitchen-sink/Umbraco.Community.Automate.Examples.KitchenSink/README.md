@@ -4,7 +4,7 @@
 
 A reference connection for [Umbraco Automate](https://github.com/umbraco/Umbraco.Automate) that shows a trigger and outcomes: the two parts of the framework this repo's other packages don't exercise. For the common case of an API key and one action, look at [Pushover](../../../Pushover/Umbraco.Community.Automate.Pushover/README.md) or [Skoda](../../../Skoda/Umbraco.Community.Automate.Skoda/README.md) instead — they're real, maintained packages and the better "what does idiomatic look like today" reference.
 
-It talks to [httpbin.org](https://httpbin.org), a free service that echoes requests back and accepts any API token, so everything works in the Demo site without signing up for anything. It isn't published to NuGet: CI builds and tests it on every pull request so it can't go stale, but it has no release tag prefix and isn't packable.
+It talks to [httpbin.org](https://httpbin.org), a free service that echoes requests back and accepts any API token, so its tests need no credentials. It isn't published to NuGet, and isn't referenced by the Demo site: CI builds and tests it on every pull request so it can't go stale, but it has no release tag prefix and isn't packable.
 
 ## What it adds
 
@@ -30,20 +30,11 @@ It talks to [httpbin.org](https://httpbin.org), a free service that echoes reque
 
 The tests in `Umbraco.Community.Automate.Examples.KitchenSink.Tests/` use the same folders, xUnit only, with hand-written HTTP fakes and Umbraco's `ActionTestHarness`.
 
-## Try it in the Demo site
-
-The Demo site references this package and already has a placeholder key at `Umbraco:Automate:Secrets:KitchenSink:ApiKey`.
-
-```bash
-dotnet run --project Umbraco.Community.Automate.Demo
-```
-
-1. In **Automation → Settings → Connections**, create a **Kitchen Sink Example (httpbin.org)** connection. The API key is already filled in; click **Test connection**.
-2. Create an automation with the **Dictionary Item Saved (Kitchen Sink Example)** trigger (optionally set **Key starts with**) and a **Send Example Message** step, with a message such as `Saved ${ trigger.key }`.
-3. Publish it, save a dictionary item under **Translation**, and check **Automation → Runs**.
-
 ## Run the tests
 
+This fixture isn't referenced by the Demo site (it's a reference for the skill, not a package to
+browse in the backoffice), so there's no Demo setup to try it in — build and run its own tests instead:
+
 ```bash
-dotnet test Packages/_Development/KitchenSink/Umbraco.Community.Automate.Examples.KitchenSink.Tests
+dotnet test .claude/skills/umbraco-community-automate/fixtures/kitchen-sink/Umbraco.Community.Automate.Examples.KitchenSink.Tests
 ```
