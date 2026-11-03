@@ -273,10 +273,62 @@ To bring in a package that lives in its own repo (as WeatherApi did from `SA.Aut
 - If the package has been released, ask before renaming aliases, moving configuration or changing the package ID, because saved automations depend on them, and document every such change in a **Migrating from <old package>** README section (see the Mastodon and WeatherApi READMEs).
 - Reshape it to the layout and conventions here, keep its behaviour, keep its tests passing, and drop what the repo handles centrally (release workflows, `umbraco-marketplace.json`, `NuGet.config`, licence and icon copies).
 
+## Checking the framework's current API
+
+`full.md`, `simple.md` and the Kitchen Sink fixture cover the framework API this repo actually
+uses, checked by compiling and testing. For anything they don't cover, or that may have changed
+since they were last touched, check a clone of the framework itself — never guess from memory
+or from `Umbraco.Automate`'s `main`/`dev` branches, which run ahead of any released version and
+can contain APIs that aren't in a published NuGet package yet.
+
+1. **Find the version actually resolved.** `Directory.Packages.props` floors `Umbraco.Automate.Core` on a *range*, not an exact version, so check what a real restore resolved to, e.g.:
+
+   ```bash
+   dotnet list Packages/WeatherApi/Umbraco.Community.Automate.WeatherApi/Umbraco.Community.Automate.WeatherApi.csproj package
+   # > Umbraco.Automate.Core   [17.0.0, 19.0.0)   17.0.0
+   ```
+
+   Add `-p:UmbracoMajor=18` to check the other major this repo builds against (see `tools/test-umbraco-compat.sh`).
+
+2. **Clone `github.com/umbraco/Umbraco.Automate` at the matching release tag** (`Umbraco.Automate@<version>`, e.g. `Umbraco.Automate@17.0.0`) — public, no auth needed — into a scratch location outside this repo (your Claude Code scratchpad directory, or any gitignored, throwaway path; don't assume where a contributor already keeps one):
+
+   ```bash
+   git clone --branch Umbraco.Automate@17.0.0 --depth 1 https://github.com/umbraco/Umbraco.Automate <somewhere-outside-this-repo>
+   ```
+
+3. Read from that clone directly rather than copying anything out of it into this skill: it's a
+   secondary reference for gaps, not a replacement for the fixture (a CI build failure catches a
+   real incompatibility; reading source by eye can still miss one).
+
+## Official tooling: scaffolding and a live-instance MCP server
+
+Two things Umbraco HQ ships for Automate, worth knowing about but not relied on here, since this
+skill is specifically for contributing to *this* repo, where conventions differ from a generic
+Automate package:
+
+- **`dotnet new umbraco-automate-actions`** scaffolds a brand-new, standalone single-Action
+  package (its own `.slnx`, floating NuGet version, no Triggers or Connections). Useful context
+  when migrating a package that started from it (see [migrating.md](references/migrating.md)),
+  but it doesn't match this repo's layout, central package versions or `.slnx` conventions —
+  don't use it to scaffold a package here.
+- **`@umbraco-automate/mcp-dev`** is a beta MCP server that bridges an AI tool to a *live*
+  Automate instance via its Management API (build/publish automations, inspect runs, roll back
+  versions). An optional power tool for validating a finished package end to end against a real
+  running site — never point it at production, since it runs automations for real — not for
+  scaffolding one.
+
 ## Working notes
 
 This skill is a living document. Add new conventions and lessons learned here (or in the sections above) as the team agrees on them.
 
+- `full.md` and `simple.md` are generated from real, compiled, tested code
+  (`tools/generate-skill-reference.sh <source dir> <reference doc> [--check]`), not hand-written:
+  a line that's just a backtick-quoted file path, immediately above a fenced code block, marks
+  that block as owned by the script, which replaces its body with that file's real contents.
+  `full.md` generates from the Kitchen Sink fixture
+  (`.claude/skills/umbraco-community-automate/fixtures/kitchen-sink/`); `simple.md` from
+  `Packages/WeatherApi/`. CI runs both with `--check` and fails if either doc no longer matches
+  the code — regenerate (drop `--check`) and commit the result if it does.
 - Front-end packages pin Playwright to the version Google Sheets uses (`"overrides": { "playwright": "1.61.0", "playwright-core": "1.61.0" }` in `Client/package.json`), so every `Client/` shares one downloaded browser.
 - In a package with a `Client/`, `Client/public/` is copied unchanged into `wwwroot/` by Vite, so `umbraco-package.json` and `icons/` live there and the manifest adds one `bundle` extension for whatever Vite builds (`Client/src/manifests.ts`). Hand-written editors without a build step go straight in `umbraco-package.json` (DevTo).
 - Automate discovers `[ConnectionType]`, `[Action]` and `[Trigger]` classes on its own (checked in the Demo site: with the Kitchen Sink's registrations removed, its trigger, actions and connection type all still appear). So composers register services only; registering the types as well is redundant.

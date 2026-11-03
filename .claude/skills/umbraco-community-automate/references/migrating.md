@@ -15,6 +15,7 @@ Like building a new package, take the user through choices before changing anyth
   - Tests and test libraries.
   - Packaging: package ID, version, NuGet metadata, marketplace files, release workflow, licence.
 - **Check whether it's been released.** Look it up on NuGet (`https://www.nuget.org/packages/<PackageId>`). A released package has users whose saved connections and automations store its aliases and settings, which changes how careful the migration must be.
+- **Check whether it started from `dotnet new umbraco-automate-actions`** (Umbraco HQ's official scaffold): a tell is a `.slnx` named after the package itself, or a floating `Umbraco.Automate.Core` version in its own `.csproj` rather than centrally managed. It's a cheap way to spot likely convention mismatches early (no central package versions, no `Directory.Build.props` tag prefix, a layout built for a standalone repo rather than this monorepo).
 - **Compare it with this repo's conventions** (SKILL.md, [fields.md](fields.md)) and list every difference: folder layout, aliases, configuration paths, settings editors, error categories, icons, tests.
 
 Present the inventory and the list of differences briefly, then ask.
