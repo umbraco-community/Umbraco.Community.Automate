@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Erik-Jan Westendorp, Umbraco Community</Authors>
+    <PackageProjectUrl>https://github.com/umbraco-community/Umbraco.Community.Automate/tree/main/Packages/Skoda/Umbraco.Community.Automate.Skoda</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/umbraco-community/Umbraco.Community.Automate</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Tags this repo uses for Skoda releases, e.g. skoda-v1.0.0.
+         IgnoreHeight: versions only ever come from a deliberate tag push, so
+         MinVer's commit-height pre-release suffix (which would also react to
+         other packages' commits in this monorepo) is turned off. -->
+    <MinVerTagPrefix>skoda-v</MinVerTagPrefix>
+    <MinVerIgnoreHeight>true</MinVerIgnoreHeight>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Produce a .snupkg (portable PDB symbol package) alongside the .nupkg
+         so consumers can step into this package's source when debugging. -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+</Project>
