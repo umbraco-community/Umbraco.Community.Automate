@@ -12,6 +12,7 @@ public sealed class StartAuxiliaryHeatingSettings
     [Field(
         Label = "Temperature unit",
         Description = "The unit the target temperature is in.",
+        SupportsBindings = true,
         EditorUiAlias = "Umb.PropertyEditorUi.RadioButtonList",
         EditorConfig = """[{ "alias": "items", "value": [{ "name": "Celsius", "value": "CELSIUS" }, { "name": "Fahrenheit", "value": "FAHRENHEIT" }] }]""",
         SortOrder = 1)]
@@ -39,6 +40,7 @@ public sealed class StartAuxiliaryHeatingSettings
     [Field(
         Label = "Start mode",
         Description = "Heat the cabin, or only ventilate it.",
+        SupportsBindings = true,
         EditorUiAlias = "Umb.PropertyEditorUi.RadioButtonList",
         EditorConfig = """[{ "alias": "items", "value": [{ "name": "Heating", "value": "HEATING" }, { "name": "Ventilation", "value": "VENTILATION" }] }]""",
         SortOrder = 4)]

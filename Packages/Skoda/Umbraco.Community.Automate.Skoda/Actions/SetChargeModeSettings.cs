@@ -9,6 +9,7 @@ public sealed class SetChargeModeSettings
     [Field(
         Label = "Charge mode",
         Description = "How the vehicle decides when to charge.",
+        SupportsBindings = true,
         EditorUiAlias = "Umb.PropertyEditorUi.Dropdown",
         EditorConfig = """
             [{ "alias": "items", "value": [
