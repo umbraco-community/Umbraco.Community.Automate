@@ -19,6 +19,7 @@ Look up the service's API, using web search and its developer documentation, and
 
 - **What it can do** that an automation would want: create (post, send, add a row), look up (find, get), update, delete. Pick the handful of operations people would most likely automate, not every endpoint.
 - **What can trigger an automation from it**: webhooks the service sends, or nothing (in which case triggers come from Umbraco, not the service).
+- **Whether sending a message or alert is the point of the service** (a chat app, a push-notification service): if so, it's a candidate for a [notification channel](../SKILL.md#notification-channels), not just a plain action — ask about this in Step 1.
 - **How it authenticates**: API key or token, OAuth (and whether OAuth tokens expire and need refreshing), or none.
 - **Hurdles a site owner will hit**: app review or approval (Facebook, Instagram and LinkedIn require an app and often review for posting permissions), business verification, paid tiers, rate limits, required scopes, deprecations.
 - **Whether it already exists**: in this repo (`Packages/`), as an open pull request, on NuGet, or as one of Umbraco Automate's built-in steps (listed in SKILL.md under "Packages without a provider"). If a package exists, suggest extending it instead (see "Adding to an existing connection"); if a built-in step already does it, say so before going further. For a general-purpose step with no service, suggest an existing general package that fits before a new one.
@@ -31,6 +32,7 @@ Ask, in one round:
 
 1. **Which actions?** (multiSelect) Offer the 3 or 4 most useful operations from your research, the most common first and recommended, e.g. "Post to a Page (Recommended)", "Post a photo", "Find a post", "Delete a post".
 2. **Any triggers?** Offer "No triggers (Recommended)" unless the request implies one, plus what the service supports, e.g. "When a new comment arrives (webhook)". Explain that most packages are actions only, and Umbraco's own triggers (Content Published and so on) start the automation.
+3. **A notification channel, only if the service is fundamentally a way to send a message or alert** (a chat app, a push-notification service) — skip this question entirely for a service that isn't. Offer "Just the action(s) above (Recommended)" vs "Also add a notification channel, so a site admin can pick this on an automation's Notifications tab for run alerts (Failed, Completed, and so on)". Explain the difference plainly: a plain action has to be wired into every automation by hand with an `If` step; a notification channel is configured once per automation and fires itself on the events the admin picks. See [Notification channels](../SKILL.md#notification-channels).
 
 ## Step 2: How it connects and how much it needs
 
@@ -47,14 +49,14 @@ Propose, don't ask open-endedly:
 - **Area name** (`Facebook`), which sets the folder `Packages/Facebook/`, the package ID `Umbraco.Community.Automate.Facebook`, the configuration path `Umbraco:Automate:Secrets:Facebook`, and the tag prefix `facebook-v`.
 
 A new package always starts with the community naming: the `Umbraco.Community.Automate.<Area>` package ID and namespaces, and `community.` aliases. Don't offer a personal prefix (`SA.`, `OC.`) as an option. If the user asks for one, recommend the community naming and explain why: it matches every other package, and it's published and maintained as part of the community set. Only someone migrating a package that's already released under their own name has a reason to keep it (see [migrating.md](migrating.md)).
-- **Aliases**: `community.facebook` and `community.facebook.<action>`, e.g. `community.facebook.createPagePost`. Point out that aliases are permanent once released.
+- **Aliases**: `community.facebook` and `community.facebook.<action>`, e.g. `community.facebook.createPagePost`; a notification channel, if chosen in Step 1, gets its own, e.g. `community.facebook.notify`. Point out that aliases are permanent once released.
 - **Display names** for the connection and each action, as they'll appear in the backoffice ("Facebook Page", "Post to Facebook Page").
 
 Offer the proposal with "Use these (Recommended)" and "Change them" as options.
 
 ## Step 4: Settings for each action
 
-For each action, list the settings you'd give it, with the editor and default you'd use (following [fields.md](fields.md)), and ask whether to change anything. One question per action, or one for all if they're small:
+For each action (and the notification channel, if chosen), list the settings you'd give it, with the editor and default you'd use (following [fields.md](fields.md)), and ask whether to change anything. One question per action, or one for all if they're small:
 
 ```
 Post to Facebook Page
@@ -67,7 +69,7 @@ Options: "Looks right (Recommended)", "Change something". Settings are where mos
 
 ## Step 5: Confirm, then build
 
-Summarise every decision in a short list: what it does, how it connects, shape, names, settings per action, icon, and anything the site owner will have to do at the service (create an app, request permissions). Ask "Build it (Recommended)" or "Change something".
+Summarise every decision in a short list: what it does, how it connects, shape, names, settings per action, notification channel (if chosen) and its settings, icon, and anything the site owner will have to do at the service (create an app, request permissions). Ask "Build it (Recommended)" or "Change something".
 
 Then build it, following the checklist under "Creating a new connection" in SKILL.md and [simple.md](simple.md) or [full.md](full.md). Only change the files listed under "What a change may touch" in SKILL.md: the package's own folder and its wiring. Don't ask further questions during the build unless something you found contradicts an earlier answer; if it does, explain and ask. At the end, report what you built, what you verified (build, tests, the Demo site), and what the user needs to do next (set up the app at the service, add the key to user secrets, open a pull request).
 
