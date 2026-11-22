@@ -2,7 +2,7 @@
 
 > **For reference only.** This example shows the skill, and anyone building by hand, two conventions none of the repo's real packages use yet. It isn't meant to be installed in a real site, and it's never published.
 
-A reference connection for [Umbraco Automate](https://github.com/umbraco/Umbraco.Automate) that shows a trigger and outcomes: the two parts of the framework this repo's other packages don't exercise. For the common case of an API key and one action, look at [Pushover](../../../Pushover/Umbraco.Community.Automate.Pushover/README.md) or [Skoda](../../../Skoda/Umbraco.Community.Automate.Skoda/README.md) instead — they're real, maintained packages and the better "what does idiomatic look like today" reference.
+A reference connection for [Umbraco Automate](https://github.com/umbraco/Umbraco.Automate) that shows a trigger and outcomes: the two parts of the framework this repo's other packages don't exercise. For the common case of an API key and one action, look at [Pushover](../../../../../../Packages/Pushover/Umbraco.Community.Automate.Pushover/README.md) or [Skoda](../../../../../../Packages/Skoda/Umbraco.Community.Automate.Skoda/README.md) instead — they're real, maintained packages and the better "what does idiomatic look like today" reference.
 
 It talks to [httpbin.org](https://httpbin.org), a free service that echoes requests back and accepts any API token, so its tests need no credentials. It isn't published to NuGet, and isn't referenced by the Demo site: CI builds and tests it on every pull request so it can't go stale, but it has no release tag prefix and isn't packable.
 
