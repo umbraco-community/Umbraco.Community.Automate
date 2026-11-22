@@ -20,7 +20,9 @@
 #
 # Without --check, rewrites <markdown file> in place. With --check, exits 1 and prints a
 # diff if regenerating would change it, without writing anything; exits 0 if it's already
-# up to date. Exits 2 on a usage error or a marker whose file doesn't exist.
+# up to date. Exits 2 (in both modes) on a usage error, a marker whose file doesn't exist, or
+# an orphaned marker -- one not immediately followed by its fence (prose, another marker, or
+# end of file in between) -- rather than silently leaving stale content in place.
 set -euo pipefail
 
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then
@@ -63,29 +65,48 @@ fi
 generated="$(mktemp)"
 trap 'rm -f "$generated"' EXIT
 
+# A marker must be immediately followed by its fence: a marker followed by prose, by another
+# marker, or by end of file is an error, not a silent no-op, so a future hand-edit that orphans
+# a marker fails loudly here (and in --check) instead of quietly freezing stale content forever.
 awk -v srcdir="$source_dir" '
-  BEGIN { pending = ""; owned = 0 }
+  BEGIN { pending = ""; pending_line = 0; owned = 0 }
   {
     if (owned == 1) {
       if ($0 ~ /^```/) { print; owned = 0 }
       next
     }
     if ($0 ~ /^`[^`]+`$/) {
+      if (pending != "") {
+        print "Marker on line " pending_line " (`" pending "`) is immediately followed by another marker on line " NR ", not a fenced code block" > "/dev/stderr"
+        pending = ""
+        exit 2
+      }
       pending = substr($0, 2, length($0) - 2)
+      pending_line = NR
       print
       next
     }
-    if (pending != "" && $0 ~ /^```/) {
-      print
-      path = srcdir "/" pending
-      while ((getline content < path) > 0) print content
-      close(path)
+    if (pending != "") {
+      if ($0 ~ /^```/) {
+        print
+        path = srcdir "/" pending
+        while ((getline content < path) > 0) print content
+        close(path)
+        pending = ""
+        owned = 1
+        next
+      }
+      print "Marker on line " pending_line " (`" pending "`) is not immediately followed by a fenced code block (line " NR " isn'\''t one)" > "/dev/stderr"
       pending = ""
-      owned = 1
-      next
+      exit 2
     }
-    pending = ""
     print
+  }
+  END {
+    if (pending != "") {
+      print "Marker on line " pending_line " (`" pending "`) is not followed by anything -- end of file reached before a fenced code block" > "/dev/stderr"
+      exit 2
+    }
   }
 ' "$markdown_file" > "$generated"
 
