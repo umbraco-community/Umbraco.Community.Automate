@@ -24,18 +24,14 @@ Present the inventory and the list of differences briefly, then ask.
 
 Ask, in one round:
 
-1. **Identity: community naming or the author's own?** Ask this first: it decides most of what follows. A migrated package can either adopt this repo's identity (package ID `Umbraco.Community.Automate.<Area>`, namespaces `Umbraco.Community.Automate.<Area>.*`, aliases `community.<area>...`) or keep its own "signature" (e.g. `SA.Automate.Pushover`, `SA.Automate.Pushover.*`, `pushover...`). Options:
-   - **"Adopt the community naming (Recommended)"**: it matches every other package, so contributors and users find it the same way, and it's published and maintained as part of the community set.
-   - **"Keep my own package ID, namespaces and aliases"**: for compatibility. Existing users upgrade in place with no reinstall, no code changes and no broken automations, and the author's name stays on the package. The only cost is that its names differ from the other packages'.
-
-   Recommend the community naming, but present keeping their own as a fully accepted choice, not a fallback to talk them out of: it's the right call when people already depend on the package and a rename would break their sites or automations. Don't push back once they've chosen. If they keep it, everything else still follows the conventions (layout, folders, configuration class, error categories, settings editors, tests, wiring); only the names stay theirs, and Step 2's alias and package ID questions fall away. The folder is still `Packages/<Area>/`, and the tag prefix is still `<area>-v`.
+1. **Identity: always the community naming.** Every package coming into this repo adopts this repo's identity: package ID `Umbraco.Community.Automate.<Area>`, namespaces `Umbraco.Community.Automate.<Area>.*` — not the author's own "signature" (e.g. `SA.Automate.Pushover`, `SA.Automate.Pushover.*`). This isn't a choice to offer; say so and move on. It matches every other package, so contributors and users find it the same way, and it's published and maintained as part of the community set. The **aliases** (`community.<area>...` vs the author's old ones) are a separate decision — ask about those in Step 2 — because unlike the package ID and namespaces, renaming them breaks every automation an existing user has stored.
 2. **How far to go**: "Full migration to the conventions (Recommended)", or "Move it as it is first, align it in a follow-up". Recommend full unless the package is large and the user wants a quick first PR.
-3. **Area name**: propose one (the service name, PascalCase), which sets `Packages/<Area>/` and the tag prefix (and, with the community naming, the package ID `Umbraco.Community.Automate.<Area>`).
+3. **Area name**: propose one (the service name, PascalCase), which sets `Packages/<Area>/`, the tag prefix, and the package ID `Umbraco.Community.Automate.<Area>`.
 4. **Credits**: who goes in `<Authors>` and in `CODEOWNERS` (default: the original author, plus "Umbraco Community").
 
 ## Step 2: Decisions that affect existing users
 
-Only ask these if the package has been released and is adopting the community naming. If it hasn't been released, apply the conventions and say so. If it keeps its own identity, the aliases and package ID stay as they are; only ask about the configuration path.
+Only ask these if the package has been released. If it hasn't been released, apply the conventions (including `community.` aliases) and say so.
 
 1. **Aliases**: saved connections and automations store the connection type and action aliases, so renaming them to `community.<area>` breaks every existing automation. Options: "Adopt `community.<area>` and document the breaking change (Recommended)", or "Keep the old aliases". (WeatherApi and Mastodon adopted the new aliases; their READMEs explain the move.)
 2. **Configuration path**: if the package read credentials from somewhere else (WeatherApi used `Umbraco:Automate:Secrets:WeatherApiKey`), moving to `Umbraco:Automate:Secrets:<Area>:<Key>` only changes the default for new connections; existing connections keep their saved values or references. Options: "Move to the shared section and document it (Recommended)", "Keep the old path".
