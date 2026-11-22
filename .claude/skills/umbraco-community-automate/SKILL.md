@@ -1,6 +1,6 @@
 ---
 name: umbraco-community-automate
-description: The house rules for building anything for Umbraco Automate in the Umbraco.Community.Automate repo: connections, actions, triggers, outcomes and outputs, API clients, configuration and secrets ($-references in Umbraco:Automate:Secrets/Variables), backoffice front ends (Client/, Vite + Lit), tests (xUnit only), the Demo site, CI and releases. Covers the Packages/<Area>/ layout, standard folder names (Actions, Triggers, Connections, Composers, Api, Models, Configuration, Client), community.<area> aliases and project wiring, with references/simple.md and references/full.md (generated from real code) as the references to copy. Use it whenever someone wants to create or change a package, connection, action or trigger (e.g. "build me an Automate package for Facebook", "add a Slack connection", "add a trigger to Mastodon"), migrate or import an existing Automate package into the repo or bring one up to the current conventions, write tests or a front end for one, wire something into the Demo site (its configuration; DemoSetupHandler does the rest), prepare a pull request for a package, remove or rename a package, or asks where something goes or how something is done in this repo, even if they don't mention Automate or the skill.
+description: The house rules for building anything for Umbraco Automate in the Umbraco.Community.Automate repo: connections, actions, triggers, notification channels, outcomes and outputs, API clients, configuration and secrets ($-references in Umbraco:Automate:Secrets/Variables), backoffice front ends (Client/, Vite + Lit), tests (xUnit only), the Demo site, CI and releases. Covers the Packages/<Area>/ layout, standard folder names (Actions, Triggers, Notifications, Connections, Composers, Api, Models, Configuration, Client), community.<area> aliases and project wiring, with references/simple.md and references/full.md (generated from real code) as the references to copy. Use it whenever someone wants to create or change a package, connection, action, trigger or notification channel (e.g. "build me an Automate package for Facebook", "add a Slack connection", "add a trigger to Mastodon", "let people get notified by Telegram when a run fails"), migrate or import an existing Automate package into the repo or bring one up to the current conventions, write tests or a front end for one, wire something into the Demo site (its configuration; DemoSetupHandler does the rest), prepare a pull request for a package, remove or rename a package, or asks where something goes or how something is done in this repo, even if they don't mention Automate or the skill.
 ---
 
 # Building for Umbraco Automate
@@ -36,6 +36,8 @@ Most community connections are simple: an API key and an action or two. Build th
 
 Read the matching reference before writing code, and [references/fields.md](references/fields.md) for every settings class. Both are complete (project files, every class, tests and wiring) and are generated from that real, compiled code — checked by building and testing it, and by CI failing if either doc drifts from it (see [Working notes](#working-notes)). The guided process in [references/new-package.md](references/new-package.md) settles the shape with the user: recommend Simple unless their answers need something from the Full column. When a Simple package later needs one Full feature, add just that section from `full.md`: the files are written to fit together.
 
+A [notification channel](#notification-channels) sits outside this table: add `Notifications/` to either shape, since a channel needs no API client, outcomes or trigger of its own.
+
 ## Layout
 
 ```
@@ -43,6 +45,7 @@ Packages/<Area>/                                  <Area> = PascalCase name, usua
   Umbraco.Community.Automate.<Area>/              the package
     Actions/        one class per action + its settings and output classes
     Triggers/       one class per trigger + its settings and output classes (when needed)
+    Notifications/  one class per notification channel + its settings (when needed)
     Connections/    the connection type + its connection settings (+ validator)
     Composers/      IComposer, IUmbracoBuilder extensions
     Api/            C# client for the external service: client, error mapping, exceptions
@@ -58,13 +61,13 @@ Packages/<Area>/                                  <Area> = PascalCase name, usua
 ```
 
 Why these names:
-- **Plural** for Automate's building blocks (`Actions`, `Triggers`, `Connections`) and for `Composers`, matching each other and Umbraco's own convention for composers.
+- **Plural** for Automate's building blocks (`Actions`, `Triggers`, `Notifications`, `Connections`) and for `Composers`, matching each other and Umbraco's own convention for composers.
 - **`Connections/`, not `Connection/` or `ConnectionType/`**: a singular `Connection` namespace shadows Automate's `Connection` type inside the package's own namespace tree and breaks code that uses it.
 - **`Client/` is only ever the npm front end.** CI gives a package front-end jobs when `Client/package.json` exists, so a C# API client must go in `Api/`, never `Client/`.
 - Namespaces follow folders: `Umbraco.Community.Automate.<Area>.Actions`, `.Connections`, and so on.
 - Folders unique to one connection (e.g. DevTo's `Articles/`, `Content/`) are fine alongside the standard ones.
 
-Don't create empty folders: add `Triggers/`, `Api/`, `Models/`, `Configuration/`, `Client/` or `wwwroot/` only when there's something to put in them.
+Don't create empty folders: add `Triggers/`, `Notifications/`, `Api/`, `Models/`, `Configuration/`, `Client/` or `wwwroot/` only when there's something to put in them.
 
 A package doesn't have to be a connection. One that only adds a trigger or an action (for example an Umbraco-side trigger, or an action that needs no external service) is just as welcome: it uses the same layout with only the folders it needs, say `Triggers/` and `Composers/`, and no `Connections/`. See **Packages without a provider** below.
 
@@ -79,14 +82,15 @@ Work through these in order and tick them off. For a package with no connection,
 3. **Configuration class** `Configuration/<Area>Configuration.cs` holding the config paths, each credential's default reference and the service's fixed values such as its base URL (see Configuration and secrets).
 4. **Connection type and settings** in `Connections/`, with credential fields defaulting to those references.
 5. **Actions** in `Actions/`, each with its settings (and output, if it returns data). Full: an `Api/` client shared by the actions, outcomes, and **triggers** in `Triggers/`.
-6. **Composer** in `Composers/`: register the package's **services** only (HTTP clients, an API client). Don't register the connection type, actions or triggers: Automate discovers them from their `[ConnectionType]`, `[Action]` and `[Trigger]` attributes. Icons and configuration references need no registration either.
-7. **Icons**: the vendor's logo for a commercial service, found on the web, and a built-in Umbraco icon (e.g. `icon-link`, no files needed) for everything else; see [Icons](#icons). A logo is registered with `wwwroot/umbraco-package.json`, which lists `icons/icons.js`, which lists `icons/<area>.icon.js` (in `Client/public/` instead if the package has a `Client/`). No C# is involved; add the icon test from [full.md](references/full.md#tests).
-8. **Package versions** go in the root `Directory.Packages.props` only; `.csproj` files never specify versions. Every package supports Umbraco 17 and 18 from one build: Umbraco and Automate packages are listed there twice, as ranges for each major (`-p:UmbracoMajor=18` switches), so a new one goes in both groups.
-9. **Wire it in**: add both projects to `Umbraco.Community.Automate.Demo.slnx` (in a `/Packages/<Area>/` solution folder) and a `ProjectReference` from `Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj`. Add the package to the list in `.github/ISSUE_TEMPLATE/bug-report.yml`, and a line for it with its maintainers in `.github/CODEOWNERS`.
-10. **Demo setup**: follow [Demo setup](#demo-setup) below. Add the configuration placeholders as soon as the package reads configuration, since the Demo needs them to resolve the connection's references. The test page can wait until the package works, often in a later prompt, but it must be done before the pull request.
-11. **Tests** for every action, outcome and trigger and the connection validation (see Testing). Full with a `Client/`: front-end tests too, and build it (`npm ci && npm run build`) before running the Demo site or packing.
-12. **README.md** in the package (see README), and a row in the root `README.md` connections table.
-13. **Verify**: `dotnet build`, `dotnet test`, `dotnet pack Packages/<Area>/Umbraco.Community.Automate.<Area> -c Release -o ./pack-check`, `tools/test-umbraco-compat.sh Packages/<Area>/Umbraco.Community.Automate.<Area>` (bash; checks Umbraco 17 and 18), then run the Demo site: check the connection type appears under **Automation → Settings → Connections → Create** with its icon and pre-filled references, and that **Test connection** resolves them (put placeholder values in `Umbraco.Community.Automate.Demo/appsettings.Development.json` or user secrets).
+6. **Notification channel** in `Notifications/`, only if the guided process settled on one (see [Notification channels](#notification-channels)) — most packages don't need this.
+7. **Composer** in `Composers/`: register the package's **services** only (HTTP clients, an API client). Don't register the connection type, actions, triggers or notification channel: Automate discovers them from their `[ConnectionType]`, `[Action]`, `[Trigger]` and `[NotificationChannel]` attributes. Icons and configuration references need no registration either.
+8. **Icons**: the vendor's logo for a commercial service, found on the web, and a built-in Umbraco icon (e.g. `icon-link`, no files needed) for everything else; see [Icons](#icons). A logo is registered with `wwwroot/umbraco-package.json`, which lists `icons/icons.js`, which lists `icons/<area>.icon.js` (in `Client/public/` instead if the package has a `Client/`). No C# is involved; add the icon test from [full.md](references/full.md#tests).
+9. **Package versions** go in the root `Directory.Packages.props` only; `.csproj` files never specify versions. Every package supports Umbraco 17 and 18 from one build: Umbraco and Automate packages are listed there twice, as ranges for each major (`-p:UmbracoMajor=18` switches), so a new one goes in both groups.
+10. **Wire it in**: add both projects to `Umbraco.Community.Automate.Demo.slnx` (in a `/Packages/<Area>/` solution folder) and a `ProjectReference` from `Umbraco.Community.Automate.Demo/Umbraco.Community.Automate.Demo.csproj`. Add the package to the list in `.github/ISSUE_TEMPLATE/bug-report.yml`, and a line for it with its maintainers in `.github/CODEOWNERS`.
+11. **Demo setup**: follow [Demo setup](#demo-setup) below. Add the configuration placeholders as soon as the package reads configuration, since the Demo needs them to resolve the connection's references. The test page can wait until the package works, often in a later prompt, but it must be done before the pull request.
+12. **Tests** for every action, outcome, trigger and notification channel, and the connection validation (see Testing). Full with a `Client/`: front-end tests too, and build it (`npm ci && npm run build`) before running the Demo site or packing.
+13. **README.md** in the package (see README), and a row in the root `README.md` connections table.
+14. **Verify**: `dotnet build`, `dotnet test`, `dotnet pack Packages/<Area>/Umbraco.Community.Automate.<Area> -c Release -o ./pack-check`, `tools/test-umbraco-compat.sh Packages/<Area>/Umbraco.Community.Automate.<Area>` (bash; checks Umbraco 17 and 18), then run the Demo site: check the connection type appears under **Automation → Settings → Connections → Create** with its icon and pre-filled references, and that **Test connection** resolves them (put placeholder values in `Umbraco.Community.Automate.Demo/appsettings.Development.json` or user secrets). If the package added a notification channel, also check it appears when adding one on an automation's Notifications tab.
 
 You don't need to edit any CI workflow: `ci.yml` discovers packages from the layout, and `release.yml` finds a package from its tag prefix.
 
@@ -212,6 +216,19 @@ Pick the right editor for every setting rather than leaving everything a text bo
 - Automate discovers the trigger from its attribute and subscribes to the notification for you; there's nothing to register. Output properties reach steps in camelCase as `${ trigger.<property> }`.
 - Other kinds exist (`ScheduledTriggerBase` for CRON, `WebhookTriggerBase`, or raising events yourself with `ITriggerDispatcher`), but Automate supplies their output itself; reach for them only when a notification trigger can't do the job.
 
+### Notification channels
+
+A **notification channel** is a different package artifact from a connection type, action or trigger: a site admin picks it per automation, on that automation's **Notifications** tab, to be alerted on run events — no `If` → `Send Message` step wired in by hand. Consider one, instead of or alongside a plain action, when the package is fundamentally a way to send a message or alert (a chat app, a push-notification service); the guided process in [new-package.md](references/new-package.md) asks about this. Most packages don't need one.
+
+- Derive from `NotificationChannelBase<TSettings>` (`Umbraco.Automate.Core.Notifications.Channels`) in `Notifications/`, overriding only `NotifyAsync(NotificationMessage message, TSettings settings, CancellationToken cancellationToken)`. The constructor takes a `NotificationChannelInfrastructure` (plus any extra DI services, e.g. `IHttpClientFactory`) and passes it to `base(...)`.
+- Put `[NotificationChannel("community.<area>", "Display Name", Description = ..., Icon = ...)]` on the class — same `community.` alias prefix and permanent-once-released rule as every other alias. Automate discovers it from the attribute at startup; nothing to register in the composer.
+- `TSettings` is a POCO with `[Field(...)]`, exactly like action and connection settings (see [Settings fields](#settings-fields)); use `object` if the channel needs none.
+- It's **standalone**: no `ConnectionType` is required. A package can be nothing but a notification channel.
+- `NotificationMessage.Data` carries a `RunNotification` (`AutomationId`, `AutomationName`, `RunId`, `Status`, `Error`, `WorkspaceId`, `CompletedUtc`) for run events, and may set `Subject`/`HtmlBody`/`TextBody`. Each configured instance picks its own "Notify on" events (Failed, Completed, Suspended, Resumed, Rejected, Recovered, Warning, Disabled, Re-enabled) in the backoffice — the channel itself doesn't filter by event.
+- Channels run sequentially and are awaited in-process when an event fires, with no queue and no retry; an exception or invalid settings is logged and skipped, and run status is unaffected. Keep `NotifyAsync` short, with its own timeout on any outbound call.
+- Use the named `Umbraco.Automate.Core.Constants.HttpClients.Default` HTTP client so the framework's outbound-request rules (no private/internal addresses) apply.
+- Not yet settled in this repo — check a framework clone (see [Checking the framework's current API](#checking-the-frameworks-current-api)) before relying on either: whether a channel can reference a saved `Connection`, and how to test one (no example exists yet in the Kitchen Sink fixture, `full.md` or `simple.md`).
+
 ### Connection validation
 - `ValidateAsync` should check required fields, then make one cheap authenticated call and return `Success("Connected as @name")`-style feedback.
 - If each check costs the user API quota, make the live check opt-in (see Skoda's `ValidateConnection`).
@@ -224,7 +241,8 @@ Pick the right editor for every setting rather than leaving everything a text bo
 - To unit test a connection type's `ValidateAsync`, construct it with `new ConnectionTypeInfrastructure(fakeResolver)`, where the fake implements `IEditableModelResolver` with explicit interface members that throw (validation never uses it). Explicit implementation avoids having to repeat the interface's generic constraint.
 - Test each action's success path, each outcome, missing or invalid settings (including an unresolved `$` reference), and how API errors map to categories. Never call the real service.
 - Every package has an `<Area>FieldTests` test checking that each setting has a `Label` and `Description` (see the templates), and a package with custom icons has an icon test. Both catch mistakes the backoffice shows silently.
-- Group tests in the same folders as the package (`Actions/`, `Connections/`, `Api/`).
+- Group tests in the same folders as the package (`Actions/`, `Connections/`, `Api/`, `Notifications/`).
+- **Notification channels have no test harness or fixture example yet** in this repo — before writing one, check whether `Umbraco.Automate.Testing` has something parallel to `ActionTestHarness`, per [Checking the framework's current API](#checking-the-frameworks-current-api); don't assume it does or doesn't.
 - If the connection has a `Client/` front end, add web-test-runner unit tests, and Playwright specs if it needs end-to-end coverage (see Google Sheets).
 
 ## README
