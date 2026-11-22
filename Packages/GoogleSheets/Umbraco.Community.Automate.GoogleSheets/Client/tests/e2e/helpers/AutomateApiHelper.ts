@@ -5,6 +5,12 @@ const AUTOMATE_API = '/umbraco/automate/management/api/v1';
 const SEED_GOOGLE_SHEETS_ENDPOINT = '/umbraco-automate-e2e/seed-google-sheets';
 const GOOGLE_SHEETS_REQUESTS_ENDPOINT = '/umbraco-automate-e2e/google-sheets-requests';
 
+// A workspace's service account must be an existing API user (Umbraco.Automate 17.6.0+ /
+// 18.6.0+ reject anything else, including a regular backoffice user). This is the Demo's
+// own seeded API user -- the same fixed GUID as `DemoSetupHandler.ApiUserKey`, predictable
+// across resets rather than a fresh one every time.
+export const DEMO_API_USER_KEY = '4fc20353-4d4f-4798-b936-bcb18008e152';
+
 // The engine's `TopologicalSort` (WorkflowCompiler.cs) treats a step-to-step `connections` array as
 // authoritative the moment it's non-empty: it BFS's reachability starting from this sentinel ID, and
 // any step with no path from it is silently dropped from compilation. Only when `connections` is
