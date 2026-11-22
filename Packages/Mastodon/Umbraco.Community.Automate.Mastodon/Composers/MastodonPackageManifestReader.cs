@@ -34,7 +34,7 @@ public class MastodonPackageManifestReader : IPackageManifestReader
                         type = "icons",
                         alias = "UmbracoCommunityAutomateMastodon.Icons",
                         name = "Mastodon Icons",
-                        js = $"{AppPluginPath}/icons.js",
+                        js = $"{AppPluginPath}/icons/icons.js",
                     },
                 ]
             }

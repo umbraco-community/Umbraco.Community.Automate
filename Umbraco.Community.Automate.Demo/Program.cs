@@ -2,6 +2,12 @@ using Umbraco.Community.Automate.Demo.E2E;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+// Your own real credentials for trying the packages against live services. The file is
+// git-ignored, so nothing in it can be committed; copy appsettings.Local.example.json to start.
+// Loaded last, so it overrides appsettings.Development.json's placeholders and user secrets, and
+// before Umbraco's builder runs, because some packages (Google Sheets) read their settings then.
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+
 builder.CreateUmbracoBuilder()
     .AddBackOffice()
     .AddWebsite()
