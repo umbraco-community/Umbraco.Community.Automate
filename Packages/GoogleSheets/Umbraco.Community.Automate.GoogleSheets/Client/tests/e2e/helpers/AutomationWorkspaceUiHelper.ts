@@ -20,11 +20,11 @@ export class AutomationWorkspaceUiHelper extends BasePage {
     }
 
     async gotoEditor(automationId: string): Promise<void> {
-        await this.page.goto(`/umbraco/section/automate/workspace/ua:automation/edit/${automationId}`);
+        await this.page.goto(`/umbraco/section/automation/workspace/ua:automation/edit/${automationId}`);
     }
 
     async gotoRunsTab(automationId: string): Promise<void> {
-        await this.page.goto(`/umbraco/section/automate/workspace/ua:automation/edit/${automationId}/view/runs`);
+        await this.page.goto(`/umbraco/section/automation/workspace/ua:automation/edit/${automationId}/view/runs`);
     }
 
     async waitForLoaded(automationName: string): Promise<void> {
