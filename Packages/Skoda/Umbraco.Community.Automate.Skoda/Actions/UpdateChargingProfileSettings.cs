@@ -21,6 +21,7 @@ public sealed class UpdateChargingProfileSettings
     [Field(
         Label = "Max charging current (AC)",
         Description = "The highest current to charge with on AC. Keep current setting leaves the profile's value unchanged.",
+        SupportsBindings = true,
         EditorUiAlias = "Umb.PropertyEditorUi.Dropdown",
         EditorConfig = """[{ "alias": "items", "value": [{ "name": "Keep current setting", "value": "" }, { "name": "Reduced", "value": "REDUCED" }, { "name": "Maximum", "value": "MAXIMUM" }] }]""")]
     public string? MaxChargingCurrent { get; set; }
@@ -28,6 +29,7 @@ public sealed class UpdateChargingProfileSettings
     [Field(
         Label = "Auto unlock plug when charged",
         Description = "Whether the charging plug unlocks once charging finishes. Keep current setting leaves the profile's value unchanged.",
+        SupportsBindings = true,
         EditorUiAlias = "Umb.PropertyEditorUi.Dropdown",
         EditorConfig = """[{ "alias": "items", "value": [{ "name": "Keep current setting", "value": "" }, { "name": "Permanently", "value": "PERMANENT" }, { "name": "Off", "value": "OFF" }] }]""")]
     public string? AutoUnlockPlugWhenCharged { get; set; }

@@ -1,7 +1,7 @@
 import { expect } from '@playwright/test';
 import { test } from '@umbraco-cms/acceptance-test-helpers';
 import { randomUUID } from 'node:crypto';
-import { AutomateApiHelper } from './helpers/AutomateApiHelper';
+import { AutomateApiHelper, DEMO_API_USER_KEY } from './helpers/AutomateApiHelper';
 import { AutomationWorkspaceUiHelper } from './helpers/AutomationWorkspaceUiHelper';
 
 const spreadsheetId = 'e2e-fake-spreadsheet-id';
@@ -24,13 +24,12 @@ test.describe('Google Sheets column-list editor', () => {
         const automationWorkspace = new AutomationWorkspaceUiHelper(umbracoUi.page);
 
         const { connectionId } = await automateApi.seedGoogleSheetsConnection();
-        const currentUser = await umbracoApi.user.getCurrentUser();
 
         const suffix = randomUUID().slice(0, 8);
         workspaceId = await automateApi.createWorkspace({
             alias: `e2e-google-sheets-ws-${suffix}`,
             name: `E2E Google Sheets Workspace ${suffix}`,
-            serviceAccountKey: currentUser.id,
+            serviceAccountKey: DEMO_API_USER_KEY,
             allowedConnections: [connectionId],
         });
 
